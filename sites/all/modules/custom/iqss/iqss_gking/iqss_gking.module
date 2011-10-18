@@ -235,7 +235,7 @@ function _iqss_gking_areas_of_research_wgt(){
 function iqss_gking_context_load_alter(&$context) {
   if (! iqss_gking_on_gking_site()) return;
   
-  if($context->name == 'openscholar-feature-taxonomy'){
+  if($context->name == 'openscholar-feature-taxonomy' || $context->name == 'openscholar-feature-publications'){
      
   	$context->reactions['block']['blocks']['iqss_gking_areas_of_research'] = array(
       'module' => 'iqss_gking',
@@ -246,7 +246,10 @@ function iqss_gking_context_load_alter(&$context) {
       'label' => 'Areas of Research',
     );
 		
-		
+  }
+  
+  if($context->name == 'openscholar-feature-taxonomy'){
+  		
     //Add this block category pages on (Lets you filter the category by publictaion type)
 	 $context->reactions['block']['blocks']['iqss_gking-filter_by_type'] = array(
       'module' => 'iqss_gking',
