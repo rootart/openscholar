@@ -240,7 +240,7 @@ function iqss_gking_context_load_alter(&$context) {
   	$context->reactions['block']['blocks']['iqss_gking_areas_of_research'] = array(
       'module' => 'iqss_gking',
       'delta' => 'areas_of_research',
-      'weight' => 5,
+      'weight' => -5,
       'region' => 'right',
       'status' => '0',
       'label' => 'Areas of Research',
