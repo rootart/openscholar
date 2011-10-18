@@ -221,4 +221,18 @@ function vsite_layout_setWidgetAutoWidth() {
 
   $('dl#scholarlayout-top-widgets').width(new_width);
   $('#widget-wrapper').scrollLeft(_scrolled); //otherwise scroller goes back to 0.
+  
+  //Set the width of the navbar and footer widgets
+  var nHeight = 36; //Height of one widget
+  var regions = $("#scholarlayout-container > .scholarlayout-widgets-list");
+
+  $.each(regions, function(i, region){
+    var rgn = $("#"+region.id);
+    if(rgn.height() < nHeight *2){
+      var items = $("#"+region.id+" > .scholarlayout-item");
+      var nWidth = (rgn.width()) / items.length;
+      items.width(nWidth - 51);
+    }//If this is a skinny container
+  });
 }
+
