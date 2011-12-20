@@ -19,7 +19,7 @@ class citation_distribute_service_googlescholar extends citation_distribute_serv
   	$node = node_load($nid);
   	
    /* returns array of author names formatted for google scholar */
-  	function _googlescholar_list_authors($contributors) {
+  	function _googlescholar_list_authors($contributors = array()) {
   		$authors = array();
   		foreach($contributors as $cont) {
   			$authors[] = $cont['name'];
@@ -55,9 +55,11 @@ class citation_distribute_service_googlescholar extends citation_distribute_serv
       'citation_abstract_html_url'    => $node->biblio_url,
     
     	'citation_keywords'							=> implode(';', $node->biblio_keywords),
-    	'citation_author'								=> _googlescholar_list_authors($node->biblio_contributors[1]),
     	'citation_publication_date'			=> _googlescholar_date((int)$node->biblio_year, $node->biblio_date),
     );
+    if (count($node->biblio_contributors[1])) {
+     $metadata['citation_author'] = _googlescholar_list_authors($node->biblio_contributors[1]);
+    }
     
 
     

@@ -11,13 +11,14 @@ class spaces_controller_variable extends spaces_controller {
     // Load original variables. Only do this once, and it may not be reset.
     $this->load_original_values();
 
+    // Load space variables.
+    // Loaded before preset intentionally since "load_preset_values" checks for spaces overrides
+    $this->reset_values('space');
+    $this->load_space_values();
+    
     // Load the preset values.
     $this->reset_values('preset');
     $this->load_preset_values();
-
-    // Load space variables.
-    $this->reset_values('space');
-    $this->load_space_values();
 
     // Alter global variable conf as we don't have any other way of
     // influencing the result of variable_get().
