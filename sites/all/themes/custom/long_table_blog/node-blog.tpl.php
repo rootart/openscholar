@@ -25,10 +25,12 @@
 	  </div>
     <?php if (!$page): ?>
     <?php
-      $teaser_more = node_teaser($node->body,NULL,1600);
-      if(strlen($teaser_more) > strlen($content)){
-      	$class_extra = (strlen($teaser_more) == strlen($node->body))?" complete":"";
-      	print '<div class="content-more'.$class_extra.'" style="display:none;">'.$teaser_more.'</div>';
+      if(isset($node->content['body']['#value'])){
+	      $teaser_more = node_teaser($node->content['body']['#value'],NULL,1600);
+	      if(strlen($teaser_more) > strlen($content)){
+	      	$class_extra = (strlen($teaser_more) == strlen($node->body))?" complete":"";
+	      	print '<div class="content-more'.$class_extra.'" style="display:none;">'.$teaser_more.'</div>';
+	      }
       }
     ?>
     <div class="submitted-by">submitted by <strong><?php print $name ?></strong>  <?php if ($submitted): ?>on <strong><?php print $submitted; ?></strong><?php endif; ?> <?php if ($terms): ?> <?php print t(' in ') . $terms; ?>  <?php endif; ?></div>
