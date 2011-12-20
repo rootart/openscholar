@@ -609,11 +609,11 @@ function vsite_users_preprocess_node(&$variables) {
   //Make use if the first and last name if avalible
   if(($user_profile = content_profile_load('vsite_users_profile',$node->uid)) && is_array($user_profile->vsite_users_first_name[0]) && is_array($user_profile->vsite_users_last_name[0])){
     //Does this user have a user profile? with their name?
-    $user = array('uid' => $node->uid);
+    $user = (object) array('uid' => $node->uid);
     $user->name = $user_profile->vsite_users_first_name[0]['value']." ".$user_profile->vsite_users_last_name[0]['value'];
     
-    if(strlen($user['name']) > 1){
-      $variables['name'] = theme('username', (object)$user);
+    if(strlen($user->name) > 1){
+      $variables['name'] = theme('username', $user);
     }//Recreate name with saved user profile data
   }
   
