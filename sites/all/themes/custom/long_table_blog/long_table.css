@@ -52,8 +52,8 @@ margin-left:0;
 text-transform:none;}
 
 body.node-type-blog h2.title {color: #760012; text-transform: none;}
-.node-type-blog h3.title {margin-bottom:0;}
-.node-type-blog h3.title a {color: #760012;font-size:1.1em;}
+.node-type-blog #content-main h3.title {margin-bottom:0;}
+.node-type-blog #content-main h3.title a {color: #760012;font-size:1.1em;}
 
 #boxes-box-vsite_taxonomy_fltr_cat h3.title {display:none;}
 
