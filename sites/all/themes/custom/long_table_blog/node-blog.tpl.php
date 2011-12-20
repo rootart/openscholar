@@ -1,4 +1,4 @@
-<?php /* dpm(get_defined_vars());*/  ?>
+<?php /* dpm(get_defined_vars()); */?>
 <div id="node-<?php print $node->nid; ?>" class="<?php print $node_classes; ?>">
   <div class="node-inner">
     <div class="os-links">
@@ -14,7 +14,7 @@
     <?php endif; ?>
      <?php if ($page): ?>
      	 
-     	<div class="submitted-by">submitted by <span class="blue"><?php print $node->name ?></span> <?php if ($submitted): ?>on <span class="blue"><?php print $submitted; ?></span><?php endif; ?>
+     	<div class="submitted-by">submitted by <strong><?php print $node->name ?></strong> <?php if ($submitted): ?>on <strong><?php print $submitted; ?></strong><?php endif; ?>
      <?php if ($terms): ?>
         <?php print t(' in ') . $terms; ?>
      <?php endif; ?>
@@ -24,7 +24,7 @@
       <?php print $content; ?> 
 	     </div>
     <?php if (!$page): ?>
-    <div class="submitted-by">submitted by <span class="blue"><?php print $node->name ?></span>  <?php if ($submitted): ?>on <span class="blue"><?php print $submitted; ?></span><?php endif; ?> <?php if ($terms): ?> <?php print t(' in ') . $terms; ?><?php endif; ?></div>
+    <div class="submitted-by">submitted by <strong><?php print $name ?></strong>  <?php if ($submitted): ?>on <strong><?php print $submitted; ?></strong><?php endif; ?> <?php if ($terms): ?> <?php print t(' in ') . $terms; ?>  <?php endif; ?></div>
     <?php endif; ?>	
     <?php if ($links): ?>
       <div class="links links-inline">
