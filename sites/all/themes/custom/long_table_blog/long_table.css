@@ -59,13 +59,17 @@ body.node-type-blog h2.title {color: #760012; text-transform: none;}
 
 ul.inline {display:inline;}
 
-.node .node-inner ul.links li {
-margin-right:10px;
-}
 
 .node .node-inner .links li.node_read_more a {
+	margin-left:5px;
 padding: 0 0 0 14px;
 background: url('images/readMore.png') left center no-repeat;
+}
+
+ul.inline li.disqus_comments span {
+	margin-left:5px;
+padding: 0 0 0 12px;
+background: url('images/commentBubble.png') left center no-repeat;
 }
 
 .submitted {
