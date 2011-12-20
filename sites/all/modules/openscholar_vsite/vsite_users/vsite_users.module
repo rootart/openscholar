@@ -612,8 +612,8 @@ function vsite_users_preprocess_node(&$variables) {
     $user = array('uid' => $node->uid);
     $user->name = $user_profile->vsite_users_first_name[0]['value']." ".$user_profile->vsite_users_last_name[0]['value'];
     
-    if(strlen($user->name) > 1){
-      $variables['name'] = theme('username', $user);
+    if(strlen($user['name']) > 1){
+      $variables['name'] = theme('username', (object)$user);
     }//Recreate name with saved user profile data
   }
   
