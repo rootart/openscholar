@@ -9,5 +9,7 @@ stylesheets[all][]   = long_table.css
 conditional-stylesheets[if lte IE 7][all][]   = long_table--ie7.css
 conditional-stylesheets[if IE][all][]         = long_table--ie.css
 
+scripts[] = longtable.js
+
 os[theme_type]   = "vsite"
 os[theme_access] = "private"
