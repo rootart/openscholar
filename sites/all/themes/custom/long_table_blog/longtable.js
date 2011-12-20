@@ -1,9 +1,9 @@
-Drupal.behaviors.harvard_longtable = function (context){
-  
+
+$(document).ready(function() {
   $('#content-main div.node div.content-more').each(function(){
-    $(this).hasClass("complete");
+
     var more_region = $(this);
-    $(this).siblings('div.links').children('li.node_read_more').childeren('a').click(function(){
+    $(this).siblings('div.links').find('li.node_read_more').children('a').click(function(){
     
       //replace the html
       more_region.siblings('div.content').html( more_region.html() );
@@ -21,4 +21,4 @@ Drupal.behaviors.harvard_longtable = function (context){
 	   
   });
   
-}
+});

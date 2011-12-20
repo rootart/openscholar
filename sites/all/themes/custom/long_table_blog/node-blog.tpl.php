@@ -25,10 +25,11 @@
 	  </div>
     <?php if (!$page): ?>
     <?php
-      if(isset($node->content['body']['#value'])){
-	      $teaser_more = node_teaser($node->content['body']['#value'],NULL,1600);
+      $full_node = node_load($node->nid);
+      if($full_node){
+	      $teaser_more = node_teaser($full_node->body,NULL,1600);
 	      if(strlen($teaser_more) > strlen($content)){
-	      	$class_extra = (strlen($teaser_more) == strlen($node->body))?" complete":"";
+	      	$class_extra = (strlen($teaser_more) == strlen($full_node->body))?" complete":"";
 	      	print '<div class="content-more'.$class_extra.'" style="display:none;">'.$teaser_more.'</div>';
 	      }
       }
