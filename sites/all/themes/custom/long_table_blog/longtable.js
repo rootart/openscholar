@@ -5,12 +5,22 @@ $(document).ready(function() {
     var more_region = $(this);
     $(this).siblings('div.links').find('li.node_read_more').children('a').click(function(){
     
-      //replace the html
-      more_region.siblings('div.content').html( more_region.html() );
+      //swap the html
+      var more_html = more_region.html();      
+      more_region.html( more_region.siblings('div.content').html() );
+      more_region.siblings('div.content').fadeTo('fast','.33',function () {
+        more_region.siblings('div.content').html( more_html );
+        more_region.siblings('div.content').fadeTo('slow','1');
+      });
+      
     	
       if(more_region.hasClass("complete")){
     	//We are showing the whole body remove the link
-    	$(this).remove();
+    	if($(this).hasClass('less')){
+    	  $(this).removeClass('less').html("Read more");
+    	}else{
+    	  $(this).addClass('less').html("Read less");
+    	}
       }else{
     	//Remove the click handler
         $(this).unbind("click");
