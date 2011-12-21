@@ -1,0 +1,7 @@
+/* THIS IS THE ONLY DIFFERENCE IN STYLE. MORE IS EXPECTED TO COME */
+
+#navbar li a
+ {
+border-bottom:none;
+ }
+ 

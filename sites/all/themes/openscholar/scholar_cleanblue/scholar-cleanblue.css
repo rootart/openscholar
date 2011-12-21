@@ -45,7 +45,7 @@ a:hover {
 .sidebar .content h1 a {color:#991122;}
 .sidebar .content h1 a:hover {color:#106599;text-decoration:none;}
 
-.sidebar .content h2 {margin-top: 0.2em;}
+.sidebar .content h2 {margin-top: 0.2em;font-size:1.14em;color:#555;}
 
 h2, h3, h4 {
   margin-bottom: 0;
@@ -183,6 +183,11 @@ body.no-sidebars #footer {
 body.sidebar-first #content-area .hg-container {
   padding-left: 210px;
   }
+  
+ #content-main, #sidebar-first, #sidebar-second  {
+  padding-top: 25px;
+  }
+
 
 .sidebar-first #content-main { border-left:1px dotted #666; }
 
