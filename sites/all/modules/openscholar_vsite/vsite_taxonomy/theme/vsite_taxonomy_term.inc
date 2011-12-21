@@ -18,7 +18,7 @@ function theme_vsite_taxonomy_term($term, $b_description = true, $b_admin_links 
   $count = vsite_taxonomy_term_count_nodes($term->tid, $b_count_childeren, $a_filter_nodes);
   $active_term = vsite_taxonomy_active_term();
 
-  if($count <= 0 || $active_term->tid == $term->tid){
+  if($count <= 0){
     $term_link = $term->name;
 
   }else{
