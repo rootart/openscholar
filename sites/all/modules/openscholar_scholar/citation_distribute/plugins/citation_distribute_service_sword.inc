@@ -128,9 +128,10 @@ abstract class citation_distribute_service_sword extends citation_distribute_ser
 		
 		/* Add each file as well */
 		foreach($node->files as $file) {
+		  $file = field_file_load($file->fid);
 	    $metadata['File'][] = array( 
-			 'filepath'=>$file->filepath,  //TODO does mets want location or should file be included in teh zip?
-			 'filemime'=>$file->filemime, 
+			 'filepath'=>$file['filepath'],
+			 'filemime'=>$file['filemime'], 
 			);
 		}
 		
@@ -162,7 +163,7 @@ abstract class citation_distribute_service_sword extends citation_distribute_ser
 			try {
 				$deposit = $sac->deposit($deposit_url, $this->username, $this->password, $this->obo, $file, $this->packaging, 'application/zip');
 			} catch(Exception $e) {
-				drupal_set_message('Deposit error: ' . $deposit . $e, 'error');
+				drupal_set_message('Deposit error: ' . $deposit, 'error');
 				return false;
 			}
 		} else {

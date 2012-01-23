@@ -210,7 +210,7 @@ function citation_distribute_nodeapi(&$node, $op, $a3) {
 		switch ($op) {
 			
 			case 'insert':
-			case 'update':					
+			case 'update':
 				$distributed = array();
 				
 				foreach( _plugins() as $plugin ) {
