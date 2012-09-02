@@ -7,13 +7,14 @@ projects[addressfield][subdir] = "contrib"
 
 projects[ctools][version] = 1.2
 projects[ctools][subdir] = "contrib"
+projects[entity][patch][] = "http://drupal.org/files/1707810-ctools-fields-mock-field-5.patch"
+
 
 projects[date][version] = 2.6
 projects[date][subdir] = "contrib"
 
 projects[entity][version] = 1.0-rc3
 projects[entity][subdir] = "contrib"
-projects[entity][patch][] = "http://drupal.org/files/entity-array_diff_assoc-1514764-15.patch"
 
 projects[entityreference][version] = 1.0-rc3
 projects[entityreference][subdir] = "contrib"
@@ -65,6 +66,13 @@ projects[mimemail][patch][] = "http://drupal.org/files/compress_install_missing_
 
 projects[module_filter][version] = 1.7
 projects[module_filter][subdir] = "contrib"
+
+projects[og][version] = 2.x-dev
+projects[og][subdir] = "contrib"
+projects[og][patch][] = "http://drupal.org/files/1730678-complex-widget-6.patch"
+
+projects[og_vocab][version] = 1.x-dev
+projects[og_vocab][subdir] = "contrib"
 
 projects[pathauto][version] = 1.2
 projects[pathauto][subdir] = "contrib"
