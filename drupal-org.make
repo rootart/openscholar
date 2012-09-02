@@ -2,9 +2,14 @@
 core = 7.x
 api = 2
 
-; Basic contributed modules.
+projects[addressfield][version] = 1.0-beta3
+projects[addressfield][subdir] = "contrib"
+
 projects[ctools][version] = 1.2
 projects[ctools][subdir] = "contrib"
+
+projects[date][version] = 2.6
+projects[date][subdir] = "contrib"
 
 projects[entity][version] = 1.0-rc3
 projects[entity][subdir] = "contrib"
@@ -15,18 +20,6 @@ projects[entityreference][subdir] = "contrib"
 projects[entityreference][patch][] = "http://drupal.org/files/1580348-universal-formatters.patch"
 projects[entityreference][patch][] = "http://drupal.org/files/1608358-selectionhandler-views-broken.patch"
 
-projects[rules][version] = 2.2
-projects[rules][subdir] = "contrib"
-
-projects[views][version] = 3.x-dev
-projects[views][subdir] = "contrib"
-
-projects[views_bulk_operations][version] = 3.x-dev
-projects[views_bulk_operations][subdir] = "contrib"
-
-projects[addressfield][version] = 1.0-beta3
-projects[addressfield][subdir] = "contrib"
-
 projects[features][version] = 1.0
 projects[features][patch][] = "http://drupal.org/files/1572578-part-one.patch"
 projects[features][patch][] = "http://drupal.org/files/1597186-1-features-do-not-cache-includes.patch"
@@ -34,38 +27,24 @@ projects[features][patch][] = "http://drupal.org/files/927566-multiple-link_path
 projects[features][patch][] = "http://drupal.org/files/1669720-fix-features-flush-cache.patch"
 projects[features][subdir] = "contrib"
 
-projects[strongarm][version] = 2.0
-projects[strongarm][subdir] = "contrib"
+projects[fences][version] = "1.0"
+projects[fences][subdir] = "contrib"
+projects[fences][patch][] = "http://drupal.org/files/undefined-index-1561244-7.patch"
 
-projects[libraries][version] = 1.0
-projects[libraries][subdir] = "contrib"
-
-
-; Other contribs.
-projects[http_client][version] = 2.3
-projects[http_client][subdir] = "contrib"
+projects[i18n][version] = "1.x-dev"
+projects[i18n][subdir] = "contrib"
 
 projects[inline_entity_form][version] = 1.0-beta4
 projects[inline_entity_form][subdir] = "contrib"
 
-projects[advanced_help][version] = 1.0
-projects[advanced_help][subdir] = "contrib"
-projects[advanced_help][patch][] = "http://drupal.org/files/advanced_help-invalid_argument_in_modules_alter-1086990-21.patch"
-projects[advanced_help][patch][] = "http://drupal.org/files/advanced-help-cache-3.patch"
+projects[libraries][version] = 1.0
+projects[libraries][subdir] = "contrib"
+
+projects[link][version] = 1.x-dev
+projects[link][subdir] = "contrib"
 
 projects[mailsystem][version] = 2.34
 projects[mailsystem][subdir] = "contrib"
-
-projects[mimemail][version] = 1.0-alpha1
-projects[mimemail][subdir] = "contrib"
-projects[mimemail][patch][] = "http://drupal.org/files/rules-1585546-1-moving_rules_actions.patch"
-projects[mimemail][patch][] = "http://drupal.org/files/compress_install_missing_value.patch"
-
-projects[token][version] = 1.2
-projects[token][subdir] = "contrib"
-
-projects[eva][version] = 1.2
-projects[eva][subdir] = "contrib"
 
 projects[message][version] = 1.5
 projects[message][subdir] = "contrib"
@@ -79,15 +58,38 @@ projects[migrate][subdir] = "contrib"
 projects[migrate_extras][version] = 2.4
 projects[migrate_extras][subdir] = "contrib"
 
-projects[date][version] = 2.6
-projects[date][subdir] = "contrib"
+projects[mimemail][version] = 1.0-alpha1
+projects[mimemail][subdir] = "contrib"
+projects[mimemail][patch][] = "http://drupal.org/files/rules-1585546-1-moving_rules_actions.patch"
+projects[mimemail][patch][] = "http://drupal.org/files/compress_install_missing_value.patch"
 
-projects[fences][version] = "1.0"
-projects[fences][subdir] = "contrib"
-projects[fences][patch][] = "http://drupal.org/files/undefined-index-1561244-7.patch"
+projects[module_filter][version] = 1.7
+projects[module_filter][subdir] = "contrib"
+
+projects[pathauto][version] = 1.2
+projects[pathauto][subdir] = "contrib"
+
+projects[strongarm][version] = 2.0
+projects[strongarm][subdir] = "contrib"
 
 projects[title][version] = "1.x-dev"
 projects[title][subdir] = "contrib"
+
+projects[token][version] = 1.2
+projects[token][subdir] = "contrib"
+
+projects[variable][version] = "2.x-dev"
+projects[variable][subdir] = "contrib"
+
+projects[views][version] = 3.x-dev
+projects[views][subdir] = "contrib"
+
+projects[views_bulk_operations][version] = 3.x-dev
+projects[views_bulk_operations][subdir] = "contrib"
+
+projects[views_slideshow][version] = 3.0
+projects[views_slideshow][subdir] = "contrib"
+
 
 ; Search related modules.
 projects[search_api][version] = 1.2
@@ -105,29 +107,6 @@ projects[facetapi][patch][] = "http://drupal.org/files/1616518-7-show-active-ter
 
 projects[search_api_sorts][version] = 1.x-dev
 projects[search_api_sorts][subdir] = "contrib"
-
-; UI improvement modules.
-projects[module_filter][version] = 1.7
-projects[module_filter][subdir] = "contrib"
-
-projects[link][version] = 1.x-dev
-projects[link][subdir] = "contrib"
-
-projects[pathauto][version] = 1.2
-projects[pathauto][subdir] = "contrib"
-
-projects[views_slideshow][version] = 3.0
-projects[views_slideshow][subdir] = "contrib"
-
-projects[chosen][version] = 1.x-dev
-projects[chosen][subdir] = "contrib"
-
-; Internationalization
-projects[variable][version] = "2.x-dev"
-projects[variable][subdir] = "contrib"
-
-projects[i18n][version] = "1.x-dev"
-projects[i18n][subdir] = "contrib"
 
 ; Base theme.
 projects[omega][version] = 3.1
