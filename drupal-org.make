@@ -7,8 +7,7 @@ projects[addressfield][subdir] = "contrib"
 
 projects[ctools][version] = 1.2
 projects[ctools][subdir] = "contrib"
-projects[entity][patch][] = "http://drupal.org/files/1707810-ctools-fields-mock-field-5.patch"
-
+projects[ctools][patch][] = "http://drupal.org/files/1707810-ctools-fields-mock-field-5.patch"
 
 projects[date][version] = 2.6
 projects[date][subdir] = "contrib"
@@ -97,7 +96,6 @@ projects[views_bulk_operations][subdir] = "contrib"
 
 projects[views_slideshow][version] = 3.0
 projects[views_slideshow][subdir] = "contrib"
-
 
 ; Search related modules.
 projects[search_api][version] = 1.2
