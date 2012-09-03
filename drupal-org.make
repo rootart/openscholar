@@ -5,6 +5,15 @@ api = 2
 projects[addressfield][version] = 1.0-beta3
 projects[addressfield][subdir] = "contrib"
 
+projects[admin_menu][version] = 3.0-rc3
+projects[admin_menu][subdir] = "contrib"
+
+projects[biblio][version] = 1.0-rc4
+projects[biblio][subdir] = "contrib"
+
+projects[boxes][version] = 1.0
+projects[boxes][subdir] = "contrib"
+
 projects[ctools][version] = 1.2
 projects[ctools][subdir] = "contrib"
 projects[ctools][patch][] = "http://drupal.org/files/1707810-ctools-fields-mock-field-5.patch"
@@ -20,6 +29,9 @@ projects[entityreference][subdir] = "contrib"
 projects[entityreference][patch][] = "http://drupal.org/files/1580348-universal-formatters.patch"
 projects[entityreference][patch][] = "http://drupal.org/files/1608358-selectionhandler-views-broken.patch"
 
+projects[entityreference_prepopulate][version] = 1.0
+projects[entityreference_prepopulate][subdir] = "contrib"
+
 projects[features][version] = 1.0
 projects[features][patch][] = "http://drupal.org/files/1572578-part-one.patch"
 projects[features][patch][] = "http://drupal.org/files/1597186-1-features-do-not-cache-includes.patch"
@@ -30,6 +42,9 @@ projects[features][subdir] = "contrib"
 projects[fences][version] = "1.0"
 projects[fences][subdir] = "contrib"
 projects[fences][patch][] = "http://drupal.org/files/undefined-index-1561244-7.patch"
+
+projects[file_entity][version] = 2.0-unstable6
+projects[file_entity][subdir] = "contrib"
 
 projects[i18n][version] = "1.x-dev"
 projects[i18n][subdir] = "contrib"
@@ -72,6 +87,12 @@ projects[og][patch][] = "http://drupal.org/files/1730678-complex-widget-6.patch"
 
 projects[og_vocab][version] = 1.x-dev
 projects[og_vocab][subdir] = "contrib"
+
+projects[panels][version] = 3.3
+projects[panels][subdir] = "contrib"
+
+projects[panelizer][version] = 3.0-rc1
+projects[panelizer][subdir] = "contrib"
 
 projects[pathauto][version] = 1.2
 projects[pathauto][subdir] = "contrib"

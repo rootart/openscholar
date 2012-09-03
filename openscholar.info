@@ -26,6 +26,7 @@ dependencies[] = file
 dependencies[] = rdf
 
 ; Contrib - core
+dependencies[] = admin_menu_toolbar
 dependencies[] = ctools
 dependencies[] = context
 dependencies[] = features
@@ -53,7 +54,7 @@ dependencies[] = media_embed
 ; boxes
 dependencies[] = views_slideshow_cycle
 
-; OS 
+; OS
 dependencies[] = os
 dependencies[] = os_files
 dependencies[] = os_boxes
