@@ -175,12 +175,6 @@ projects[views_slideshow][subdir] = "contrib"
 projects[wysiwyg][version] = 2.1
 projects[wysiwyg][subdir] = "contrib"
 
-wysiwyg
-
-; Base theme.
-projects[omega][version] = 3.1
-projects[omega_kickstart][version] = 3.0-beta1
-
 ; Libraries.
 
 ; TODO: Add Colorbox for media-gallery
