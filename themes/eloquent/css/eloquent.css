@@ -69,7 +69,7 @@ img {
   .region-sidebar-first .content ul.menu li {list-style-image:url('../images/mainNavLftIcon.gif');color:#106599;}
   .region-sidebar-first .content ul.menu li  a {padding-left:0px;}
   
-  .region-sidebar-second .content ul.menu {margin-left:12px;}
+  .region-sidebar-second .content ul.menu {margin-left:18px;}
   .region-sidebar-second .content ul.menu li {list-style-image:url('../images/mainNavLftIcon.gif');color:#106599;padding-bottom:6px;}
   .region-sidebar-second .content ul.menu li  a {padding-left:0px;}
   
@@ -175,6 +175,7 @@ text-align:center;
 #menu-bar ul.nice-menu ul li a {
 	color:#FFF;
 	background:#353535;
+	padding:5px 8px;
 }
 
 

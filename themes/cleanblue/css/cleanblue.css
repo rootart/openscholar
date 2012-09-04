@@ -327,6 +327,11 @@ ul.nice-menu ul {
 
 }
 
+.sidebar ul.nice-menu {
+	width: 130px;
+	}
+
+
 .sidebar ul.nice-menu ul {
 	margin-top:-36px;
 	border:none;

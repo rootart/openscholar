@@ -212,8 +212,8 @@ body.header-main-right .region-header-second {
     background: none;
     }
 
-#menu-bar #block-os-primary-menu li a,
-#menu-bar #block-os-primary-menu li a:visited {
+#menu-bar ul.nice-menu li a,
+#menu-bar ul.nice-menu li a:visited {
   line-height: 25px;
   text-transform:uppercase;
   color: #fff;
@@ -224,14 +224,10 @@ body.header-main-right .region-header-second {
   border-right: 1px solid #3b4611;
   }
 
-#menu-bar #block-os-primary-menu li.first a {
-  padding-left: 22px;
-  }
-
-#menu-bar #block-os-primary-menu li a:active,
-#menu-bar #block-os-primary-menu li a:hover,
-#menu-bar #block-os-primary-menu li a.active,
-#menu-bar #block-os-primary-menu li.active-trail a {
+#menu-bar ul.nice-menu li a:active,
+#menu-bar ul.nice-menu li a:hover,
+#menu-bar ul.nice-menu li a.active,
+#menu-bar ul.nice-menu li.active-trail a {
   background: url(../images/navbar.png) 0 -48px repeat-x transparent;
   text-decoration:none;
   }
@@ -273,6 +269,7 @@ body.header-main-right .region-header-second {
 #menu-bar ul.nice-menu ul li a {
 	color:#FFF;
 	background:#353535;
+	padding:5px 8px;
 }
 
 

@@ -135,7 +135,7 @@ a:hover {
 
   }
 
-#menu-bar ul {
+#menu-bar {
   text-align: right;
   }
 
@@ -162,6 +162,18 @@ a:hover {
 
 .clearfix:after {
 	  display: inline;
+	
+}
+
+#menu-bar ul.nice-menu ul {
+	left: -1.5em;
+    top: 1.3em;
+    border-top:none;
+	
+}
+
+#menu-bar ul.nice-menu ul a {
+	color:#293352;
 	
 }
 

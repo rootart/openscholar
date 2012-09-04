@@ -20,6 +20,7 @@ body {
 
 
 #page /* Page wrapper, includes the .container class which sets the overall page or section width. */ {
+	margin-bottom: 30px;
 }
 
 
@@ -28,7 +29,8 @@ body {
 
 /* bigscreen three_col_grail */
 
-#columns /* Wraps the 3 vertical columns - content, sidebar-first and sidebar-second. */ {
+#columns {
+    
 }
 
 
@@ -38,7 +40,7 @@ body {
 
 
 #main-content /* Wraps the main-content-header, the content region and feed-icons. */ {
-	 padding-top: 10px;
+	 padding-top: 20px;
 	 position: relative;
 }
 
