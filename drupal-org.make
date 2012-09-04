@@ -8,11 +8,11 @@ projects[addressfield][subdir] = "contrib"
 projects[admin_menu][version] = 3.0-rc3
 projects[admin_menu][subdir] = "contrib"
 
-projects[biblio][version] = 1.0-rc4
-projects[biblio][subdir] = "contrib"
-
 projects[boxes][version] = 1.0
 projects[boxes][subdir] = "contrib"
+
+projects[calendar][version] = 3.4
+projects[calendar][subdir] = "contrib"
 
 projects[ctools][version] = 1.2
 projects[ctools][subdir] = "contrib"
@@ -20,6 +20,15 @@ projects[ctools][patch][] = "http://drupal.org/files/1707810-ctools-fields-mock-
 
 projects[date][version] = 2.6
 projects[date][subdir] = "contrib"
+
+projects[devel][version] = 1.3
+projects[devel][subdir] = "contrib"
+
+projects[diff][version] = 3.0-alpha1
+projects[diff][subdir] = "contrib"
+
+projects[disqus][version] = 1.9
+projects[disqus][subdir] = "contrib"
 
 projects[entity][version] = 1.0-rc3
 projects[entity][subdir] = "contrib"
@@ -32,12 +41,21 @@ projects[entityreference][patch][] = "http://drupal.org/files/1608358-selectionh
 projects[entityreference_prepopulate][version] = 1.0
 projects[entityreference_prepopulate][subdir] = "contrib"
 
+projects[facetapi][version] = 1.1
+projects[facetapi][subdir] = "contrib"
+
+projects[fb_social][version] = 2.0-beta4
+projects[fb_social][subdir] = "contrib"
+
 projects[features][version] = 1.0
 projects[features][patch][] = "http://drupal.org/files/1572578-part-one.patch"
 projects[features][patch][] = "http://drupal.org/files/1597186-1-features-do-not-cache-includes.patch"
 projects[features][patch][] = "http://drupal.org/files/927566-multiple-link_path.patch"
 projects[features][patch][] = "http://drupal.org/files/1669720-fix-features-flush-cache.patch"
 projects[features][subdir] = "contrib"
+
+projects[feeds][version] = 2.0-alpha5
+projects[feeds][subdir] = "contrib"
 
 projects[fences][version] = "1.0"
 projects[fences][subdir] = "contrib"
@@ -52,6 +70,9 @@ projects[i18n][subdir] = "contrib"
 projects[inline_entity_form][version] = 1.0-beta4
 projects[inline_entity_form][subdir] = "contrib"
 
+projects[imagefield_crop][version] = 2.0
+projects[imagefield_crop][subdir] = "contrib"
+
 projects[libraries][version] = 1.0
 projects[libraries][subdir] = "contrib"
 
@@ -60,6 +81,12 @@ projects[link][subdir] = "contrib"
 
 projects[mailsystem][version] = 2.34
 projects[mailsystem][subdir] = "contrib"
+
+projects[media][version] = 1.2
+projects[media][subdir] = "contrib"
+
+projects[media_gallery][version] = 1.0-beta8
+projects[media_gallery][subdir] = "contrib"
 
 projects[message][version] = 1.5
 projects[message][subdir] = "contrib"
@@ -81,6 +108,18 @@ projects[mimemail][patch][] = "http://drupal.org/files/compress_install_missing_
 projects[module_filter][version] = 1.7
 projects[module_filter][subdir] = "contrib"
 
+projects[mollom][version] = 2.2
+projects[mollom][subdir] = "contrib"
+
+projects[multiform][version] = 1.0
+projects[multiform][subdir] = "contrib"
+
+projects[nice_menus][version] = 2.1
+projects[nice_menus][subdir] = "contrib"
+
+projects[oembed][version] = 0.1-beta3
+projects[oembed][subdir] = "contrib"
+
 projects[og][version] = 2.x-dev
 projects[og][subdir] = "contrib"
 projects[og][patch][] = "http://drupal.org/files/1730678-complex-widget-6.patch"
@@ -97,6 +136,18 @@ projects[panelizer][subdir] = "contrib"
 projects[pathauto][version] = 1.2
 projects[pathauto][subdir] = "contrib"
 
+projects[purl][version] = 1.x-dev
+projects[purl][subdir] = "contrib"
+
+projects[search_api][version] = 1.2
+projects[search_api][subdir] = "contrib"
+
+projects[search_api_db][version] = 1.x-dev
+projects[search_api_db][subdir] = "contrib"
+
+projects[spaces][version] = 3.0-alpha1
+projects[spaces][subdir] = "contrib"
+
 projects[strongarm][version] = 2.0
 projects[strongarm][subdir] = "contrib"
 
@@ -105,6 +156,9 @@ projects[title][subdir] = "contrib"
 
 projects[token][version] = 1.2
 projects[token][subdir] = "contrib"
+
+projects[twitter_pull][version] = 1.0-rc2
+projects[twitter_pull][subdir] = "contrib"
 
 projects[variable][version] = "2.x-dev"
 projects[variable][subdir] = "contrib"
@@ -118,25 +172,15 @@ projects[views_bulk_operations][subdir] = "contrib"
 projects[views_slideshow][version] = 3.0
 projects[views_slideshow][subdir] = "contrib"
 
-; Search related modules.
-projects[search_api][version] = 1.2
-projects[search_api][subdir] = "contrib"
+projects[wysiwyg][version] = 2.1
+projects[wysiwyg][subdir] = "contrib"
 
-projects[search_api_db][version] = 1.x-dev
-projects[search_api_db][subdir] = "contrib"
-
-projects[search_api_ranges][version] = 1.x-dev
-projects[search_api_ranges][subdir] = "contrib"
-
-projects[facetapi][version] = 1.1
-projects[facetapi][subdir] = "contrib"
-projects[facetapi][patch][] = "http://drupal.org/files/1616518-7-show-active-term.patch"
-
-projects[search_api_sorts][version] = 1.x-dev
-projects[search_api_sorts][subdir] = "contrib"
+wysiwyg
 
 ; Base theme.
 projects[omega][version] = 3.1
 projects[omega_kickstart][version] = 3.0-beta1
 
 ; Libraries.
+
+; TODO: Add Colorbox for media-gallery
