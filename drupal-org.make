@@ -154,6 +154,9 @@ projects[strongarm][subdir] = "contrib"
 projects[title][version] = "1.x-dev"
 projects[title][subdir] = "contrib"
 
+projects[transliteration][version] = 3.1
+projects[transliteration][subdir] = "contrib"
+
 projects[token][version] = 1.2
 projects[token][subdir] = "contrib"
 
