@@ -41,8 +41,8 @@ function os_taxonomy_vocabulary_term_list($vid, $options = array()) {
   foreach ($terms as $tid => $term) {
     $tree = taxonomy_get_tree($vid, $term->tid, $options['depth']);
     $items[$tid] = array(
-      'term_name' => $term->name,
-      'description' => $term->description,
+      'term_name' => check_plain($term->name),
+      'description' => check_plain($term->description),
       'tree' => $tree,
       'tagged_items' => os_taxonomy_count_term_tagged_items($tid, $options['bundles']),
       'child_number' => os_taxonomy_count_term_tagged_items($tree, $options['bundles']),
@@ -107,20 +107,84 @@ function os_taxonomy_count_term_tagged_items($tid, $node_bundles = array()) {
 }
 
 /**
- * Count the number of attached node to the taxonomy.
+ * Return an query object for nodes that attached to term.
  */
-function os_taxonomy_count_attached_nodes($tid, $node_bundles = array()) {
+function os_taxonomy_count_attached_nodes_query_object($tid, $node_bundles = array()) {
   $query = db_select('taxonomy_index', 't');
-  $query->condition('tid', $tid);
-  $query->fields('t');
+  $query->condition('tid', $tid)
+    ->distinct()
+    ->fields('t');
 
   if (!empty($node_bundles)) {
     $query->join('node', 'n', 't.nid = n.nid');
     $query->condition('n.type', $node_bundles, 'IN');
   }
 
+  return $query;
+}
+
+/**
+ * Count the number of attached node to the taxonomy.
+ */
+function os_taxonomy_count_attached_nodes($tid, $node_bundles = array()) {
+  $query = os_taxonomy_count_attached_nodes_query_object($tid, $node_bundles);
+
   return $query
     ->countQuery()
     ->execute()
-    ->fetchField();
+    ->fetchAssoc();
+}
+
+/**
+ * Return the nodes id that tagged to a taxonomy term.
+ */
+function os_taxonomy_list_attached_nodes($tid, $node_bundles = array()) {
+  $query = os_taxonomy_count_attached_nodes_query_object($tid, $node_bundles);
+
+  $result = $query->execute();
+  $nids = array();
+  while($record = $result->fetchAssoc()) {
+    $nids[$record['nid']] = $record['nid'];
+  }
+
+  return array_keys($nids);
+}
+
+/**
+ * Return generated item list of a nodes tagged to the term.
+ */
+function os_taxonomy_show_taxonomy_term_tagged_node($taxonomy_term, $options = array()) {
+  $options += array(
+    'show_term_description' => FALSE,
+    'show_tagged_nodes_child_element' => TRUE,
+  );
+
+  $nodes = os_taxonomy_list_attached_nodes($taxonomy_term->tid);
+
+  $title = check_plain($taxonomy_term->name);
+  $title .= $options['show_term_description'] ? '<br />' . check_plain($taxonomy_term->description) : '';
+
+  if ($options['show_tagged_nodes_child_element']) {
+    $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid);
+
+    foreach ($childrens as $children) {
+      $attached_nodes = os_taxonomy_list_attached_nodes($children->tid);
+      foreach ($attached_nodes as $attached_node) {
+        $nodes[] = $attached_node;
+      }
+    }
+  }
+
+  $nodes = node_load_multiple(array_unique($nodes));
+
+  $data = null;
+  foreach ($nodes as $node) {
+    $items[] = array(
+      'data' => $node->title,
+    );
+  }
+
+  $body = theme('item_list', array('type' => 'ul', 'title' => $title, 'items' => $items));
+
+  return $body;
 }
