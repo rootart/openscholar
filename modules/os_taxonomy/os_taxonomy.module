@@ -45,7 +45,7 @@ function os_taxonomy_vocabulary_term_list($vid, $options = array()) {
       'description' => $term->description,
       'tree' => $tree,
       'tagged_items' => os_taxonomy_count_term_tagged_items($tid, $options['bundles']),
-      'child_number' => count($tree),
+      'child_number' => os_taxonomy_count_term_tagged_items($tree, $options['bundles']),
       'url' => entity_uri('taxonomy_term', $term),
     );
   }
@@ -93,6 +93,23 @@ function os_taxonomy_vocabulary_term_list($vid, $options = array()) {
  * Return the number of the tagged items to the term.
  */
 function os_taxonomy_count_term_tagged_items($tid, $node_bundles = array()) {
+  $items_number = 0;
+
+  if (is_array($tid)) {
+    foreach ($tid as $term) {
+      $items_number += os_taxonomy_count_attached_nodes($term->tid, $node_bundles);
+    }
+  }
+  else {
+    $items_number = os_taxonomy_count_attached_nodes($tid, $node_bundles);  }
+
+  return $items_number;
+}
+
+/**
+ * Count the number of attached node to the taxonomy.
+ */
+function os_taxonomy_count_attached_nodes($tid, $node_bundles = array()) {
   $query = db_select('taxonomy_index', 't');
   $query->condition('tid', $tid);
   $query->fields('t');
