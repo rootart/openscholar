@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * @file
+ * taxonomy terms API for OpenScholar.
+ */
+
+/**
+ * Return generated item list of the terms.
+ */
+function os_taxonomy_vocabulary_term_list($vid, $options = array()) {
+  $vocabulary = taxonomy_vocabulary_load($vid);
+  $options += array(
+    'range' => 10,
+    'offset' => 0,
+    'depth' => NULL,
+    'bundles' => array(),
+    'count_items' => TRUE,
+    'add_childs' => TRUE,
+    'show_empty_terms' => TRUE,
+    'link_to_empty_terms' => TRUE,
+    'include_terms_description' => TRUE,
+    'apply_link_active_css_class' => TRUE,
+  );
+
+  $query = new entityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'taxonomy_term')
+    ->propertyCondition('vid', $vid)
+    ->range($options['offset'], $options['offset'] + $options['range'])
+    ->propertyOrderBy('name')
+    ->execute();
+
+  if (empty($result['taxonomy_term'])) {
+    return;
+  }
+
+  $data = array();
+
+  $terms = taxonomy_term_load_multiple(array_keys($result['taxonomy_term']));
+  foreach ($terms as $tid => $term) {
+    $tree = taxonomy_get_tree($vid, $term->tid, $options['depth']);
+    $items[$tid] = array(
+      'term_name' => $term->name,
+      'description' => $term->description,
+      'tree' => $tree,
+      'tagged_items' => os_taxonomy_count_term_tagged_items($tid, $options['bundles']),
+      'child_number' => count($tree),
+      'url' => entity_uri('taxonomy_term', $term),
+    );
+  }
+
+  foreach($items as $tid => $item) {
+    // Skip on this if we don't dispaly empty childs term.
+    if (!$options['show_empty_terms'] && !$item['tagged_items'] == 0 && !$item['child_number'] == 0) {
+      continue;
+    }
+
+    $name = l($item['term_name'], $item['url']['path']);
+    $desciption = '';
+
+    // The attached number to the term name.
+    $number = $item['tagged_items'];
+    if ($options['add_childs']) {
+      $number += $item['child_number'];
+    }
+
+    // Check if we need to disable the link to the term base on the child number.
+    if (!$number && !$options['link_to_empty_terms']) {
+      $name = $item['term_name'];
+    }
+
+    // Adding number to the term name.
+    if ($options['count_items']) {
+      $name .= $number ? ' (' . $number . ')' : '';
+    }
+
+    if ($options['include_terms_description'] && !empty($item['description'])) {
+      $desciption = '<br />  - ' . $item['description'];
+    }
+
+    $data[] = array(
+      'data' => $name . $desciption,
+    );
+  }
+
+  $body = theme('item_list', array('type' => 'ul', 'items' => $data));
+
+  return $body;
+}
+
+/**
+ * Return the number of the tagged items to the term.
+ */
+function os_taxonomy_count_term_tagged_items($tid, $node_bundles = array()) {
+  $query = db_select('taxonomy_index', 't');
+  $query->condition('tid', $tid);
+  $query->fields('t');
+
+  if (!empty($node_bundles)) {
+    $query->join('node', 'n', 't.nid = n.nid');
+    $query->condition('n.type', $node_bundles, 'IN');
+  }
+
+  return $query
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+}
