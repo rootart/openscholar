@@ -5,6 +5,7 @@
  * taxonomy terms API for OpenScholar.
  */
 
+
 /**
  * Return generated item list of the terms.
  */
@@ -101,7 +102,8 @@ function os_taxonomy_count_term_tagged_items($tid, $node_bundles = array()) {
     }
   }
   else {
-    $items_number = os_taxonomy_count_attached_nodes($tid, $node_bundles);  }
+    $items_number = os_taxonomy_count_attached_nodes($tid, $node_bundles);
+  }
 
   return $items_number;
 }
