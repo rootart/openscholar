@@ -232,7 +232,12 @@ function vsite_admin_paths_alter(&$paths){
  */
 function vsite_vsite_og_node_type_info() {
   return array(
-    'group1' => 'group',
+    'vsite' => 'group',
+    'event' => 'group content',
+    'biblio' => 'group content',
+    'person' => 'group content',
+    'announcement' => 'group content',
+    'media_gallery' => 'group content',
   );
 }
 
@@ -249,7 +254,11 @@ function vsite_vsite_og_node_type_info() {
 function vsite_get_type_from_bundle($bundle = NULL) {
   $info = module_invoke_all('vsite_og_node_type_info');
 
-  return isset($info[$bundle]) ? $info[$bundle] : $info;
+  if (empty($bundle)) {
+    return $info;
+  }
+
+  return isset($info[$bundle]) ? $info[$bundle] : FALSE;
 }
 
 /**
@@ -273,8 +282,6 @@ function vsite_field_attach_create_bundle($entity_type, $bundle) {
     // Group content.
     vsite_attach_fields_to_group_content($bundle);
   }
-
-  og_create_field(OG_VOCAB_FIELD, $entity_type, $bundle);
 }
 
 /**
@@ -287,11 +294,15 @@ function vsite_attach_fields_to_group_content($bundle) {
   og_create_field(OG_AUDIENCE_FIELD, 'node', $bundle);
 }
 
-
 /**
- * Attaching group fields for a group bundle type.
+ * Add group fields to bundle
+ *
+ * @param $bundle
+ *   The node-type to attach the fields to.
  */
 function vsite_attach_fields_to_group($bundle) {
+  og_create_field(OG_GROUP_FIELD, 'node', $bundle);
+
   // field_site_address.
   $field = array(
     'active' => '1',
