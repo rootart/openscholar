@@ -243,16 +243,17 @@ function vsite_vsite_og_node_type_info() {
  *    The node type bundle.
  *
  *  @return
- *    group/group content
+ *    group/group content. If $bundle is empty, all the node types info will be
+ *    returned.
  */
 function vsite_get_type_from_bundle($bundle = NULL) {
   $info = module_invoke_all('vsite_og_node_type_info');
 
-  return isset($info[$bundle]) ? $info[$bundle] : '';
+  return isset($info[$bundle]) ? $info[$bundle] : $info;
 }
 
 /**
- * Implements hook_field_create_instance().
+ * Implements hook_field_attach_create_bundle().
  *
  * Add OG vocanulary field to a group-content bundle.
  */
@@ -291,7 +292,7 @@ function vsite_attach_fields_to_group_content($bundle) {
  * Attaching group fields for a group bundle type.
  */
 function vsite_attach_fields_to_group($bundle) {
-  // Creating field_site_address.
+  // field_site_address.
   $field = array(
     'active' => '1',
     'cardinality' => '1',
@@ -366,7 +367,7 @@ function vsite_attach_fields_to_group($bundle) {
     field_create_instance($instance);
   }
 
-  // Creating field_site_description.
+  // field_site_description.
   $field = array(
     'active' => '1',
     'cardinality' => '1',
@@ -440,7 +441,7 @@ function vsite_attach_fields_to_group($bundle) {
     field_create_instance($instance);
   }
 
-  // Crearing field_site_logo.
+  // field_site_logo.
   $field = array(
     'active' => '1',
     'cardinality' => '1',
