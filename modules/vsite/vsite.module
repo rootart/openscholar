@@ -131,39 +131,6 @@ function vsite_spaces_presets_alter(&$presets){
   }
 }
 
-/**
- * Alter information returned from module/theme info files
- */
-function vsite_system_info_alter(&$info, $file, $type){
-  static $working;
-
-  // Only alter the vsite info file
-  if ($type != 'module' || $file->name != 'vsite' || $working) {
-    return;
-  }
-
-  $working = true;
-
-  // Add the feature settings for the dynamically managed og reference fields
-  if (! is_array($info['features']['field']))
-    $info['features']['field'] = array();
-
-  include_once ('vsite.features.field.inc');
-  foreach ( vsite_get_group_fields() as $field => $definition ) {
-    if (! in_array($field, $info['features']['field'])) {
-      $info['features']['field'][] = $field;
-    }
-  }
-
-  foreach (vsite_get_group_type_fields() as $field => $definition) {
-    if (!in_array($field, $info['features']['field'])) {
-      $info['features']['field'][] = $field;
-    }
-  }
-
-  $working = false;
-}
-
 function vsite_field_default_fields_alter(&$fields) {
   if (isset($fields['node-vsite-field_group_path'])) {
     $fields += vsite_get_group_fields();
@@ -268,9 +235,38 @@ function vsite_admin_paths_alter(&$paths){
 }
 
 /**
- * Return the entity reference fields to the vsite feature bundles
+ * Implements hook_field_create_instance().
+ *
+ * Add OG vocanulary field to a group-content bundle.
  */
-function vsite_get_group_fields() {
+function vsite_vocab_field_create_instance($instance) {
+  if ($instance['entity_type'] != 'node') {
+    return;
+  }
+
+  $bundle = $instance['bundle'];
+  if (!$type = vsite_get_type_from_bundle($bundle)) {
+    return;
+  }
+
+  if ($type == 'group') {
+    vsite_attach_fields_to_group($bundle);
+  }
+  else {
+    vsite_attach_fields_to_group_content($bundle);
+  }
+
+  og_create_field(OG_VOCAB_FIELD, $instance['entity_type'], $instance['bundle']);
+}
+
+/**
+ * Add group content fields to bundle.
+ *
+ * @param $bundle
+ *   The node-type to attach the fields to.
+ */
+function vsite_get_group_content_fields($bundle) {
+  og_create_field(OG_AUDIENCE_FIELD, 'node', $bundle);
   $fields = array();
   foreach (array_keys(os_get_bundles(TRUE, 'og', TRUE)) as $bundle ) {
 
@@ -381,7 +377,7 @@ function vsite_get_group_fields() {
 function vsite_get_group_type_fields() {
   $groups = og_get_all_group_bundle();
   $fields = array();
-  
+
   if(!isset($groups['node'])){
     //No group_group fields have been added yet
     //@todo create these fields when the group field is created with "hook_field_create_instance"
@@ -645,31 +641,31 @@ function _vsite_purl_init(){
   }
 }
 
-/** 
+/**
  * Implements hook_menu_alter()
  * Using this function to remove the "Groups" link
  * from the users 'edit' form
  */
 function vsite_menu_alter(&$items) {
-	$items['user/%user/edit/groups']['access callback'] = false;
+  $items['user/%user/edit/groups']['access callback'] = false;
 }// end function
 
 /**
  * Function to load all the sites the user belongs to
  */
 function vsite_load_user_sites($userId) {
-	$sites = array();
-	$sitesArray = array();
-	// grab their sites 
-	$vsites = vsite_get_vsite_by_owner($userId);
-	// create each site as a link
-	foreach($vsites as $site) {
-		$sites=array('#title'=>$site->group->title, '#type'=>'link','#href'=>$site->get_absolute_url());
-		// prepare them for theme_list_item
-		$sitesArray[] = array('data'=>drupal_render($sites));
-	}// end foreach
-	
-	return $sitesArray;
+  $sites = array();
+  $sitesArray = array();
+  // grab their sites
+  $vsites = vsite_get_vsite_by_owner($userId);
+  // create each site as a link
+  foreach($vsites as $site) {
+    $sites=array('#title'=>$site->group->title, '#type'=>'link','#href'=>$site->get_absolute_url());
+    // prepare them for theme_list_item
+    $sitesArray[] = array('data'=>drupal_render($sites));
+  }// end foreach
+
+  return $sitesArray;
 }// end function
 
 /**
@@ -678,56 +674,56 @@ function vsite_load_user_sites($userId) {
  * also altering to add in "My Websites" for all sites the user belongs to.
  */
 function vsite_user_view_alter(&$build) {
-	global $user;
-	
-	// Removal section
-		// remove the "history" and "member for" info if it's there
-		if(isset($build['summary'])) {
-			unset($build['summary']);
-		}// end if
-		// remove the og_user_group_ref
-		if(isset($build['og_user_group_ref'])) {
-			$build['og_user_group_ref']['#access'] = false;
-		}// end if
-		// remove the og_other_user_group_ref
-		if(isset($build['og_other_user_group_ref'])) {
-			$build['og_other_user_group_ref']['#access'] = false;
-		}// end if
-	// 
+  global $user;
 
-		// make sure they're logged in
-		if($user->uid) {
-		// Additions section
-			// load their link created vsites
-			$vsites = (vsite_load_user_sites($build['#account']->uid));
-	
-			// in d6 a plural or singular was used in order to apply the correct CSS selector to the list
-			// retain that functionality
-			if(count($vsites)>1) {
-				$cssSelector = array('class'=>'plural');
-			}else{
-				$cssSelector = array('class'=>'single');
-			}// end if
-			
-			// pass the items to theme_item_list
-			$vsitesList = theme_item_list(array('items'=>$vsites, 'title'=>'','type'=>'ul','attributes'=>$cssSelector));
-			
-			// set a new field
-			$build['web_sites'] = array(
-			      	'#title' => 'My Websites',
-			      	'#type' => 'user_profile_item', 
-					'#markup' => $vsitesList,
-   		 	);//
-   		 //
-	}// end if
+  // Removal section
+    // remove the "history" and "member for" info if it's there
+    if(isset($build['summary'])) {
+      unset($build['summary']);
+    }// end if
+    // remove the og_user_group_ref
+    if(isset($build['og_user_group_ref'])) {
+      $build['og_user_group_ref']['#access'] = false;
+    }// end if
+    // remove the og_other_user_group_ref
+    if(isset($build['og_other_user_group_ref'])) {
+      $build['og_other_user_group_ref']['#access'] = false;
+    }// end if
+  //
+
+    // make sure they're logged in
+    if($user->uid) {
+    // Additions section
+      // load their link created vsites
+      $vsites = (vsite_load_user_sites($build['#account']->uid));
+
+      // in d6 a plural or singular was used in order to apply the correct CSS selector to the list
+      // retain that functionality
+      if(count($vsites)>1) {
+        $cssSelector = array('class'=>'plural');
+      }else{
+        $cssSelector = array('class'=>'single');
+      }// end if
+
+      // pass the items to theme_item_list
+      $vsitesList = theme_item_list(array('items'=>$vsites, 'title'=>'','type'=>'ul','attributes'=>$cssSelector));
+
+      // set a new field
+      $build['web_sites'] = array(
+              '#title' => 'My Websites',
+              '#type' => 'user_profile_item',
+          '#markup' => $vsitesList,
+          );//
+        //
+  }// end if
 }// end function
 
 /**
  * Implement hook_mail_alter
  * function to alter some of the emails that are sent out
  * to users based on certain actions
- * 
+ *
  */
 function vsite_mail_alter(&$message) {
-	// ToDo
+  // ToDo
 }// end function
