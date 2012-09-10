@@ -22,9 +22,8 @@ function os_taxonomy_theme() {
       'variables' => array(
         'name' => NULL,
         'number' => NULL,
-        'count_items' => NULL,
         'description' => NULL,
-        'show_terms_description' => NULL,
+        'terms_description' => NULL,
       ),
     ),
     'taxonomy_term_list_row' => array(
@@ -48,6 +47,100 @@ function os_taxonomy_theme() {
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function os_taxonomy_views_api() {
+  return array(
+    'api' => 3,
+  );
+}
+
+/**
+ * Implements hook_views_default_views().
+ */
+function os_taxonomy_views_default_views() {
+  $export = array();
+
+  $view = new view();
+  $view->name = 'os_taxonomy_vocabulary_term_list';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'OS taxonomy vocabulary term list';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'OS taxonomy taxonomy term list';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['row_plugin'] = 'fields';
+  /* Relationship: Content: Taxonomy terms on node */
+  $handler->display->display_options['relationships']['term_node_tid']['id'] = 'term_node_tid';
+  $handler->display->display_options['relationships']['term_node_tid']['table'] = 'node';
+  $handler->display->display_options['relationships']['term_node_tid']['field'] = 'term_node_tid';
+  $handler->display->display_options['relationships']['term_node_tid']['required'] = TRUE;
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['label'] = '';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  /* Sort criterion: Content: Post date */
+  $handler->display->display_options['sorts']['created']['id'] = 'created';
+  $handler->display->display_options['sorts']['created']['table'] = 'node';
+  $handler->display->display_options['sorts']['created']['field'] = 'created';
+  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Contextual filter: Taxonomy vocabulary: Vocabulary ID */
+  $handler->display->display_options['arguments']['vid']['id'] = 'vid';
+  $handler->display->display_options['arguments']['vid']['table'] = 'taxonomy_vocabulary';
+  $handler->display->display_options['arguments']['vid']['field'] = 'vid';
+  $handler->display->display_options['arguments']['vid']['relationship'] = 'term_node_tid';
+  $handler->display->display_options['arguments']['vid']['default_action'] = 'empty';
+  $handler->display->display_options['arguments']['vid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['vid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['vid']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['vid']['summary_options']['items_per_page'] = '25';
+  /* Contextual filter: Content: Has taxonomy term ID */
+  $handler->display->display_options['arguments']['tid']['id'] = 'tid';
+  $handler->display->display_options['arguments']['tid']['table'] = 'taxonomy_index';
+  $handler->display->display_options['arguments']['tid']['field'] = 'tid';
+  $handler->display->display_options['arguments']['tid']['default_action'] = 'summary';
+  $handler->display->display_options['arguments']['tid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['tid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['tid']['summary']['format'] = 'unformatted_summary';
+  $handler->display->display_options['arguments']['tid']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['tid']['break_phrase'] = TRUE;
+
+  /* Display: OS taxonomy vocabulary term list */
+  $handler = $view->new_display('panel_pane', 'OS taxonomy vocabulary term list', 'vocabulary_list');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+
+  /* Display: OS taxonomy taxonomy term list */
+  $handler = $view->new_display('panel_pane', 'OS taxonomy taxonomy term list', 'term_list');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'entity';
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
+
+  $export['os_taxonomy_vocabulary_term_list'] = $view;
+
+  return $export;
+}
+
+/**
  * Building the content for each row in the terms list.
  *
  *  @param Array $varibles
@@ -57,7 +150,7 @@ function os_taxonomy_theme() {
  *      with zero tagged nodes.
  *    - url_path: The url of the taxonomy term.
  *    - link_options: A setting variable for the l function.
- *    - show_terms_description: Controll switch for displaying the taxonomy term
+ *    - terms_description: Controll switch for displaying the taxonomy term
  *      desscription.
  *    - description: The taxonomy term description.
  */
@@ -68,7 +161,7 @@ function theme_volcabulary_term_list_row($variables) {
   $name = !$number && !$variables['link_to_empty_terms'] ? $name : l($name, $variables['url_path'], $variables['link_options']);
   $output = $name . $number;
 
-  if ($variables['show_terms_description'] && !empty($variables['description'])) {
+  if ($variables['terms_description'] && !empty($variables['description'])) {
     $output .= '<br />  - ' . check_plain($variables['description']);
   }
 
@@ -91,8 +184,13 @@ function theme_volcabulary_term_list_row($variables) {
  *        count.
  *      - show_empty_terms: Show empty terms in the terms list.
  *      - link_to_empty_terms: Show en empty term name as a link to the term.
- *      - show_terms_description: Show to term descprition under the title.
+ *      - terms_description: Show to term descprition under the title.
  *      - tid_active_class: The term id that will get the active class.
+ *      - simple_view: Display a simple view of the vocabulary with no concern
+ *        to the vocabulary terms hierarchy ordering.
+ *      - show_childs: Controll if to show the childrens with their father term.
+ *        Also, the number of the tagged nodes to the childs term will not be
+ *        added to the tagged node number of the father term.
  */
 function theme_volcabulary_term_list($variables) {
   $options = $variables['options'] + array(
@@ -100,13 +198,19 @@ function theme_volcabulary_term_list($variables) {
     'offset' => 0,
     'depth' => NULL,
     'bundles' => array(),
-    'add_childs' => TRUE,
-    'count_items' => TRUE,
+    'add_childs' => FALSE,
+    'simple_view' => TRUE,
+    'show_childs' => TRUE,
     'tid_active_class' => 0,
     'show_empty_terms' => TRUE,
     'link_to_empty_terms' => TRUE,
-    'show_terms_description' => TRUE,
+    'terms_description' => TRUE,
   );
+
+  // Displaying the volcabulary term in a simple display using views.
+  if ($options['simple_view']) {
+    return views_embed_view('os_taxonomy_vocabulary_term_list', 'vocabulary_list', $variables['vid']);
+  }
 
   $vocabulary = taxonomy_vocabulary_load($variables['vid']);
 
@@ -122,8 +226,6 @@ function theme_volcabulary_term_list($variables) {
     return;
   }
 
-  $data = array();
-
   $terms = taxonomy_term_load_multiple(array_keys($result['taxonomy_term']));
   foreach ($terms as $tid => $term) {
     $items[$tid] = array(
@@ -132,14 +234,17 @@ function theme_volcabulary_term_list($variables) {
       'tagged_items' => os_taxonomy_count_term_tagged_items(array($term), $options['bundles']),
       'url' => entity_uri('taxonomy_term', $term),
       'class' => $options['tid_active_class'] == $tid ? 'active' : '',
+      'child' => taxonomy_get_parents($tid) ? TRUE : FALSE,
     );
 
     // Add the number of tagged nodes to the kids when needed.
-    if ($options['add_childs']) {
+    if ($options['add_childs'] && !$options['show_childs']) {
       $tree = taxonomy_get_tree($variables['vid'], $term->tid, $options['depth']);
       $items[$tid]['child_number'] = os_taxonomy_count_term_tagged_items($tree, $options['bundles']);
     }
   }
+
+  $data = array();
 
   foreach($items as $tid => $item) {
     // Skip on this if we don't dispaly empty childs term.
@@ -147,9 +252,14 @@ function theme_volcabulary_term_list($variables) {
       continue;
     }
 
+    // Don't show the a term which is a child of another term.
+    if ($item['child'] && !$options['show_childs']) {
+      continue;
+    }
+
     // The attached number to the term name.
     $number = $item['tagged_items'];
-    $number += $options['add_childs'] ? $item['child_number'] : 0;
+    $number += $options['add_childs'] && isset($item['child_number']) ? $item['child_number'] : 0;
 
     // Check if we need to disable the link to the term base on the child number.
     $link_options = empty($item['class']) ? array() : array('attributes' => array('class' => $item['class']));
@@ -161,9 +271,8 @@ function theme_volcabulary_term_list($variables) {
         'link_options' => $link_options,
         'url_path' => $item['url']['path'],
         'description' => $item['description'],
-        'count_items' => $options['count_items'],
         'link_to_empty_terms' => $options['link_to_empty_terms'],
-        'show_terms_description' => $options['show_terms_description'],
+        'terms_description' => $options['terms_description'],
       )),
     );
   }
@@ -180,7 +289,7 @@ function theme_volcabulary_term_list($variables) {
  *      - bundles: The bundles type of the tagged node that will include in the
  *        count.
  *      - tree: Display the list as tree
- *      - view_mode: The node view mode to display.
+ *      - view_mode: The node view mode to display when showing as a tree.
  *      - description: Display the term description under the term title.
  *      - child_element: Attach the child node terms.
  *      - tagged_nodes_depth: Dpeth level of tagged node to terms.
@@ -195,7 +304,7 @@ function theme_taxonomy_term_tagged_node($variables) {
   $options = $variables['options'] + array(
     'range' => 0,
     'offset' => 0,
-    'tree' => TRUE,
+    'tree' => FALSE,
     'indentation' => 10,
     'bundles' => array(),
     'view_mode' => 'full',
@@ -212,6 +321,30 @@ function theme_taxonomy_term_tagged_node($variables) {
 
   $title = check_plain($taxonomy_term->name);
   $title .= $options['description'] ? '<br />' . check_plain($taxonomy_term->description) : '';
+
+  // The vocabulary terms are not shown as tree, there for display it using
+  // views.
+  if (!$options['tree']) {
+    $output = $title;
+    $tid = $taxonomy_term->tid;
+
+    // Show the nodes child's term with the term's nodes.
+    if ($options['child_element'] && $options['tagged_nodes_depth'] !== FALSE) {
+      // Get all the childrens.
+      $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['tagged_nodes_depth']);
+      foreach ($childrens as $children) {
+        $tids[] = $children->tid;
+      }
+
+      // Build array with the childrens and the current term id and pass it as
+      // a contextual filter the the view.
+      $tids[] = $tid;
+      $tid = implode("+", $tids);
+    }
+
+    $output .= views_embed_view('os_taxonomy_vocabulary_term_list', 'term_list', $taxonomy_term->vid, $tid, array('view_mode' => $options['view_mode']));
+    return $output;
+  }
 
   if ($options['tagged_nodes_depth'] !== FALSE) {
     $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['tagged_nodes_depth']);
@@ -372,4 +505,24 @@ function os_taxonomy_list_attached_nodes($tid, $node_bundles = array(), $range =
   }
 
   return array_keys($nids);
+}
+
+/**
+ * Implements hook_view_pre_render().
+ *
+ * When the view mode of the node's term list is defined, change the view mode
+ * of the rendered entity.
+ */
+function os_taxonomy_views_pre_render(&$view) {
+  if (!($view->name == 'os_taxonomy_vocabulary_term_list' && !empty($view->args[2]['view_mode']))) {
+    return;
+  }
+
+  foreach (array_keys($view->display['term_list']->handler->view->style_plugin->row_plugin->rendered_content) as $key) {
+    if (!is_int($key)) {
+      continue;
+    }
+
+    $view->display['term_list']->handler->view->style_plugin->row_plugin->rendered_content[$key]['#view_mode'] = $view->args[2]['view_mode'];
+  }
 }

@@ -1,5 +1,8 @@
 name = OS Taxonomy
 description = Managing OS taxonomy terms.
-core = 7.x
+
+dependencies[] = views
+
 package = OpenScholar
 php = 5.2.4
+core = 7.x
