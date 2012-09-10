@@ -233,11 +233,6 @@ function vsite_admin_paths_alter(&$paths){
 function vsite_vsite_og_node_type_info() {
   return array(
     'vsite' => 'group',
-    'event' => 'group content',
-    'biblio' => 'group content',
-    'person' => 'group content',
-    'announcement' => 'group content',
-    'media_gallery' => 'group content',
   );
 }
 

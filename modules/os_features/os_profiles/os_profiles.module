@@ -13,10 +13,10 @@ include_once 'os_profiles.features.inc';
  */
 function os_profiles_process_node(&$vars) {
   if ($vars['type'] !== 'person') return;
-  
+
   // Helps poor theme developers find these changes to $variables
   $vars['classes'] .= ' modified-in-os_profiles_process_node';
-  
+
   // Moves the profile photo thumbnail before teaser title (full name)
   if (isset($vars['content']['field_person_photo'])) {
     $vars['title_prefix'] = $vars['content']['field_person_photo'];
@@ -29,14 +29,14 @@ function os_profiles_process_node(&$vars) {
   		'data' => drupal_get_path('module', 'os_profiles') . '/os_profiles.css',
   	),
   );
-  
+
   if (!$vars['teaser']) {
     $vars['title_prefix']['#suffix'] = '<h2>' . $vars['title'] . '</h2>';
   }
-  
+
   // Toggles header tag depending on view mode
   $h = ($vars['teaser']) ? '4' : '3';
-  
+
   // Customizes field markup with prefixes and suffixes
   if (isset($vars['content']['field_professional_title'])) {
     $title_plain = $vars['content']['field_professional_title'][0]['#markup'];
@@ -54,15 +54,24 @@ function os_profiles_process_node(&$vars) {
 
 /**
  * Implements hook_node_presave().
- * 
+ *
  * Generates node title for Person nodes
  */
 function os_profiles_node_presave($node) {
   if ($node->type !== 'person') return;
-  
+
   // Sets the node title like "[first] [middle] [last]"
   $title = _os_profiles_person_node_title($node);
   if ($title) $node->title = $title;
+}
+
+/**
+ * Implements hook_vsite_og_node_type_info().
+ */
+function os_profiles_og_node_type_info() {
+  return array(
+    'person' => 'group content',
+  );
 }
 
 /**
@@ -75,7 +84,7 @@ function _os_profiles_person_node_title($node) {
     $items = field_get_items('node', $node, 'field_' . $field);
     if (!empty($items[0]['value'])) $values[] = $items[0]['value'];
   }
-  
+
   $title = implode(' ', $values);
   return $title;
 }
