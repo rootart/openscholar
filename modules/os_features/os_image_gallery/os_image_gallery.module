@@ -21,7 +21,7 @@ function os_image_gallery_contextual_links_view_alter(&$element, $items) {
 /**
  * Implements hook_vsite_og_node_type_info().
  */
-function os_image_gallery_og_node_type_info() {
+function os_image_gallery_vsite_og_node_type_info() {
   return array(
     'media_gallery' => 'group content',
   );

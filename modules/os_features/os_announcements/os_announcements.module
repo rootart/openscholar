@@ -22,7 +22,7 @@ function os_announcements_process_node(&$vars) {
 /**
  * Implements hook_vsite_og_node_type_info().
  */
-function os_announcements_og_node_type_info() {
+function os_announcements_vsite_og_node_type_info() {
   return array(
     'announcement' => 'group content',
   );

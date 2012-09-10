@@ -68,7 +68,7 @@ function os_profiles_node_presave($node) {
 /**
  * Implements hook_vsite_og_node_type_info().
  */
-function os_profiles_og_node_type_info() {
+function os_profiles_vsite_og_node_type_info() {
   return array(
     'person' => 'group content',
   );
