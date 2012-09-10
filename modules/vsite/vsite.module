@@ -259,7 +259,10 @@ function vsite_get_type_from_bundle($bundle = NULL) {
 /**
  * Implements hook_field_attach_create_bundle().
  *
- * Add OG vocanulary field to a group-content bundle.
+ * When creating a new node bundle check if the bundle is defined as a group or
+ * group content and attach the right fields.
+ *
+ * @see hook_vsite_og_node_type_info().
  */
 function vsite_field_attach_create_bundle($entity_type, $bundle) {
   if ($entity_type != 'node') {
