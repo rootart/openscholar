@@ -1,24 +1,33 @@
 <?php
 
+/**
+ * @file
+ * OS Books file module.
+ */
+
 define("OS_BOOKS_CACHE", 'cache_book_pages');
 
-/*
- * Gets the root node of any book tree
+/**
+ * Gets the root node of any book tree.
  */
 function os_books_get_root($node, $level = 0) {
-  if (is_numeric($node)) $node = node_load($node);
+  if (is_numeric($node)) {
+    $node = node_load($node);
+  }
 
-  // node isn't a book. Just leave
-  if (!isset($node->book)) return $node;
+  // Node isn't a book. Just leave.
+  if (!isset($node->book)) {
+   return $node;
+  }
 
   if ($level) {
-    // get the parent that's at the $level depth of the tree
+    // Get the parent that's at the $level depth of the tree.
     if ($node->book['p'.$level]) {  // book['p$int'] only goes up to 9
       $item = book_link_load($node->book['p'.$level]);
       $node = node_load($item['nid']);
     }
     else {
-      while ($node -> book['depth'] > $level){
+      while ($node->book['depth'] > $level) {
         $parent = book_link_load($node->book['plid']);
         $pid = $parent['nid'];
         $node = node_load($pid);
@@ -31,17 +40,17 @@ function os_books_get_root($node, $level = 0) {
   return $node;
 }
 
-/*
- * Takes any node in a book tree and builds the entirety of that tree
+/**
+ * Takes any node in a book tree and builds the entirety of that tree.
  */
-function os_books_build_tree($node, $flatten = false) {
+function os_books_build_tree($node, $flatten = FALSE) {
   $root = os_books_get_root($node);
   static $building = array();
 
-  // if we're in the middle of building this tree, do nothing
-  // this prevents an infinite loop
+  // If we're in the middle of building this tree, do nothing
+  // this prevents an infinite loop.
   if (isset($root->book) && !isset($building[$root->nid])) {
-    $building[$root->nid] = true;
+    $building[$root->nid] = TRUE;
     $cache = _os_books_get_cache($root->nid);
     if ($cache) return $cache;
 
@@ -56,14 +65,21 @@ function os_books_build_tree($node, $flatten = false) {
 }
 
 /**
+ * Given a node in a book, builds a full table of contents for that book.
  *
- * Given a node in a book, builds a full table of contents for that book
- * @param $nid	Either a nid or a full node object
- * @param $separate	true if the function should split the top level and second level into separate
+ * @param $nid
+ *  Either a nid or a full node object.
+ *
+ * @param $separate
+ *  True if the function should split the top level and second level into
+ *  separate.
  */
-function os_books_build_toc($node, $separate = false) {
+function os_books_build_toc($node, $separate = FALSE) {
   $block = array();
-  if (is_numeric($node)) $node = node_load($node);
+
+  if (is_numeric($node)) {
+    $node = node_load($node);
+  }
 
   if (is_object($node) && isset($node->book)) {
     $menu_tree = menu_tree_all_data($node->book['menu_name']);
@@ -81,17 +97,19 @@ function os_books_build_toc($node, $separate = false) {
 }
 
 /**
- * Recursive function to collect the data array from the book
+ * Recursive function to collect the data array from the book.
  */
-function _os_books_build_tree_recursive($tree, $flatten = false) {
-  if (!is_array($tree)) $tree = array($tree);
+function _os_books_build_tree_recursive($tree, $flatten = FALSE) {
+  if (!is_array($tree)) {
+    $tree = array($tree);
+  }
 
   $output = array();
   $orig_path = $_GET['q'];
   foreach ($tree as $link) {
     $nid = $link['link']['nid'];
     $node = node_load($nid);
-    // trick drupal into thinking we're on this node
+    // Trick drupal into thinking we're on this node.
     $_GET['q'] = 'node/'.$nid;
     $output[$nid]['content'] = drupal_render(node_show($node));
     $output[$nid]['url'] = drupal_get_path_alias('node/'.$nid);
@@ -99,7 +117,7 @@ function _os_books_build_tree_recursive($tree, $flatten = false) {
     if ($link['link']['has_children']) {
       $children = _os_books_build_tree_recursive($link['below'], $flatten);
       if ($flatten) {
-        // array merge blows away our nid keys
+        // Array merge blows away our nid keys.
         foreach ($children as $k => $v) {
           $output[$k] = $v;
         }
@@ -109,7 +127,7 @@ function _os_books_build_tree_recursive($tree, $flatten = false) {
       }
     }
   }
-  // change the path back
+  // Change the path back.
   $_GET['q'] = $orig_path;
 
   return $output;
@@ -119,11 +137,11 @@ function os_books_node_view($node, $view_mode) {
   if ($view_mode == 'full') {
     if (isset($node->book) && $node->book) {
       $content = $node->content;
-      // drupal destroys $node->content during its build process.
-      // without it, we get fatal errors
+      // Drupal destroys $node->content during its build process.
+      // Without it, we get fatal errors.
       $pages = os_books_build_tree($node, true);
       $node->content = $content;
-      // this is the page's node, not one we render through os_books
+      // This is the page's node, not one we render through os_books.
       if ($pages) {
         drupal_add_js(array(
         	'os_books' => array(
@@ -140,30 +158,31 @@ function os_books_node_view($node, $view_mode) {
         $output = '<div class="book-menu"><h3 class="title">' . $block_toc['subject'] . '</h3>' . $block_toc['content'] . '</div>';
         $node->content['booktoc'] = array(
           '#weight' => -10,
-          '#markup' => $output
+          '#markup' => $output,
         );
       }
 
-      // unset the book navigation links
+      // Unset the book navigation links.
       if (module_exists('book') && book_type_is_allowed($node->type)) {
         unset($node->content['book_navigation']);
       }
 
-      // add contextual links
-      // Drupal doesn't add contextual links to a node when we're on that node's page
-      // this'll probably have to go somewhere else eventually, to catch all nodes
+      // Add contextual links
+      // Drupal doesn't add contextual links to a node when we're on that
+      // node's page this'll probably have to go somewhere else eventually,
+      // to catch all nodes.
       if (node_is_page($node)) {
         $node->content['#contextual_links']['node'] = array('node', array($node->nid));
       }
 
-      // printed links
+      // Printed links.
       if (user_access('access printer-friendly version')) {
         $node->content['links']['book']['#links']['book_printer_full'] = array(
           'title' => t('Printer-friendly version'),
           'href' => 'book/export/html/' . $node->book['bid'],
           'attributes' => array('title' => t('Show a printer-friendly version of this book.'))
         );
-        unset ($node->content['links']['book']['#links']['book_printer']);
+        unset($node->content['links']['book']['#links']['book_printer']);
       }
     }
   }
@@ -174,11 +193,10 @@ function _os_books_get_book_settings($bid) {
 }
 
 /**
+ * Node API hooks.
  *
- * Node API hooks
- * Used for clearing caches when a book node changes
+ * Used for clearing caches when a book node changes.
  */
-
 function os_books_node_insert($node) {
   _os_books_clear_cache($node);
 }
@@ -191,7 +209,9 @@ function os_books_node_delete($node) {
   _os_books_clear_cache($node);
 }
 
-// caching functions
+/**
+ * Caching functions.
+ */
 function _os_books_get_cache($root, $bid = 0) {
   if (is_object($root) && isset($root->nid)) {
     $root = $root->nid;
@@ -249,8 +269,11 @@ function _os_books_get_book_cache_wildcard($bid) {
 /**
  * Return the full key.
  * To be used with getting or setting a specific cache
- * @param unknown_type $bid - The id of the book itself
- * @param unknown_type $root - The id of the node used as the root
+ * @param $bid
+ *  The id of the book itself.
+ *
+ * @param $root
+ *  The id of the node used as the root.
  */
 function _os_books_get_cache_key($bid, $root) {
   $cid_parts = array();
@@ -258,8 +281,10 @@ function _os_books_get_cache_key($bid, $root) {
   $cid_parts[] = "os_book";
   $cid_parts[] = $bid;
   $cid_parts[] = $root;
-  //$cid_parts[] = scholar_book_toc_location();    // clear cache when book settings are changed?
-  //$cid_parts[] = (spaces_access_admin())?1:0; // special caching for super user.
+  // Clear cache when book settings are changed ?
+  // $cid_parts[] = scholar_book_toc_location();
+  // Special caching for super user.
+  // $cid_parts[] = (spaces_access_admin())?1:0;
 
   if (module_exists('locale')) {
     global $language;
