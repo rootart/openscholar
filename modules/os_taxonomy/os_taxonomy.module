@@ -1,0 +1,449 @@
+<?php
+
+/**
+ * @file
+ * taxonomy terms API for OpenScholar.
+ */
+
+include_once 'os_taxonomy.views.inc';
+
+/**
+ * Implements hook_theme().
+ */
+function os_taxonomy_theme() {
+  return array(
+    'volcabulary_term_list' => array(
+      'function' => 'theme_volcabulary_term_list',
+      'variables' => array(
+        'vid' => 0,
+        'options' => array(),
+      ),
+    ),
+    'volcabulary_term_list_row' => array(
+      'function' => 'theme_volcabulary_term_list_row',
+      'variables' => array(
+        'name' => NULL,
+        'number' => NULL,
+        'description' => NULL,
+        'terms_description' => NULL,
+      ),
+    ),
+    'taxonomy_term_list_row' => array(
+      'function' => 'theme_taxonomy_term_tagged_node',
+      'variables' => array(
+        'taxonomy_term' => NULL,
+        'options' => array(),
+      ),
+    ),
+    'taxonomy_term_node_render' => array(
+      'function' => 'theme_taxonomy_term_node_render',
+      'variables' => array(
+        'node' => NULL,
+        'direction' => 0,
+        'indentation' => 0,
+        'view_mode' => NULL,
+        'indentation_type' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function os_taxonomy_views_api() {
+  return array(
+    'api' => 3,
+  );
+}
+
+/**
+ * Building the content for each row in the terms list.
+ *
+ *  @param Array $varibles
+ *    - number: The number of tagged itmes to the taxonomy term.
+ *    - name: The name of taxonomy term.
+ *    - link_to_empty_terms: Switch that controll if to link a taxonomy term
+ *      with zero tagged nodes.
+ *    - url_path: The url of the taxonomy term.
+ *    - link_options: A setting variable for the l function.
+ *    - terms_description: Controll switch for displaying the taxonomy term
+ *      desscription.
+ *    - description: The taxonomy term description.
+ */
+function theme_volcabulary_term_list_row($variables) {
+  $number = !$variables['number'] ? '' : ' (' . $variables['number'] . ')';
+  $name = check_plain($variables['name']);
+
+  $name = !$number && !$variables['link_to_empty_terms'] ? $name : l($name, $variables['url_path'], $variables['link_options']);
+  $output = $name . $number;
+
+  if ($variables['terms_description'] && !empty($variables['description'])) {
+    $output .= '<br />  - ' . check_plain($variables['description']);
+  }
+
+  return $output;
+}
+
+/**
+ * Return generated item list of the terms.
+ *
+ *  @param Array $variables:
+ *    - vid: The volcabulary ID.
+ *    - options: List of settings that concern to the list generation.
+ *      - range: Number of terms to show from this volcabulary
+ *      - offset: The term location that query start from.
+ *      - depth: When a term is a tree, this value set the level of braches
+ *        to show.
+ *      - bundles: The bundles type of the tagged node that will include in the
+ *        count.
+ *      - add_childs: Define if we add the childs tagged node number to the
+ *        count.
+ *      - show_empty_terms: Show empty terms in the terms list.
+ *      - link_to_empty_terms: Show en empty term name as a link to the term.
+ *      - terms_description: Show to term descprition under the title.
+ *      - tid_active_class: The term id that will get the active class.
+ *      - simple_view: Display a simple view of the vocabulary with no concern
+ *        to the vocabulary terms hierarchy ordering.
+ *      - show_childs: Controll if to show the childrens with their father term.
+ *        Also, the number of the tagged nodes to the childs term will not be
+ *        added to the tagged node number of the father term.
+ */
+function theme_volcabulary_term_list($variables) {
+  $options = $variables['options'] + array(
+    'range' => 10,
+    'offset' => 0,
+    'depth' => NULL,
+    'bundles' => array(),
+    'add_childs' => FALSE,
+    'simple_view' => TRUE,
+    'show_childs' => TRUE,
+    'tid_active_class' => 0,
+    'show_empty_terms' => TRUE,
+    'link_to_empty_terms' => TRUE,
+    'terms_description' => TRUE,
+  );
+
+  // Displaying the volcabulary term in a simple display using views.
+  if ($options['simple_view']) {
+    return views_embed_view('os_taxonomy_vocabulary_term_list', 'vocabulary_list', $variables['vid']);
+  }
+
+  $vocabulary = taxonomy_vocabulary_load($variables['vid']);
+
+  $query = new entityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'taxonomy_term')
+    ->propertyCondition('vid', $variables['vid'])
+    ->range($options['offset'], $options['offset'] + $options['range'])
+    ->propertyOrderBy('name')
+    ->execute();
+
+  if (empty($result['taxonomy_term'])) {
+    return;
+  }
+
+  $terms = taxonomy_term_load_multiple(array_keys($result['taxonomy_term']));
+  foreach ($terms as $tid => $term) {
+    $items[$tid] = array(
+      'term_name' => $term->name,
+      'description' => $term->description,
+      'tagged_items' => os_taxonomy_count_term_tagged_items(array($term), $options['bundles']),
+      'url' => entity_uri('taxonomy_term', $term),
+      'class' => $options['tid_active_class'] == $tid ? 'active' : '',
+      'is_child' => taxonomy_get_parents($tid) ? TRUE : FALSE,
+    );
+
+    // Add the number of tagged nodes to the childrens when needed.
+    if ($options['add_childs'] && !$options['show_childs']) {
+      $tree = taxonomy_get_tree($variables['vid'], $term->tid, $options['depth']);
+      $items[$tid]['child_number'] = os_taxonomy_count_term_tagged_items($tree, $options['bundles']);
+    }
+  }
+
+  $data = array();
+
+  foreach($items as $tid => $item) {
+    // Skip on this if we don't dispaly empty childs term.
+    if (!$options['show_empty_terms'] && !$item['tagged_items'] && !$item['child_number']) {
+      continue;
+    }
+
+    // Don't show the a term which is a child of another term.
+    if ($item['is_child'] && !$options['show_childs']) {
+      continue;
+    }
+
+    // The attached number to the term name.
+    $number = $item['tagged_items'];
+    $number += $options['add_childs'] && isset($item['child_number']) ? $item['child_number'] : 0;
+
+    // Check if we need to disable the link to the term base on the child number.
+    $link_options = empty($item['class']) ? array() : array('attributes' => array('class' => $item['class']));
+
+    $data[] = array(
+      'data' => theme('volcabulary_term_list_row', array(
+        'name' => $item['term_name'],
+        'number' => $number,
+        'link_options' => $link_options,
+        'url_path' => $item['url']['path'],
+        'description' => $item['description'],
+        'link_to_empty_terms' => $options['link_to_empty_terms'],
+        'terms_description' => $options['terms_description'],
+      )),
+    );
+  }
+
+  return theme('item_list', array('type' => 'ul', 'items' => $data));
+}
+
+/**
+ * Generate a list of nodes related to the node.
+ *
+ *  @param Array $variables:
+ *    - taxonomy_term: Taxonomy term object.
+ *    - options:
+ *      - bundles: The bundles type of the tagged node that will include in the
+ *        count.
+ *      - tree: Display the list as tree
+ *      - view_mode: The node view mode to display when showing as a tree.
+ *      - description: Display the term description under the term title.
+ *      - child_element: Attach the child node terms.
+ *      - tagged_nodes_depth: Dpeth level of tagged node to terms.
+ *      - range: How much elements to show.
+ *      - offset: The node location to start from.
+ *      - indentation: How much indentation units to apply to the tree.
+ *      - indentation_type: The indentation unit type: px/em/%.
+ */
+function theme_taxonomy_term_tagged_node($variables) {
+  global $language;
+
+  $options = $variables['options'] + array(
+    'range' => 0,
+    'offset' => 0,
+    'tree' => FALSE,
+    'indentation' => 10,
+    'bundles' => array(),
+    'view_mode' => 'full',
+    'description' => FALSE,
+    'child_element' => TRUE,
+    'indentation_type' => 'px',
+    'tagged_nodes_depth' => NULL,
+  );
+  $taxonomy_term = $variables['taxonomy_term'];
+
+  $data = NULL;
+  $depth = array();
+  $nodes = os_taxonomy_list_attached_nodes($taxonomy_term->tid, $options['bundles'], $options['range'], $options['offset']);
+
+  $title = check_plain($taxonomy_term->name);
+  $title .= $options['description'] ? '<br />' . check_plain($taxonomy_term->description) : '';
+
+  // The vocabulary terms are not shown as tree, therefore display it using
+  // views.
+  if (!$options['tree']) {
+    $output = $title;
+    $tid = $taxonomy_term->tid;
+
+    // Show the nodes child's term with the term's nodes.
+    if ($options['child_element'] && $options['tagged_nodes_depth'] !== FALSE) {
+      // Get all the childrens.
+      $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['tagged_nodes_depth']);
+      foreach ($childrens as $children) {
+        $tids[] = $children->tid;
+      }
+
+      // Build array with the childrens and the current term id and pass it as
+      // a contextual filter the the view.
+      $tids[] = $tid;
+      $tid = implode("+", $tids);
+    }
+
+    $output .= views_embed_view('os_taxonomy_vocabulary_term_list', 'term_list', $taxonomy_term->vid, $tid, array('view_mode' => $options['view_mode']));
+    return $output;
+  }
+
+  if ($options['tagged_nodes_depth'] !== FALSE) {
+    $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['tagged_nodes_depth']);
+
+    foreach ($childrens as $children) {
+      $attached_nodes = os_taxonomy_list_attached_nodes($children->tid, $options['bundles'], $options['range'], $options['offset']);
+
+      foreach ($attached_nodes as $attached_node) {
+        $nodes[] = $attached_node;
+        if ($options['tree']) {
+          $depth[$attached_node] = count(taxonomy_get_parents_all($children->tid));
+        }
+      }
+    }
+  }
+
+  $nodes = node_load_multiple(array_unique($nodes));
+
+  foreach ($nodes as $node) {
+    $indentation = '';
+    if (isset($depth[$node->nid]) && $options['tree']) {
+      for ($i = 1; $i <= $depth[$node->nid]; $i++) {
+        $indentation += $options['indentation'];
+      }
+    }
+
+    $direction = $language->direction ? 'margin-right: ' : 'margin-left: ';
+    $items[] = array(
+      'data' => theme('taxonomy_term_node_render', array(
+        'node' => $node,
+        'direction' => $direction,
+        'indentation' => $indentation,
+        'view_mode' => $options['view_mode'],
+        'indentation_type' => $options['indentation_type'],
+      )),
+    );
+  }
+
+  return theme('item_list', array('type' => 'ul', 'title' => $title, 'items' => $items));
+}
+
+/**
+ * Rendering node to view inside the node related to terms.
+ *
+ *  @param Array $variables
+ *    - indentation: The amount of indentation to apply on the elements in the
+ *      list.
+ *    - direction: The direction of the indentation i.e margin-left/margin-right.
+ *    - indentation_type: The indentation units type: px/em/%.
+ */
+function theme_taxonomy_term_node_render($variables) {
+  $style = $variables['indentation'] ? ' style="' . $variables['direction'] . $variables['indentation'] . $variables['indentation_type'] . ';"' : '';
+
+  return '<div ' . $style . '>' . drupal_render(node_view($variables['node'], $variables['view_mode'])) . '</div>';
+}
+
+/**
+ * Return the number of the tagged items to the term.
+ *
+ *  @param $terms
+ *    Array of taxonomy terms objects for counting the tagged items.
+ *
+ *  @param $node_bundles
+ *    Node bundles to include in the query.
+ *
+ *  @return
+ *    Nubmer of the tagged nodes to the taxonomy term(s).
+ */
+function os_taxonomy_count_term_tagged_items($terms, $node_bundles = array()) {
+  $items_number = 0;
+
+  foreach ($terms as $term) {
+    $items_number += os_taxonomy_count_attached_nodes($term->tid, $node_bundles);
+  }
+
+  return $items_number;
+}
+
+/**
+ * Return an query object for nodes that attached to term.
+ *
+ *  @param $tid
+ *    Using the taxonomy_get_tree function, or taxonomy_term_load_multiple ,
+ *    this argument can be an array of taxonomy terms or a single term id.
+ *
+ *  @param $node_bundles
+ *    Node bundles to include in the query.
+ *
+ *  @return
+ *    db_select() object before executing.
+ */
+function os_taxonomy_count_attached_nodes_query_object($tid, $node_bundles = array()) {
+  $query = db_select('taxonomy_index', 't');
+  $query->condition('tid', $tid)
+    ->distinct()
+    ->fields('t');
+
+  if (!empty($node_bundles)) {
+    $query->join('node', 'n', 't.nid = n.nid');
+    $query->condition('n.type', $node_bundles, 'IN');
+  }
+
+  return $query;
+}
+
+/**
+ * Count the number of attached node to the taxonomy.
+ *
+ *  @param $tid
+ *    Using the taxonomy_get_tree function, or taxonomy_term_load_multiple ,
+ *    this argument can be an array of taxonomy terms or a single term id.
+ *
+ *  @param $node_bundles
+ *    Node bundles to include in the query.
+ *
+ *  @return
+ *    The number of attached node to the term.
+ */
+function os_taxonomy_count_attached_nodes($tid, $node_bundles = array()) {
+  $query = os_taxonomy_count_attached_nodes_query_object($tid, $node_bundles);
+
+  return $query
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+}
+
+/**
+ * Return the nodes id that tagged to a taxonomy term.
+ *
+ *  @param $tid
+ *    Using the taxonomy_get_tree function, or taxonomy_term_load_multiple ,
+ *    this argument can be an array of taxonomy terms or a single term id.
+ *
+ *  @param $node_bundles
+ *    Node bundles to include in the query.
+ *
+ *  @param $range
+ *    Number of elements to process.
+ *
+ *  @param $offset
+ *    Location of an element to start from.
+ *
+ *  @return
+ *    List of tagged nodes nid's to the term.
+ */
+function os_taxonomy_list_attached_nodes($tid, $node_bundles = array(), $range = NULL, $offset = NULL) {
+  $query = os_taxonomy_count_attached_nodes_query_object($tid, $node_bundles);
+
+  if ($range) {
+    $query->range($range + $offset, $range);
+  }
+
+  $result = $query->execute();
+  $nids = array();
+  while ($record = $result->fetchAssoc()) {
+    $nids[$record['nid']] = $record['nid'];
+  }
+
+  return array_keys($nids);
+}
+
+/**
+ * Implements hook_view_pre_render().
+ *
+ * When the view mode of the node's term list is defined, change the view mode
+ * of the rendered entity.
+ */
+function os_taxonomy_views_pre_render(&$view) {
+  if ($view->name != 'os_taxonomy_vocabulary_term_list' && empty($view->args[2]['view_mode'])) {
+    return;
+  }
+
+  $rendered_content = &$view->display['term_list']->handler->view->style_plugin->row_plugin->rendered_content;
+
+  foreach (array_keys($rendered_content) as $key) {
+    // Processing only integer keys, therefore skip on the key that contain the
+    // value '#sorted'.
+    if (!is_int($key)) {
+      continue;
+    }
+
+    $rendered_content[$key]['#view_mode'] = $view->args[2]['view_mode'];
+  }
+}
