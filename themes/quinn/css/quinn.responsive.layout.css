@@ -1,6 +1,6 @@
 /* bigscreen three_col_grail */
 @media only screen and (min-width:1025px) {
-.container {width:1000px}
+.container {width:1025px}
 #content-column,.content-column,div.sidebar {float: left; clear: none}
 .two-sidebars .content-inner {margin-left: 200px; margin-right: 200px}
 .sidebar-first .content-inner {margin-left: 200px; margin-right: 0}

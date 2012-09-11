@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 function os_publications_overview() {
   $args = func_get_args();
@@ -13,7 +14,7 @@ function os_publications_overview() {
 
   $ckey = _os_publications_cache_key($args);
   if ($cache = cache_get($ckey, 'cache_biblio_lists')) {
-//    return $cache->data;
+    //    return $cache->data;
   }
 
   module_load_include('inc', 'biblio', 'includes/biblio.pages');
@@ -72,8 +73,8 @@ function os_publications_export($format = "tagged", $nid = NULL, $popup = FALSE)
   module_load_include('inc', 'biblio', 'includes/biblio.import.export');
 
   $title = 'publications';
-  if ($nid !== null) {
-    $node = node_load($nid);
+  if ($nid !== NULL) {
+    $node  = node_load($nid);
     $title = str_replace(' ', '_', $node->title);
     $title = substr($title, 0, 8);
   }
@@ -98,7 +99,7 @@ function os_publications_export($format = "tagged", $nid = NULL, $popup = FALSE)
 
     // handle for spaces
     if (module_exists('spaces') && $space = spaces_get_space()) {
-      $title = $space->group->purl.'-'.$title;
+      $title = $space->group->purl . '-' . $title;
     }
 
     $header = drupal_get_http_header('Content-Disposition');
@@ -106,7 +107,7 @@ function os_publications_export($format = "tagged", $nid = NULL, $popup = FALSE)
     $match = array();
     preg_match('!filename="([^"]+)"!', $header, $match);
     $filename = str_replace(array('Drupal-Biblio', 'Biblio'), $title, $match[1]);
-    $header_new = preg_replace('!filename="([^"]+)"!', 'filename="'.$filename.'"', $header);
+    $header_new = preg_replace('!filename="([^"]+)"!', 'filename="' . $filename . '"', $header);
 
     drupal_add_http_header('Content-Disposition', $header_new);
     echo $output;
@@ -124,15 +125,15 @@ function os_publications_settings() {
     '#type' => 'container',
     '#attributes' => array(
       'class' => array('column', 'column-left'),
-    )
+    ),
   );
   $form['right'] = array(
     '#type' => 'container',
     '#attributes' => array(
       'class' => array('column', 'column-right'),
-    )
+    ),
   );
-  $style = module_exists('biblio_citeproc')?'biblio_citeproc_style':'biblio_style';
+  $style = module_exists('biblio_citeproc') ? 'biblio_citeproc_style' : 'biblio_style';
   $form['left'][$style] = array(
     '#type' => 'radios',
     '#title' => t('Select your preferred bibliographic format'),
@@ -146,9 +147,9 @@ function os_publications_settings() {
     '#title' => t('Select which export formats should accompany each bibliographic record'),
     '#default_value' => variable_get('biblio_export_links', array('tagged', 'xml', 'bibtex')),
     '#options' => array(
-      'tagged'  => t('EndNote Tagged'),
-      'xml'     => t('EndNote XML'),
-      'bibtex'  => t('BibTex'),
+      'tagged' => t('EndNote Tagged'),
+      'xml' => t('EndNote XML'),
+      'bibtex' => t('BibTex'),
     ),
     '#description' => t('Each selected format will appear in its own export link.'),
   );
@@ -177,11 +178,12 @@ function os_publications_settings() {
    }*/
 
 
+
   $form['right']['os_publications_note_in_teaser'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show the "note" content in teaser?'),
     //'#description' => t('This alters the bibliographic format of your publications.'),
-    '#default_value' => variable_get('os_publications_note_in_teaser', false),
+    '#default_value' => variable_get('os_publications_note_in_teaser', FALSE),
     '#description' => t('If this is checked and you add a note to a publication then it will show as part of a publications teaser.'),
   );
 
@@ -189,14 +191,14 @@ function os_publications_settings() {
     '#type' => 'textfield',
     '#title' => t('Publications per page'),
     '#size' => 5,
-    '#default_value' => variable_get('biblio_rowsperpage',25),
+    '#default_value' => variable_get('biblio_rowsperpage', 25),
     '#description' => t('Select the number of publication to be displayed on each page.'),
   );
 
   $form['left']['biblio_sort'] = array(
     '#type' => 'radios',
     '#title' => t('By default, sort publications by which category'),
-    '#default_value' => variable_get('biblio_sort','year'),
+    '#default_value' => variable_get('biblio_sort', 'year'),
     '#options' => array('author' => t('Author'), 'title' => t('Title'), 'type' => t('Type'), 'year' => t('Year')),
   );
 
@@ -210,7 +212,7 @@ function os_publications_settings() {
   $form['left']['biblio_sort_tabs'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Allow additional sorting of your publications by'),
-    '#default_value' => variable_get('biblio_sort_tabs', array('author'=>'author', 'title'=>'title', 'type'=>'type', 'year'=>'year')),
+    '#default_value' => variable_get('biblio_sort_tabs', array('author' => 'author', 'title' => 'title', 'type' => 'type', 'year' => 'year')),
     '#options' => array('author' => t('Author'), 'title' => t('Title'), 'type' => t('Type'), 'year' => t('Year')),
     //'#description' => t('You turn the sorting links at the top of the /biblio page here.'),
   );
@@ -241,5 +243,7 @@ function os_publications_settings() {
    '#default_value' => variable_get('scholar_publications_shorten_citations', 0),
   );*/
 
+
   return system_settings_form($form);
 }
+

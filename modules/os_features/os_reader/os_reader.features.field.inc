@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_reader.features.field.inc
@@ -180,3 +183,4 @@ function os_reader_field_default_fields() {
 
   return $fields;
 }
+

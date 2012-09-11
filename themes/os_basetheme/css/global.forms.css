@@ -150,8 +150,8 @@ input[disabled] {
 
 /** OS LOGIN BUTTON **/
 #block-os-login {
-	bottom:-22px;
-	position:relative;
+	 float: right;
+    position: relative;
 }
 
 

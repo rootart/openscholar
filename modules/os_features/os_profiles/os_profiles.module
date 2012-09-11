@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * Code for the Profiles feature.
@@ -12,7 +15,9 @@ include_once 'os_profiles.features.inc';
  * Enter description here...
  */
 function os_profiles_process_node(&$vars) {
-  if ($vars['type'] !== 'person') return;
+  if ($vars['type'] !== 'person') {
+    return;
+  }
 
   // Helps poor theme developers find these changes to $variables
   $vars['classes'] .= ' modified-in-os_profiles_process_node';
@@ -24,10 +29,10 @@ function os_profiles_process_node(&$vars) {
   }
   // Includes custom CSS
   $vars['title_prefix']['#attached'] = array(
-  	'css' => array(
-  		'type' => 'file',
-  		'data' => drupal_get_path('module', 'os_profiles') . '/os_profiles.css',
-  	),
+    'css' => array(
+      'type' => 'file',
+      'data' => drupal_get_path('module', 'os_profiles') . '/os_profiles.css',
+    ),
   );
 
   if (!$vars['teaser']) {
@@ -40,15 +45,21 @@ function os_profiles_process_node(&$vars) {
   // Customizes field markup with prefixes and suffixes
   if (isset($vars['content']['field_professional_title'])) {
     $title_plain = $vars['content']['field_professional_title'][0]['#markup'];
-    if ($title_plain) $vars['content']['field_professional_title'][0]['#markup'] = '<h' . $h . '>' . $title_plain . '</h' . $h . '>';
+    if ($title_plain) {
+      $vars['content']['field_professional_title'][0]['#markup'] = '<h' . $h . '>' . $title_plain . '</h' . $h . '>';
+    }
   }
   if (isset($vars['content']['field_email'])) {
     $email_plain = $vars['content']['field_email'][0]['#markup'];
-    if ($email_plain) $vars['content']['field_email'][0]['#markup'] = '<a href="mailto:' . $email_plain . '">email</a>';
+    if ($email_plain) {
+      $vars['content']['field_email'][0]['#markup'] = '<a href="mailto:' . $email_plain . '">email</a>';
+    }
   }
   if (isset($vars['content']['field_phone'])) {
     $phone_plain = $vars['content']['field_phone'][0]['#markup'];
-    if ($phone_plain) $vars['content']['field_phone'][0]['#markup'] = '<em>p:</em> ' . $phone_plain;
+    if ($phone_plain) {
+      $vars['content']['field_phone'][0]['#markup'] = '<em>p:</em> ' . $phone_plain;
+    }
   }
 }
 
@@ -58,11 +69,15 @@ function os_profiles_process_node(&$vars) {
  * Generates node title for Person nodes
  */
 function os_profiles_node_presave($node) {
-  if ($node->type !== 'person') return;
+  if ($node->type !== 'person') {
+    return;
+  }
 
   // Sets the node title like "[first] [middle] [last]"
   $title = _os_profiles_person_node_title($node);
-  if ($title) $node->title = $title;
+  if ($title) {
+    $node->title = $title;
+  }
 }
 
 /**
@@ -82,9 +97,12 @@ function _os_profiles_person_node_title($node) {
   $values = array();
   foreach ($fields as $field) {
     $items = field_get_items('node', $node, 'field_' . $field);
-    if (!empty($items[0]['value'])) $values[] = $items[0]['value'];
+    if (!empty($items[0]['value'])) {
+      $values[] = $items[0]['value'];
+    }
   }
 
   $title = implode(' ', $values);
   return $title;
 }
+

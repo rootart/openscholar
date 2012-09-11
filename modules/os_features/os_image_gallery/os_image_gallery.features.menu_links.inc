@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_image_gallery.features.menu_links.inc
@@ -31,3 +34,4 @@ function os_image_gallery_menu_default_menu_links() {
 
   return $menu_links;
 }
+

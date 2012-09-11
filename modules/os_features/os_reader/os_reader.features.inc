@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_reader.features.inc
@@ -37,3 +40,4 @@ function os_reader_node_info() {
   );
   return $items;
 }
+

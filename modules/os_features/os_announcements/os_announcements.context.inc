@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_announcements.context.inc
@@ -11,7 +14,8 @@ function os_announcements_context_default_contexts() {
   $export = array();
 
   $context = new stdClass();
-  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  /* Edit this to true to make a default context disabled initially */
+  $context->disabled = FALSE;
   $context->api_version = 3;
   $context->name = 'announcements_announcements';
   $context->description = 'Context that is active in the announcements section of your site';
@@ -37,7 +41,7 @@ function os_announcements_context_default_contexts() {
     ),
     'views' => array(
       'values' => array(
-        'announcements_listing:page' => 'announcements_listing:page',
+        'os_announcements:page' => 'os_announcements:page',
       ),
     ),
   );
@@ -52,3 +56,4 @@ function os_announcements_context_default_contexts() {
 
   return $export;
 }
+

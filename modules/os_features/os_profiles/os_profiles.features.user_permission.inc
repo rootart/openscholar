@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_profiles.features.user_permission.inc
@@ -66,3 +69,4 @@ function os_profiles_user_default_permissions() {
 
   return $permissions;
 }
+

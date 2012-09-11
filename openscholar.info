@@ -39,6 +39,7 @@ dependencies[] = pathauto
 dependencies[] = biblio
 
 ; media / files / wysiwyg
+dependencies[] = imagefield_crop
 dependencies[] = media
 dependencies[] = oembed
 dependencies[] = file_entity

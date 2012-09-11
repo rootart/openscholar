@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_image_gallery.features.user_permission.inc
@@ -65,3 +68,4 @@ function os_image_gallery_user_default_permissions() {
 
   return $permissions;
 }
+

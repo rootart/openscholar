@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_announcements.features.inc
@@ -41,3 +44,4 @@ function os_announcements_node_info() {
   );
   return $items;
 }
+

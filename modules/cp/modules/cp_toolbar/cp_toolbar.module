@@ -262,6 +262,7 @@ function cp_toolbar_fill_drawer() {
   $drawer['people-drawer']['add'] = array(
     '#theme' => 'links',
     '#links' => array(
+      'create' => menu_get_item('cp/users/create'),
       'users' => menu_get_item('cp/users/add'),
     ),
     '#attributes' => array(

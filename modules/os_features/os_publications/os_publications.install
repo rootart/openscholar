@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 function os_publications_schema() {
   $schema['cache_biblio_lists'] = drupal_get_schema_unprocessed('system', 'cache');
@@ -8,11 +9,11 @@ function os_publications_schema() {
 
 function os_publications_install() {
   db_add_field('biblio', 'biblio_url_title', array(
-    'type' => 'varchar',
-    'length' => 128,
-    'not null' => FALSE,
-    'description' => 'A title to go with the Relevant URL',
-  ));
+      'type' => 'varchar',
+      'length' => 128,
+      'not null' => FALSE,
+      'description' => 'A title to go with the Relevant URL',
+    ));
 }
 
 function os_publications_uninstall() {
@@ -23,11 +24,7 @@ function os_publications_enable() {
   _os_publications_update_field_data();
 
   // place it behind import/export modules
-  db_update('system')
-    ->fields(array('weight' => 50))
-    ->condition('name', 'os_publications', '=')
-    ->condition('type', 'module', '=')
-    ->execute();
+  db_update('system')->fields(array('weight' => 50))->condition('name', 'os_publications', '=')->condition('type', 'module', '=')->execute();
 }
 
 /*
@@ -35,14 +32,19 @@ function os_publications_enable() {
  * All field changes should be exported to the csv using SQL
  */
 function _os_publications_update_field_data() {
-  static $run_once = false;
+  static $run_once = FALSE;
 
-  if ($run_once) return;  // this only needs to be run once per update
+  // this only needs to be run once per update
+  if ($run_once) {
+    return;
+  }
 
-  $file = drupal_get_path('module', 'os_publications').'/misc/biblio_settings.inc';
-  if (!file_exists($file)) return;
+  $file = drupal_get_path('module', 'os_publications') . '/misc/biblio_settings.inc';
+  if (!file_exists($file)) {
+    return;
+  }
 
-  list ($biblio_field_type, $biblio_field_type_data, $biblio_contributor_type, $biblio_contributor_type_data) = include($file);
+  list($biblio_field_type, $biblio_field_type_data, $biblio_contributor_type, $biblio_contributor_type_data) = include ($file);
 
   db_truncate('biblio_field_type')->execute();
   foreach ($biblio_field_type as $type) {
@@ -65,3 +67,4 @@ function _os_publications_update_field_data() {
     drupal_write_record('biblio_contributor_type_data', $contrib_type_data);
   }
 }
+

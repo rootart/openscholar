@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_image_gallery.features.inc
@@ -138,3 +141,4 @@ function os_image_gallery_node_info() {
   );
   return $items;
 }
+

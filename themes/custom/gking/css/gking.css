@@ -739,9 +739,10 @@ html.js .front .region-header-second div.ctools-dropdown div.ctools-dropdown-con
 
 /* Publications Tabs & Research Group Tabs */
 
-.front #content-column .box-os_modal_tabbed {
+.front #content-column .block-boxes-os_boxes_tabs {
   background:url(../images/pubs-bg.png) repeat-x 0 0 #fff;
   padding: 0 26px;
+  width: 100%;
   }
 
 .box-os_modal_tabbed h2.block-title {
@@ -818,36 +819,47 @@ body.page-iqss-gking-research-group h3 {
 
 /**	 QUICK TABS**/
 	
-div.quicktabs_main {
+div.ui-tabs-panel {
 padding:10px;
 -moz-margin-top: 0px;
 margin-top: 1px;
 background-image: none;
 	}
 	
-.quicktabs_tabs {
-    float: right;
+.ui-tabs .ui-tabs-panel {
+    background-image: none;
+    border-top: none;
+ 
+}	
+
+.ui-corner-top {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+	
+.ui-tabs .ui-tabs-nav {
+    margin-left: 330px;
 }
 
-ul.quicktabs_tabs {
-    margin-top: 20px;
+.ui-tabs .ui-tabs-nav {
+     margin-top: -60px;
 }
 
-.quicktabs_tabs ul {
+.ui-tabs .ui-tabs-nav ul {
 width:100%;
 
 }
 
-ul.quicktabs_tabs li {
+.ui-tabs .ui-tabs-nav li {
 list-style: none;
 display: inline;
 margin: 0;
 }
 
-.quicktabs_tabs li a {
+.ui-tabs .ui-tabs-nav li a {
 text-decoration: none;
-padding: 10px 12px 19px 12px;
-background: transparent;
+padding: 9px 12px 19px 12px;
+background: none;
  -moz-border-radius-topleft: 0px;
  -moz-border-radius-topright: 0px;
 -webkit-border-top-left-radius:0px;
@@ -858,26 +870,38 @@ font-style:bold;
 border:none;
 }
 
-.quicktabs_tabs li a:link, .quicktabs_tabs li a:visited, #tablist li a:visited {
+.ui-tabs .ui-tabs-nav li a:link, .ui-tabs .ui-tabs-nav li a:visited, #tablist li a:visited {
 color: #000;
 font-size: 14px;
 font-weight:bold;
 }
 
-.quicktabs_tabs li a:hover {
+.ui-tabs .ui-tabs-nav li a:hover {
 color: #000;
 background: transparent;
 }
 
-.quicktabs_tabs li.active a {
+.ui-tabs .ui-tabs-nav li.active a {
 color: #000;
 background: #FFF;
 border:none;
 }
 
-.quicktabs_wrapper .quicktabs_tabpage {margin-top:55px; margin-bottom: 16px;}
 
-.box-os_modal_tabbed h2.block-title {font-size: 21px;}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    background: none;
+    border: none;
+ 
+}
+
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected {
+ background:  #FFFFFF;
+}
+
+.block-boxes-os_boxes_tabs .ui-tabs { margin-bottom: 16px;}
+
+.block-boxes-os_boxes_tabs h2.block-title {font-size: 21px;background: none;color:#FFF;border-bottom: none;}
 
 /* FOOTER */
 

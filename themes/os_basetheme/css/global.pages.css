@@ -579,6 +579,12 @@ border-top:1px solid #ccc;
 .ui-tabs .ui-tabs-nav li a {
     padding: 0.15em 1em;
   }
+
+.page-cp #tabs,
+.page-cp #tabs .links {
+	border:none;
+	border-bottom:none;
+}	
 	
 	
 	

@@ -1,10 +1,13 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * Code for the OS announcements feature module.
  */
 
-include_once('os_announcements.features.inc');
+include_once ('os_announcements.features.inc');
 
 /**
  * Implements hook_process_hook() for node.
@@ -12,7 +15,9 @@ include_once('os_announcements.features.inc');
  * Customizes $submitted for announcement nodes as just "M D, YYYY"
  */
 function os_announcements_process_node(&$vars) {
-  if ($vars['type'] !== 'announcement') return;
+  if ($vars['type'] !== 'announcement') {
+    return;
+  }
   // Build the submitted variable used by default in node templates
   $pubdate = format_date($vars['created'], 'custom', 'F j, Y');
   // Publication date, formatted with time element

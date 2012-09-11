@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_image_gallery.features.field.inc
@@ -864,3 +867,4 @@ function os_image_gallery_field_default_fields() {
 
   return $fields;
 }
+

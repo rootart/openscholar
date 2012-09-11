@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_image_gallery.context.inc
@@ -11,7 +14,8 @@ function os_image_gallery_context_default_contexts() {
   $export = array();
 
   $context = new stdClass();
-  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  /* Edit this to true to make a default context disabled initially */
+  $context->disabled = FALSE;
   $context->api_version = 3;
   $context->name = 'gallery_gallery';
   $context->description = 'Image gallery or image page';
@@ -38,7 +42,8 @@ function os_image_gallery_context_default_contexts() {
     ),
     'views' => array(
       'values' => array(
-        'gallery_slideshow' => 'gallery_slideshow',
+        'os_image_gallery' => 'os_image_gallery',
+        'os_image_gallery_slideshow' => 'os_image_gallery_slideshow',
       ),
     ),
   );
@@ -53,3 +58,4 @@ function os_image_gallery_context_default_contexts() {
 
   return $export;
 }
+

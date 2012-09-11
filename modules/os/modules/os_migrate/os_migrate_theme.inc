@@ -2,9 +2,9 @@
 
 /**
  * @file
- * 
+ *
  * Theme map.
- * 
+ *
  * Old themes were stored in og.og_theme
  * Now they're spaces variables.
  **/
@@ -14,7 +14,7 @@ class ThemeOSMigration extends OSMigration {
 
   public function __construct() {
     /* A handful of custom themes have become flavors.  Set those AFTER flavors are imported */
-    $this->dependencies = array('SpacesOverridesVariable'); 
+    $this->dependencies = array('SpacesOverridesVariable');
     $this->description = t('Vsite theme settings');
     $this->destination_schema =       array(
         'type' => array(
@@ -37,28 +37,28 @@ class ThemeOSMigration extends OSMigration {
           'type' => 'text',
         ),
       );
-    
-    parent::__construct();    
 
-    // if desired, supply node with defaults.  
+    parent::__construct();
+
+    // if desired, supply node with defaults.
     $this->source = $this->source(); //condtion type?
-    $this->destination = $this->destination(); 
+    $this->destination = $this->destination();
     $this->map = $this->map();
     //$this->dependencies = array('UsersOS', 'EmbedInlineOS', 'ImageInlineOS', 'FileInlineOS', 'HTMLInlineOS', 'VsiteNodeOS'); //og when that's done
-    
+
     //table copy doesn't like defaults.  just set them all in prepare.
     $this->addSimpleMappings(array('id', 'value', 'object_id', 'object_type', 'type'));
-    
+
     $this->addUnmigratedSources(array('og_theme', 'nid'), t('DNM'));
   }
-  
+
   /**
-   * several helper functions for setting up child nodes.  
+   * several helper functions for setting up child nodes.
    * it's not clear to me yet what level of abstraction I'll be working at
-   * so for now I'm leaivng it up to the node that implements this class 
+   * so for now I'm leaivng it up to the node that implements this class
    * to use the provided options or come up with their own.
    */
-  
+
   public function query() {
     $query = parent::d6_db_select('og', 'og');
     $query->addField('og', 'og_theme', 'value');
@@ -68,24 +68,24 @@ class ThemeOSMigration extends OSMigration {
     if (isset($this->restrict_vsites)) {
       $query->condition('nid', $this->restrict_vsites, 'IN'); //dancabral, jlepore, jsagotsky, gary
     }
-    
+
     return $query;
   }
-  
+
   public function sourceFields() {
     $source_fields =  array();
     return $source_fields;
   }
-  
+
   public function source() {
     return new MigrateSourceSQL($this->query(), array('og_theme'), null, array('map_joinable' => FALSE));
   }
-  
+
   public function destination() {
     //return new MigrateDestinationTable('spaces_overrides'); //
     return new MigrateDestinationTableCopy('spaces_overrides', $this->destination_schema);
   }
-  
+
   //map provides the schema for the primary key of the source table.  this lets migrate associate a unique source id
   //with a migrated object
   public function map() {
@@ -112,7 +112,7 @@ class ThemeOSMigration extends OSMigration {
 
   /**
    * Implements prepareRow
-   * 
+   *
    * Fetches path from {url_alias}
    */
   function prepareRow($current_row) {
@@ -120,12 +120,12 @@ class ThemeOSMigration extends OSMigration {
     if (preg_match($prefix, $current_row->value)) {
       $current_row->value = preg_replace($prefix, '', $current_row->value);
     }
-    
-    //several custom themes were made into flavors.  
+
+    //several custom themes were made into flavors.
     $this->_custom_theme_to_flavor($current_row);
-    
+
     //removed: Burroughs, collector, density.
-    
+
     $themes = list_themes();
     if (!isset($themes[$current_row->value])) {
       parent::saveMessage(t('Ignoring theme, @theme.  It is no longer supported.', array('@theme'=>$current_row->value)), MigrationBase::MESSAGE_NOTICE);
@@ -138,7 +138,7 @@ class ThemeOSMigration extends OSMigration {
     $current_row->object_id = 'theme_default';
   }
 
-  
+
   function _custom_theme_to_flavor(&$row) {
     //get the new theme
     switch ($row->value) {
@@ -151,24 +151,24 @@ class ThemeOSMigration extends OSMigration {
         $row->value = 'eloquent';
         $flavor = 'eloquent_sand_modfront';
       break;
-      
+
       case 'kshepsle':
         $row->value = 'eloquent';
-        $flavor = 'eloquent_sand_modfront';
+        $flavor = 'eloquent_green_modfront';
       break;
-      
+
       default:
         return;
     }
-    
-    //set the flavor.  
+
+    //set the flavor.
     $object_id = 'os_appearance_' . $row->value . '_flavor';
     db_insert('spaces_overrides')->fields(array(
       'type' => 'og',
       'id' => $row->id,
       'object_type' => 'variable',
       'object_id' => $object_id,
-      'value' => $flavor,
+      'value' => serialize($flavor),
     ))->execute();
   }
 }

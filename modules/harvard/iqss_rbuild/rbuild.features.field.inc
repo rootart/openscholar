@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * rbuild.features.field.inc
@@ -9,7 +12,7 @@
  */
 function rbuild_field_default_fields() {
   $fields = array();
-  
+
   // Exported field: 'node-software_project-field_rbuild_docs'
   $fields['node-software_project-field_rbuild_docs'] = array(
     'field_config' => array(
@@ -77,7 +80,7 @@ function rbuild_field_default_fields() {
       ),
     ),
   );
-  
+
   // Exported field: 'node-software_project-field_rbuild_short_name'
   $fields['node-software_project-field_rbuild_short_name'] = array(
     'field_config' => array(
@@ -145,7 +148,7 @@ function rbuild_field_default_fields() {
       ),
     ),
   );
-  
+
   // Exported field: 'node-software_project-field_software_repo'
   $fields['node-software_project-field_software_repo'] = array(
     'field_config' => array(
@@ -212,7 +215,7 @@ function rbuild_field_default_fields() {
       ),
     ),
   );
-  
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Description');
@@ -231,3 +234,4 @@ function rbuild_field_default_fields() {
 
   return $fields;
 }
+
