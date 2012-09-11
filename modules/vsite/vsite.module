@@ -287,248 +287,332 @@ function vsite_attach_fields_to_group_content($bundle) {
  */
 function vsite_attach_fields_to_group($bundle) {
   og_create_field(OG_GROUP_FIELD, 'node', $bundle);
-
-  // field_site_address.
-  $field = array(
-    'active' => '1',
-    'cardinality' => '1',
-    'deleted' => '0',
-    'entity_types' => array(),
-    'field_name' => 'field_site_address',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
-    'indexes' => array(
-      'format' => array(
-        0 => 'format',
-      ),
-    ),
-    'module' => 'text',
-    'settings' => array(
-      'max_length' => '255',
-    ),
-    'translatable' => '0',
-    'type' => 'text',
-  );
+  og_create_field(OG_ACCESS_FIELD, 'node', $bundle);
 
   if (!field_info_field('field_site_address')) {
-    $field = field_create_field($field);
-  }
-
-  $instance = array(
-    'bundle' => $bundle,
-    'default_value' => 'Your Town<br>Your City, State, ZIP',
-    'deleted' => '0',
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 3,
+    // field_site_address.
+    $field = array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_site_address',
+      'foreign keys' => array(
+        'format' => array(
+          'columns' => array(
+            'format' => 'format',
+          ),
+          'table' => 'filter_format',
+        ),
       ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+      'indexes' => array(
+        'format' => array(
+          0 => 'format',
+        ),
       ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_site_address',
-    'label' => 'Site Address',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => '0',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
       'module' => 'text',
       'settings' => array(
-        'size' => '30',
+        'max_length' => '255',
       ),
-      'type' => 'text_textfield',
-      'weight' => '32',
-    ),
-  );
+      'translatable' => '0',
+      'type' => 'text',
+    );
+    $field = field_create_field($field);
+  }
 
   if (!field_info_instance('node', 'field_site_address', $bundle)) {
+    $instance = array(
+      'bundle' => $bundle,
+      'default_value' => 'Your Town<br>Your City, State, ZIP',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => 3,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_site_address',
+      'label' => 'Site Address',
+      'required' => 0,
+      'settings' => array(
+        'text_processing' => '0',
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'text',
+        'settings' => array(
+          'size' => '30',
+        ),
+        'type' => 'text_textfield',
+        'weight' => '32',
+      ),
+    );
     field_create_instance($instance);
   }
-
-  // field_site_description.
-  $field = array(
-    'active' => '1',
-    'cardinality' => '1',
-    'deleted' => '0',
-    'entity_types' => array(),
-    'field_name' => 'field_site_description',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
-    'indexes' => array(
-      'format' => array(
-        0 => 'format',
-      ),
-    ),
-    'module' => 'text',
-    'settings' => array(
-      'max_length' => '255',
-    ),
-    'translatable' => '0',
-    'type' => 'text',
-  );
 
   if (!field_info_field('field_site_description')) {
-    $field = field_create_field($field);
-  }
-
-  $instance = array(
-    'bundle' => $bundle,
-    'default_value' => 'Your website',
-    'deleted' => '0',
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 2,
+    // field_site_description.
+    $field = array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_site_description',
+      'foreign keys' => array(
+        'format' => array(
+          'columns' => array(
+            'format' => 'format',
+          ),
+          'table' => 'filter_format',
+        ),
       ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+      'indexes' => array(
+        'format' => array(
+          0 => 'format',
+        ),
       ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_site_description',
-    'label' => 'Site Description',
-    'required' => FALSE,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
       'module' => 'text',
       'settings' => array(
-        'size' => 60,
+        'max_length' => '255',
       ),
-      'type' => 'text_textfield',
-      'weight' => '31',
-    ),
-  );
-
-  if (!field_info_instance('node', 'field_site_description', $bundle)) {
-    field_create_instance($instance);
-  }
-
-  // field_site_logo.
-  $field = array(
-    'active' => '1',
-    'cardinality' => '1',
-    'deleted' => '0',
-    'entity_types' => array(),
-    'field_name' => 'field_site_logo',
-    'foreign keys' => array(
-      'fid' => array(
-        'columns' => array(
-          'fid' => 'fid',
-        ),
-        'table' => 'file_managed',
-      ),
-    ),
-    'indexes' => array(
-      'fid' => array(
-        0 => 'fid',
-      ),
-    ),
-    'module' => 'imagefield_crop',
-    'settings' => array(
-      'default_image' => 0,
-      'uri_scheme' => 'public',
-    ),
-    'translatable' => '0',
-    'type' => 'imagefield_crop',
-  );
-
-  if (!field_info_field('field_site_logo')) {
+      'translatable' => '0',
+      'type' => 'text',
+    );
     $field = field_create_field($field);
   }
 
-  $instance = array(
-    'bundle' => $bundle,
-    'deleted' => '0',
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'image',
-        'settings' => array(
-          'image_link' => '',
-          'image_style' => '',
+  if (!field_info_instance('node', 'field_site_description', $bundle)) {
+    $instance = array(
+      'bundle' => $bundle,
+      'default_value' => 'Your website',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => 2,
         ),
-        'type' => 'image',
-        'weight' => 4,
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
       ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_site_logo',
-    'label' => 'Site Logo',
-    'required' => FALSE,
-    'settings' => array(
-      'alt_field' => 0,
-      'file_directory' => '',
-      'file_extensions' => 'png gif jpg jpeg',
-      'max_filesize' => '',
-      'max_resolution' => '',
-      'min_resolution' => '',
-      'title_field' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'module' => 'imagefield_crop',
+      'entity_type' => 'node',
+      'field_name' => 'field_site_description',
+      'label' => 'Site Description',
+      'required' => FALSE,
       'settings' => array(
-        'collapsible' => 2,
-        'croparea' => '500x500',
-        'custom_ratio' => '',
-        'enforce_minimum' => TRUE,
-        'enforce_ratio' => TRUE,
-        'gif_processing' => 'convert',
-        'preview_image_style' => 'thumbnail',
-        'progress_indicator' => 'throbber',
-        'resolution' => '200x150',
-        'select_maximum_area' => TRUE,
-        'validate_resolution' => 0,
+        'text_processing' => 0,
+        'user_register_form' => FALSE,
       ),
-      'type' => 'imagefield_crop_widget',
-      'weight' => '33',
-    ),
-  );
-
-  if (!field_info_instance('node', 'field_site_logo', $bundle)) {
+      'widget' => array(
+        'module' => 'text',
+        'settings' => array(
+          'size' => 60,
+        ),
+        'type' => 'text_textfield',
+        'weight' => '31',
+      ),
+    );
     field_create_instance($instance);
   }
+
+  if (!field_info_field('field_site_logo')) {
+    // field_site_logo.
+    $field = array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_site_logo',
+      'foreign keys' => array(
+        'fid' => array(
+          'columns' => array(
+            'fid' => 'fid',
+          ),
+          'table' => 'file_managed',
+        ),
+      ),
+      'indexes' => array(
+        'fid' => array(
+          0 => 'fid',
+        ),
+      ),
+      'module' => 'imagefield_crop',
+      'settings' => array(
+        'default_image' => 0,
+        'uri_scheme' => 'public',
+      ),
+      'translatable' => '0',
+      'type' => 'imagefield_crop',
+    );
+    $field = field_create_field($field);
+  }
+
+  if (!field_info_instance('node', 'field_site_logo', $bundle)) {
+    $instance = array(
+      'bundle' => $bundle,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'image',
+          'settings' => array(
+            'image_link' => '',
+            'image_style' => '',
+          ),
+          'type' => 'image',
+          'weight' => 4,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_site_logo',
+      'label' => 'Site Logo',
+      'required' => FALSE,
+      'settings' => array(
+        'alt_field' => 0,
+        'file_directory' => '',
+        'file_extensions' => 'png gif jpg jpeg',
+        'max_filesize' => '',
+        'max_resolution' => '',
+        'min_resolution' => '',
+        'title_field' => 0,
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'module' => 'imagefield_crop',
+        'settings' => array(
+          'collapsible' => 2,
+          'croparea' => '500x500',
+          'custom_ratio' => '',
+          'enforce_minimum' => TRUE,
+          'enforce_ratio' => TRUE,
+          'gif_processing' => 'convert',
+          'preview_image_style' => 'thumbnail',
+          'progress_indicator' => 'throbber',
+          'resolution' => '200x150',
+          'select_maximum_area' => TRUE,
+          'validate_resolution' => 0,
+        ),
+        'type' => 'imagefield_crop_widget',
+        'weight' => '33',
+      ),
+    );
+    field_create_instance($instance);
+  }
+
+  if (!field_info_field('field_group_path')) {
+    // field_group_path.
+    $field = array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_group_path',
+      'foreign keys' => array(),
+      'indexes' => array(),
+      'module' => 'link',
+      'settings' => array(
+        'attributes' => array(
+          'class' => '',
+          'rel' => '',
+          'target' => 'default',
+        ),
+        'display' => array(
+          'url_cutoff' => 80,
+        ),
+        'enable_tokens' => 1,
+        'title' => 'optional',
+        'title_maxlength' => 128,
+        'title_value' => '',
+        'url' => 0,
+      ),
+      'translatable' => '0',
+      'type' => 'link_field',
+    );
+    $field = field_create_field($field);
+  }
+
+  if (!field_info_instance('node', 'field_group_path', $bundle)) {
+    $instance = array(
+      'bundle' => $bundle,
+      'default_value' => NULL,
+      'default_value_function' => 'vsite_group_default_homepage_value',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '5',
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_group_path',
+      'label' => 'Group Homepage Path',
+      'required' => 0,
+      'settings' => array(
+        'attributes' => array(
+          'class' => '',
+          'configurable_title' => 0,
+          'rel' => '',
+          'target' => 'default',
+          'title' => '',
+        ),
+        'display' => array(
+          'url_cutoff' => '80',
+        ),
+        'enable_tokens' => 0,
+        'rel_remove' => 'default',
+        'title' => 'none',
+        'title_maxlength' => '128',
+        'title_value' => '',
+        'url' => 0,
+        'user_register_form' => FALSE,
+        'validate_url' => 0,
+      ),
+      'widget' => array(
+        'active' => 0,
+        'module' => 'link',
+        'settings' => array(),
+        'type' => 'link_field',
+        'weight' => '2',
+      ),
+    );
+    field_create_instance($instance);
+  }
+
 }
 
 /**
