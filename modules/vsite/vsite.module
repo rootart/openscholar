@@ -274,7 +274,9 @@ function vsite_field_attach_create_bundle($entity_type, $bundle) {
  *   The node-type to attach the fields to.
  */
 function vsite_attach_fields_to_group_content($bundle) {
-  og_create_field(OG_AUDIENCE_FIELD, 'node', $bundle);
+  $og_field = og_fields_info(OG_AUDIENCE_FIELD);
+  $og_field['instance']['default_value_function'] = 'vsite_group_audience_field_default_value';
+  og_create_field(OG_AUDIENCE_FIELD, 'node', $bundle, $og_field);
 }
 
 /**
