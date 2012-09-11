@@ -23,6 +23,17 @@ class os_taxonomy_fbt extends os_boxes_default {
   public function options_form(&$form_state){
     $form = array();
 
+
+    $vocabularies = $this->get_all_volcabularies();
+
+    $form['vocabulary'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Vocabularies'),
+      '#options' => $vocabularies,
+      '#required' => TRUE,
+      '#description' => t('Which vocabularies would you like to use to filter posts.'),
+    );
+
     $form += parent::options_form($form_state);
     return $form;
   }
@@ -34,6 +45,13 @@ class os_taxonomy_fbt extends os_boxes_default {
     $block = parent::render();
 
     $block['content'] = "Filter By Category Block [STUB]";
+    // For now - display the first vocabulary terms.
+    $block['content'] .= theme('volcabulary_term_list', array(
+      'vid' => 1,
+      'options' => array(
+        'simple_view' => FALSE,
+      ),
+    ));
 
     return $block;
   }
@@ -43,4 +61,19 @@ class os_taxonomy_fbt extends os_boxes_default {
    */
   public function cache_info(){
   }
+
+  /**
+   * Get all the volcabularies id using the taxonomy terms.
+   */
+   private function get_all_volcabularies() {
+      $query = db_query('SELECT * FROM {taxonomy_vocabulary}');
+
+      $vocabularies = array();
+
+      foreach ($query->fetchAll() as $result) {
+        $vocabularies[$result->vid] = $result->name;
+      }
+
+      return $vocabularies;
+   }
 }
