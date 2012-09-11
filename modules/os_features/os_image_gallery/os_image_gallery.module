@@ -92,10 +92,6 @@ function os_image_gallery_form_alter(&$form, &$form_state, $form_id) {
 
     //make an image instead of a link
     $form['preview']['#theme'] = 'media_admin_thumbnail';
-<<<<<<< HEAD
-
-=======
->>>>>>> SCHOLAR-3-0
   }
 }
 
@@ -107,13 +103,8 @@ function os_image_gallery_form_alter(&$form, &$form_state, $form_id) {
 function os_image_gallery_file_delete($file) {
   $query = new EntityFieldQuery();
   $result = $query->entityCondition('entity_type', 'node')
-<<<<<<< HEAD
-              ->fieldCondition('media_gallery_media', 'fid', $file->fid, '=')
-              ->execute();
-=======
       ->fieldCondition('media_gallery_media', 'fid', $file->fid, '=')
       ->execute();
->>>>>>> SCHOLAR-3-0
 
   if (isset($result['node'])) {
     $nids = array_keys($result['node']);
