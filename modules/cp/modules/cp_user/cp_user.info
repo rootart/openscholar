@@ -6,5 +6,3 @@ php = 5.2.4
 dependencies[] = cp
 dependencies[] = ctools
 dependencies[] = os
-features[features_api][] = api:1
-files[] = cp_user.form.inc
