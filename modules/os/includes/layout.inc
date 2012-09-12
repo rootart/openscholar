@@ -131,7 +131,7 @@ function os_layout_get($context, $load_meta = FALSE, $unused_blocks = FALSE) {
       'title' => '',
       'weight' => 0,
   );
-  foreach ($block_settings as &$b ) {
+  foreach ($block_settings as &$b) {
     $b += $required;
   }
 
@@ -515,7 +515,7 @@ function _os_layout_adjust_relative_weight(&$block_settings, $previous_layout, $
   foreach ( $block_settings as $id => $block ) {
     // Skip this block if there is no weight setting OR they are not in the same
     // region.
-    if (! isset($block['weight']) || $block_settings[$bid]['region'] != $block['region']) {
+    if (!isset($block['weight']) || $block_settings[$bid]['region'] != $block['region']) {
       continue;
     }
 
@@ -543,7 +543,7 @@ function _os_layout_adjust_relative_weight(&$block_settings, $previous_layout, $
   $block_settings[$bid]['weight'] = $w_old;
 
   // No other blocks impacted.
-  if (! count($impacted_blocks)) {
+  if (!count($impacted_blocks)) {
     return;
   }
 

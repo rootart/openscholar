@@ -34,7 +34,7 @@
  *   The new user account or false if there was an error.
  */
 function os_user_create($user_info) {
-  $account = user_save(NULL,$user_info);
+  $account = user_save(NULL, $user_info);
 
   if (!$account || !isset($account->uid)){
     return FALSE;

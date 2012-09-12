@@ -186,7 +186,7 @@ function os_menu_tree_data($menu_name) {
 function os_menu_tree($menu_name) {
 
   $menus = os_get_menus();
-  if (! isset($menus[$menu_name])) {
+  if (!isset($menus[$menu_name])) {
     return;
   }
 
@@ -223,7 +223,7 @@ function os_menu_tree($menu_name) {
 function os_menu_link_save(&$item) {
   $mlid = FALSE;
   if (module_exists('vsite_menu')) {
-    //Save a menu item using the vsite controllers.
+    // Save a menu item using the vsite controllers.
     $mlid = vsite_menu_menu_link_save($item);
   }
   else {
