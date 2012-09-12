@@ -2,7 +2,7 @@
 
 /**
  * @file
- * taxonomy terms API for OpenScholar.
+ * Taxonomy terms API for OpenScholar.
  */
 
 include_once 'os_taxonomy.views.inc';
@@ -49,24 +49,15 @@ function os_taxonomy_theme() {
 }
 
 /**
- * Implements hook_views_api().
- */
-function os_taxonomy_views_api() {
-  return array(
-    'api' => 3,
-  );
-}
-
-/**
- * Building the content for each row in the terms list.
+ * Build the content for each row in the terms list.
  *
- *  @param Array $varibles
+ *  @param $varibles
  *    - number: The number of tagged itmes to the taxonomy term.
  *    - name: The name of taxonomy term.
  *    - link_to_empty_terms: Switch that controll if to link a taxonomy term
  *      with zero tagged nodes.
  *    - url_path: The url of the taxonomy term.
- *    - link_options: A setting variable for the l function.
+ *    - link_options: A setting variable for the l() function.
  *    - terms_description: Controll switch for displaying the taxonomy term
  *      desscription.
  *    - description: The taxonomy term description.
@@ -88,7 +79,7 @@ function theme_volcabulary_term_list_row($variables) {
 /**
  * Return generated item list of the terms.
  *
- *  @param Array $variables:
+ *  @param $variables:
  *    - vid: The volcabulary ID.
  *    - options: List of settings that concern to the list generation.
  *      - range: Number of terms to show from this volcabulary
@@ -198,9 +189,9 @@ function theme_volcabulary_term_list($variables) {
 }
 
 /**
- * Generate a list of nodes related to the node.
+ * Generate a list of nodes related to the term.
  *
- *  @param Array $variables:
+ *  @param $variables:
  *    - taxonomy_term: Taxonomy term object.
  *    - options:
  *      - bundles: The bundles type of the tagged node that will include in the
@@ -209,7 +200,7 @@ function theme_volcabulary_term_list($variables) {
  *      - view_mode: The node view mode to display when showing as a tree.
  *      - description: Display the term description under the term title.
  *      - child_element: Attach the child node terms.
- *      - tagged_nodes_depth: Dpeth level of tagged node to terms.
+ *      - max_depth: Depth level of tagged node to terms.
  *      - range: How much elements to show.
  *      - offset: The node location to start from.
  *      - indentation: How much indentation units to apply to the tree.
@@ -228,7 +219,7 @@ function theme_taxonomy_term_tagged_node($variables) {
     'description' => FALSE,
     'child_element' => TRUE,
     'indentation_type' => 'px',
-    'tagged_nodes_depth' => NULL,
+    'max_depth' => NULL,
   );
   $taxonomy_term = $variables['taxonomy_term'];
 
@@ -246,9 +237,9 @@ function theme_taxonomy_term_tagged_node($variables) {
     $tid = $taxonomy_term->tid;
 
     // Show the nodes child's term with the term's nodes.
-    if ($options['child_element'] && $options['tagged_nodes_depth'] !== FALSE) {
+    if ($options['child_element'] && $options['max_depth'] !== FALSE) {
       // Get all the childrens.
-      $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['tagged_nodes_depth']);
+      $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['max_depth']);
       foreach ($childrens as $children) {
         $tids[] = $children->tid;
       }
@@ -263,8 +254,8 @@ function theme_taxonomy_term_tagged_node($variables) {
     return $output;
   }
 
-  if ($options['tagged_nodes_depth'] !== FALSE) {
-    $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['tagged_nodes_depth']);
+  if ($options['max_depth'] !== FALSE) {
+    $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['max_depth']);
 
     foreach ($childrens as $children) {
       $attached_nodes = os_taxonomy_list_attached_nodes($children->tid, $options['bundles'], $options['range'], $options['offset']);
@@ -306,7 +297,7 @@ function theme_taxonomy_term_tagged_node($variables) {
 /**
  * Rendering node to view inside the node related to terms.
  *
- *  @param Array $variables
+ *  @param $variables
  *    - indentation: The amount of indentation to apply on the elements in the
  *      list.
  *    - direction: The direction of the indentation i.e margin-left/margin-right.

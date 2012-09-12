@@ -3,6 +3,8 @@ description = Managing OS taxonomy terms.
 
 dependencies[] = views
 
+features[views_view][] = os_taxonomy_vocabulary_term_list
+
 package = OpenScholar
 php = 5.2.4
 core = 7.x
