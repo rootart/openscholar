@@ -2,68 +2,69 @@
 
 /**
  * @file layout.inc
- *
- * Provides layout management and crud functions
+ * Provides layout management and crud functions.
  *
  * os_layout_get_contexts
- * Return an array of all the contexts avalible (optionally) filtered by privacy
+ * Return an array of all the contexts avalible (optionally) filtered by privacy.
  *
  * os_layout_get
- * Return an array of block settings for a single context
+ * Return an array of block settings for a single context.
  *
  * os_layout_get_multiple
- * Returns an array of block settings for multiple contexts
+ * Returns an array of block settings for multiple contexts.
  *
  * os_layout_set
- * Saves block settings for a single context
+ * Saves block settings for a single context.
  *
  * os_layout_set_multiple
- * Saves and array of block settings for multiple contexts
+ * Saves and array of block settings for multiple contexts.
  *
  * os_layout_put
- * Helper function to add a single block to a layout
+ * Helper function to add a single block to a layout.
  *
  * os_layout_load_block
- * Given a blocks full meta-data including config paths and access parameters
+ * Given a blocks full meta-data including config paths and access parameters.
  *
  * os_layout_block_delete
- * Given a bid remove all instances of that block from the layout system
+ * Given a bid remove all instances of that block from the layout system.
  *
  */
 
 /**
- * Return the public non-admin contexts that are avalible in a site
+ * Return the public non-admin contexts that are avalible in a site.
  *
- * @param $privacy and
- *          array (or single value)
- *          (0 -> disabled, 2 -> private, 1 -> public)
- *          TRUE returns all
+ * @param $privacy
+ *  0: disabled
+ *  1: public
+ *  2: private
+ *
+ *  TRUE returns all.
  */
-function os_layout_get_contexts($privacy = array(1,2)){
-  if (! is_array($privacy)) {
-    if (! $privacy) {
-      // If false was passed then return no contexts
+function os_layout_get_contexts($privacy = array(1, 2)) {
+  if (!is_array($privacy)) {
+    if (!$privacy) {
+      // If false was passed then return no contexts.
       return array();
     }
   }
 
   $os_contexts = array();
-  foreach ( module_implements('os_layout_contexts') as $module ) {
+  foreach (module_implements('os_layout_contexts') as $module) {
     $contexts = module_invoke($module, 'os_layout_contexts');
-    foreach ( $contexts as $id => $name ) {
+    foreach ($contexts as $id => $name) {
       $os_contexts[$id] = $name;
     }
   }
 
   drupal_alter('os_layout_contexts_alter', $os_contexts);
 
-  // Check privacy settings if needed
+  // Check privacy settings if needed.
   if (is_array($privacy)) {
-    // //Retrieve the features that match the privacy settings
+    // // Retrieve the features that match the privacy settings.
     // $avalible_features = array_intersect(variable_get('spaces_features',
   // array()), $privacy);
     //
-    // //Map contexts to features
+    // // Map contexts to features.
     // $context_map = features_get_component_map('context');
     // foreach ( $os_contexts as $value ) {
     // ;
@@ -76,61 +77,61 @@ function os_layout_get_contexts($privacy = array(1,2)){
 /**
  * Returns the blocks for a individual context
  *
- * @param string $context
- *          The identifier string for a context
+ * @param $context
+ *  The identifier string for a context.
  *
- * @param $load_meta Add
- *          meta-data used by admin forms
+ * @param $load_meta
+ *  Add meta-data used by admin forms.
  *
- * @param $unused_blocks Add
- *          all unused site blocks
+ * @param $unused_blocks
+ *  Add all unused site blocks.
  *
- * @return array List of blocks
+ * @return
+ *  List of blocks.
  */
-function os_layout_get($context, $load_meta = false, $unused_blocks = false){
-  /**
-   * Context load alters the context (for vsites) so no need to do anything
-   * extra
-   */
+function os_layout_get($context, $load_meta = FALSE, $unused_blocks = FALSE) {
+   // context load alters the context (for vsites) so no need to do anything
+   // extra.
   $o_context = context_load($context);
 
   if (! is_object($o_context) || ! isset($o_context->reactions['block'])) {
-    // This was an invalid context
-    return false;
+    // This was an invalid context.
+    return FALSE;
   }
 
   if (array_key_exists('blocks', $o_context->reactions['block'])) {
     $block_settings = $o_context->reactions['block']['blocks'];
   }
   else {
-    // No blocks set yet for this context
+    // No blocks set yet for this context.
     $block_settings = array();
   }
 
   if ($unused_blocks) {
     $site_blocks = module_invoke_all('os_widget');
     foreach ( $site_blocks as $bid => $block ) {
+      // Add unused block.
       if (! isset($block_settings[$bid])) {
-        $block['region'] = false;
+        $block['region'] = FALSE;
         $block_settings[$bid] = $block;
-      } // Add unused block
+      }
     }
   }
 
   if ($load_meta) {
-    foreach ( $block_settings as $bid => $block ) {
-      $block_settings[$bid] = os_layout_load_block($bid, true, $block);
+    foreach ($block_settings as $bid => $block) {
+      $block_settings[$bid] = os_layout_load_block($bid, FALSE, $block);
     }
   }
 
-  // ensure blocks all have the required fields
+  // Ensure blocks all have the required fields.
   $required = array(
-      'region' => false,
+      'region' => FALSE,
       'status' => 0,
       'title' => '',
-      'weight' => 0
+      'weight' => 0,
   );
-  foreach ( $block_settings as &$b ) {
+  foreach ($block_settings as &$b ) {
     $b += $required;
   }
 
@@ -138,33 +139,34 @@ function os_layout_get($context, $load_meta = false, $unused_blocks = false){
 }
 
 /**
- * Returns the blocks for multiple contexts
- * with child contexts overriding the parents
+ * Returns the blocks for multiple contexts with child contexts overriding the
+ * parents.
  *
- * @param array $contexts
- *          A list of context identifiers to load and aggregate
+ * @param $contexts
+ *  A list of context identifiers to load and aggregate.
  *
- * @param $load_meta Add
- *          meta-data used by admin forms
+ * @param $load_meta
+ *  Add meta-data used by admin forms.
  *
- * @param $unused_blocks Add
- *          all unused site blocks
+ * @param $unused_blocks
+ *  Add all unused site blocks.
  *
- * @return array List of blocks
+ * @return
+ *  List of blocks.
  */
-function os_layout_get_multiple($contexts, $load_meta = false, $unused_blocks = false){
+function os_layout_get_multiple($contexts, $load_meta = FALSE, $unused_blocks = FALSE) {
   usort($contexts, '_os_context_sort_by_hierarchy');
 
   $context_blocks = array();
 
-  // Retrieve all of the blocks
-  foreach ( $contexts as $context ) {
-    // Merge the blocks with child blocks replacing parent blocks
+  // Retrieve all of the blocks.
+  foreach ($contexts as $context) {
+    // Merge the blocks with child blocks replacing parent blocks.
     $blocks = os_layout_get($context, $load_meta, $unused_blocks);
 
-    // If this was true then the unused blocks were all added
-    // on the first run, there is no need to keep getting them
-    // also this prevents un-intended overrides
+    // If this was true then the unused blocks were all added on the first run,
+    // there is no need to keep getting them also this prevents un-intended
+    // overrides.
     $unused_blocks = false;
 
     if (is_array($blocks)) {
@@ -176,58 +178,54 @@ function os_layout_get_multiple($contexts, $load_meta = false, $unused_blocks = 
 }
 
 /**
- * Saves an array blocks for a individual context
+ * Saves an array blocks for a individual context.
  *
- * @param string $context
- * @param array $blocks
- *
- * @return boolean Success
+ * @param $context
+ * @param $blocks
  */
-function os_layout_set($context, $blocks){
+function os_layout_set($context, $blocks) {
   _os_layout_sanitize_blocks($blocks);
   if (module_exists('vsite_layout')) {
-    // Write the context to the overrides table
+    // Write the context to the overrides table.
     vsite_layout_context_set($context, $blocks);
   }
   else {
     $o_context = context_load($context);
     $o_context->reactions['block']['blocks'] = $blocks;
-    // write the context to the database
+    // write the context to the database.
     context_save($o_context);
   }
 }
 
 /**
- * Reverts a individual context back to defaults
+ * Reverts a individual context back to defaults.
  *
- * @param string $context
+ * @param $context
  *
- * @return boolean Success
+ * @return
+ *  TRUE/FALSE
  */
-function os_layout_revert($context){
+function os_layout_revert($context) {
   if (module_exists('vsite_layout')) {
-    // Write the context to the overrides table
+    // Write the context to the overrides table.
     vsite_layout_context_revert($context);
-    return true;
+    return TRUE;
   }
   else {
-    // No overrides in single tenant, nothing to do
-    return false;
+    // No overrides in single tenant, nothing to do.
+    return FALSE;
   }
 }
 
 /**
  * Saves an array blocks to multiple contexts, resolving weight issues and
- * deciding what overrides need to be made
+ * deciding what overrides need to be made.
  *
- * @param array $contexts
- * @param array $blocks
- *          An array of blocks to save to the contexts with the correct block
- *          keys
- *
- * @return boolean Success
+ * @param $contexts
+ * @param $blocks
+ *  An array of blocks to save to the contexts with the correct block keys.
  */
-function os_layout_set_multiple($contexts, $blocks){
+function os_layout_set_multiple($contexts, $blocks) {
   usort($contexts, '_os_context_sort_by_hierarchy');
   uasort($blocks, 'os_layout_block_sort');
 
@@ -242,66 +240,65 @@ function os_layout_set_multiple($contexts, $blocks){
   );
 
   $context_settings = array();
-  // Resolve dependencies and alter the contexts accordingly
+  // Resolve dependencies and alter the contexts accordingly.
   foreach ( $contexts as $index => $context ) {
     $layout_blocks = os_layout_get($context);
-    // TODO: handle case when $layout_blocks is false
-    // Sort the blocks
+    // TODO: handle case when $layout_blocks is false.
+    // Sort the blocks.
     uasort($layout_blocks, 'os_layout_block_sort');
 
     $last_child = (count($contexts) == ($index + 1));
 
-    // Get the removed blocks that no longer exist from this context
+    // Get the removed blocks that no longer exist from this context.
     $missing_blocks = array_diff(array_keys($layout_blocks), array_keys($blocks));
 
-    // check common blocks for differences)
+    // check common blocks for differences.
     foreach ( array_intersect_key($blocks, $layout_blocks) as $bid => $block ) {
-      $changed = false;
-      foreach ( $block_fields as $key ) {
+      $changed = FALSE;
+      foreach ($block_fields as $key) {
         if ($layout_blocks[$bid][$key] != $blocks[$bid][$key]) {
-          /**
-           *
-           * @todo Adapt block weights and check for removed bocks
-           */
+
+          // @todo Adapt block weights and check for removed bocks
           switch ($key) {
             case 'weight' :
               // If this is the childmost context, no need to adjust weights,
               // just save them,
-              // same with if we need to save an override for another reason
-              if ($last_child || $changed)
+              // same with if we need to save an override for another reason.
+              if ($last_child || $changed) {
                 break;
+              }
               _os_layout_adjust_relative_weight($blocks, $layout_blocks, $bid);
               // Check to see if the weight has been reset
               $changed = ($layout_blocks[$bid][$key] != $blocks[$bid][$key]);
               break;
             default :
-              // Nothing to do
-              $changed = true;
+              // Nothing to do.
+              $changed = FALSE;
               break;
           }
         }
       }
-      // Not changed take no action
+      // Not changed take no action.
       if (! $changed && ! $last_child) {
-        $blocks[$bid]['default_matched'] = true;
+        $blocks[$bid]['default_matched'] = TRUE;
       }
       else {
-        $blocks[$bid]['default_matched'] = false;
+        $blocks[$bid]['default_matched'] = FALSE;
       }
     }
 
     // If this context has a child context, queue up blocks to be set as removed
-    // in child
-    if (! $last_child) {
+    // in child.
+    if (!$last_child) {
       $removed_blocks = array_merge($missing_blocks, $removed_blocks);
     }
     else {
       // This is the childmost context, add the blocks as regionless to override
-      // as removed
-      foreach ( $removed_blocks as $bid ) {
-        // Add this block without a region
-        $layout_blocks[$bid] = os_layout_load_block($bid, false, array(
-            'region' => false
+      // as removed.
+      foreach ($removed_blocks as $bid) {
+        // Add this block without a region.
+        $layout_blocks[$bid] = os_layout_load_block($bid, FALSE, array(
+            'region' => FALSE,
         ));
       }
     }
@@ -309,9 +306,9 @@ function os_layout_set_multiple($contexts, $blocks){
     $context_settings[$context] = $layout_blocks;
   }
 
-  foreach ( $blocks as $bid => $block ) {
-    // Remove those blocks that are represented in parents
-    if (! empty($block['default_matched'])) {
+  foreach ($blocks as $bid => $block) {
+    // Remove those blocks that are represented in parents.
+    if (!empty($block['default_matched'])) {
       unset($blocks[$bid]);
     }
   }
@@ -320,20 +317,18 @@ function os_layout_set_multiple($contexts, $blocks){
   $context_settings[$context] = array_merge($context_settings[$context], $blocks);
 
   // Commit the context settings
-  foreach ( $context_settings as $context => $layout_blocks ) {
+  foreach ($context_settings as $context => $layout_blocks) {
     os_layout_set($context, $layout_blocks);
   }
 }
 
 /**
- * Adds/Updates an individual block within a named context
+ * Adds/Updates an individual block within a named context.
  *
- * @param array $block
- * @param string $context
- *
- * @return boolean Success
+ * @param $block
+ * @param $context
  */
-function os_layout_put($block, $context){
+function os_layout_put($block, $context) {
   $context_blocks = os_layout_get($context);
   // Valid Context?
   if (is_array($context_blocks)) {
@@ -346,15 +341,16 @@ function os_layout_put($block, $context){
 
 /**
  *
- * @param string $bid
- *          Block identifier [os-primary-menu]
+ * @param $bid
+ *  Block identifier [os-primary-menu]
  *
- * @param boolean $load_info
- *          Load Block meta-data used by admin forms
+ * @param $load_info
+ *  Load Block meta-data used by admin forms
  *
- * @return array $block
+ * @return
+ *  Block.
  */
-function os_layout_load_block($bid, $load_meta = true, $block = array()){
+function os_layout_load_block($bid, $load_meta = FALSE, $block = array()) {
   list($module, $delta) = explode('-', $bid, 2);
 
   if ($load_meta) {
@@ -367,7 +363,7 @@ function os_layout_load_block($bid, $load_meta = true, $block = array()){
       }
     }
 
-    // Load block install file
+    // Load block install file.
     module_load_include('install', 'block', 'block');
 
     if (function_exists('block_schema')) {
@@ -375,14 +371,14 @@ function os_layout_load_block($bid, $load_meta = true, $block = array()){
       $block_schema = block_schema();
 
       foreach ( $block_schema['block']['fields'] as $field => $info ) {
-        // If a default exists populate that
+        // If a default exists populate that.
         if (! isset($block[$field]) && isset($info['default'])) {
           $block[$field] = $info['default'];
         }
       }
     }
 
-    // Get the blocks current title by rendering it
+    // Get the blocks current title by rendering it.
     if (! isset($block['title']) && isset($block['delta'])) {
       $render_hook = "{$module}_block_view";
       if (function_exists($render_hook)) {
@@ -400,72 +396,70 @@ function os_layout_load_block($bid, $load_meta = true, $block = array()){
 }
 
 /**
- * Remove a block from one or more contexts
+ * Remove a block from one or more contexts.
  *
- * @param string $bid
- *          Block identifier [os-primary-menu]
+ * @param $bid
+ *  Block identifier [os-primary-menu].
  *
- * @param array/string $contexts
- *          An array of contexts or individual context to delete a block from,
- *          defaults to all contexts
+ * @param $contexts
+ *  An array of contexts or individual context to delete a block from, defaults
+ *  to all contexts.
  */
-function os_layout_block_delete($bid, $contexts = false){
-  if (! $contexts) {
-    $contexts = os_layout_get_contexts(true);
+function os_layout_block_delete($bid, $contexts = FALSE) {
+  if (!$contexts) {
+    $contexts = os_layout_get_contexts(TRUE);
   }
-  elseif (! is_array($contexts)) {
-    $contexts = array(
-        $contexts
-    );
+  elseif (!is_array($contexts)) {
+    $contexts = array($contexts);
   }
 
-  // Remove from each context
-  foreach ( $contexts as $context => $title ) {
+  // Remove from each context.
+  foreach ($contexts as $context => $title) {
     $blocks = os_layout_get($context);
-    $set = false;
+    $set = FALSE;
     if (isset($blocks[$bid])) {
       unset($blocks[$bid]);
-      $set = true;
+      $set = FALSE;
     }
     if ($set) {
       os_layout_set($context, $blocks);
     }
   }
 
-  return true;
+  return TRUE;
 }
 
 /**
- * Return a context ranking
+ * Return a context ranking.
  *
- * @todo Add weight to context table
+ * @todo Add weight to context table.
  */
-function _os_context_get_rank($context){
+function _os_context_get_rank($context) {
   $context_rank = drupal_static(__FUNCTION__, array());
 
-  if (! isset($context_rank[$context])) {
+  if (!isset($context_rank[$context])) {
     $o_context = context_load($context);
     if (isset($o_context->weight)) {
       $context_rank[$context] = $o_context->weight;
     }
     else {
-
-      // Global Special Contexts
-      if (in_array($context, array(
-          'os_public',
-          'os_cp'
-      ))) {
+      // Global Special Contexts.
+      $array = array(
+        'os_public',
+        'os_cp',
+      );
+      if (in_array($context, array($array))) {
         $context_rank[$context] = 1;
         return $context_rank[$context];
       }
 
       $map = features_get_component_map('context');
       if (array_key_exists($context, $map)) {
-        // Feature context
+        // Feature context.
         $context_rank[$context] = 2;
       }
       else {
-        // Page or other non-feature context
+        // Page or other non-feature context.
         $context_rank[$context] = 3;
       }
     }
@@ -477,10 +471,10 @@ function _os_context_get_rank($context){
 /**
  * Sort a list of contexts by hierarchy
  *
- * @param string $context1
- * @param string $context2
+ * @param $context1
+ * @param $context2
  */
-function _os_context_sort_by_hierarchy($context1, $context2){
+function _os_context_sort_by_hierarchy($context1, $context2) {
   $a = _os_context_get_rank($context1);
   $b = _os_context_get_rank($context2);
 
@@ -491,36 +485,39 @@ function _os_context_sort_by_hierarchy($context1, $context2){
 }
 
 /**
- * Adjust the weights of blocks in multiple contexts
+ * Adjust the weights of blocks in multiple contexts.
  *
- * @param array $block_settings
- *          New block settings (already sorted)
- * @param array $previous_layout
- *          Layout to compare against (already sorted)
- * @param string $bid
- *          The block in question with the changed weight
+ * @param $block_settings
+ *  New block settings (already sorted).
  *
+ * @param $previous_layout
+ *  Layout to compare against (already sorted).
+ *
+ * @param $bid
+ *  The block in question with the changed weight.
  */
-function _os_layout_adjust_relative_weight(&$block_settings, $previous_layout, $bid){
+function _os_layout_adjust_relative_weight(&$block_settings, $previous_layout, $bid) {
 
-  // Has the relative order changed
+  // Has the relative order changed.
   if (array_keys(array_intersect_key($block_settings, $previous_layout)) != array_keys(array_intersect_key($previous_layout, $block_settings))) {
     return;
   }
 
-  // Loop through the old array
+  // Loop through the old array.
   $w_new = $block_settings[$bid]['weight'];
   $w_old = $previous_layout[$bid]['weight'];
-  // Blocks that need thier weight adjusted
+
+  // Blocks that need thier weight adjusted.
   $impacted_blocks = array();
   $range_begin = false;
   $range_end = false;
 
   foreach ( $block_settings as $id => $block ) {
     // Skip this block if there is no weight setting OR they are not in the same
-    // region
-    if (! isset($block['weight']) || $block_settings[$bid]['region'] != $block['region'])
+    // region.
+    if (! isset($block['weight']) || $block_settings[$bid]['region'] != $block['region']) {
       continue;
+    }
 
     if ($block['weight'] < min($w_new, $w_old)) {
       $range_begin = $block['weight'];
@@ -533,8 +530,7 @@ function _os_layout_adjust_relative_weight(&$block_settings, $previous_layout, $
 
     if (! empty($block['default_matched'])) {
       // One of the blocks that we would have to adjust to reconcile this weight
-      // is
-      // owned by a parent context, so this is an override
+      // is owned by a parent context, so this is an override.
       return;
     }
 
@@ -543,39 +539,40 @@ function _os_layout_adjust_relative_weight(&$block_settings, $previous_layout, $
     }
   }
 
-  // Its ok to change it's weight
+  // Its ok to change it's weight.
   $block_settings[$bid]['weight'] = $w_old;
 
-  // No other blocks impacted
-  if (! count($impacted_blocks))
+  // No other blocks impacted.
+  if (! count($impacted_blocks)) {
     return;
+  }
 
   if ($w_old < $w_new) {
-    // Decreasing weight
+    // Decreasing weight.
     $increment = is_bool($range_begin) ? - 10 : ($range_begin - $w_old) / count($impacted_blocks);
   }
   else {
-    // Increasing weight
+    // Increasing weight.
     $increment = is_bool($range_end) ? 10 : ($range_end - $w_old) / count($impacted_blocks);
   }
 
-  foreach ( $impacted_blocks as $key => $impacted_bid ) {
+  foreach ($impacted_blocks as $key => $impacted_bid) {
     $block_settings[$impacted_bid]['weight'] = $w_old + ($increment * ($key + 1));
   }
 }
 
 /**
- * Remove fields from blocks that are not part of the block schema
+ * Remove fields from blocks that are not part of the block schema.
  *
  * @param array $blocks
  */
-function _os_layout_sanitize_blocks(&$blocks){
+function _os_layout_sanitize_blocks(&$blocks) {
 
-  // Load block install file
+  // Load block install file.
   module_load_include('install', 'block', 'block');
 
   if (function_exists('block_schema')) {
-    // Populate block with the defaults from the schema
+    // Populate block with the defaults from the schema.
     $block_schema = block_schema();
 
     foreach ( $blocks as $bid => $block ) {
