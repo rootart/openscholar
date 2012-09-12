@@ -121,5 +121,76 @@ function iqss_projects_front_default_box() {
   );
   $export['iqss_projects_fp_logoblock'] = $box;
 
+  $box = new stdClass();
+  $box->disabled = FALSE; /* Edit this to true to make a default box disabled initially */
+  $box->api_version = 1;
+  $box->delta = 'iqss_projects_fp_navblock';
+  $box->plugin_key = 'simple';
+  $box->title = '';
+  $box->description = 'OpenScholar: Top Links';
+  $box->options = array(
+    'body' => array(
+      'value' => iqss_projects_front_navblock_content(),
+      'format' => 'filtered_html',
+    ),
+    'additional_classes' => '',
+  );
+  $export['iqss_projects_fp_navblock'] = $box;
+
   return $export;
+}
+
+/**
+ * Function to return the contents for iqss_pojects_fp_navblock_view
+ */
+function iqss_projects_front_navblock_content() {
+  $items = array();
+
+  global $user;
+  $items[] = array(
+    '#title' => $user -> uid ? 'Log out' : 'Log in',
+    '#href' =>  $user -> uid ? 'logout' : 'user',
+    '#type' => 'link',
+  );
+
+  $vsites = vsite_get_vsite_by_owner($user->uid);
+  if (!vsite_vsite_exists_access($vsites)) {
+    if($vsites){
+    	//print_r($vsites);
+	    $items[] = array(
+		    '#title' => ((count($vsites) > 1) ? 'Go to your sites' : "Go to your site"),
+		    '#href' => ((count($vsites) > 1) ? 'user' : $vsites[0]->get_absolute_url()),
+	        '#type' => 'link',
+		  );
+    } //No sites or ablility to create one
+  }else{
+  	//Create a site
+  	$items[] = array(
+	    '#title' => ((count($vsites) > 1)?"Create a web site.":'Get your web site!'),
+	    '#href' => 'site/register',
+  	    '#type' => 'link',
+	  );
+  }
+
+  $txt = 'Need a Site for a Project?';
+  $url = 'http://projects.iq.harvard.edu';
+  $mode = variable_get('openscholar_installation_mode', 'scholar');
+
+  if ($mode == 'project'){
+    $txt = 'Need a Personal Site?';
+    $url = 'http://scholar.harvard.edu';
+  }
+
+  $items[] = array(
+    '#title' => $txt,
+    '#href' =>  $url,
+    '#type' => 'link',
+  );
+  $link_array = array();
+  // Loop each item in the array to pass it a new array rendered
+  foreach($items as $item) {
+  	$link_array[] = array('data'=>drupal_render($item));
+  }
+
+  return $vsitesList = theme_item_list(array('items'=>$link_array, 'title'=>'','type'=>'ul','attributes'=>array('id'=>'top-front')));
 }

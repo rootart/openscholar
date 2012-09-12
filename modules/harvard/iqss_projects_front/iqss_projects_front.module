@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once('iqss_projects_front.features.inc');
 
 /**
@@ -15,39 +15,46 @@ function iqss_projects_front_context_default_contexts_alter(&$contexts){
         'weight' => -100,
         'region' => 'content_top',
     );
-    
+
     $fp_blocks['boxes-iqss_projects_fp_logoblock'] = array(
         'module' => 'boxes',
         'delta' => 'iqss_projects_fp_logoblock',
         'weight' => -100,
         'region' => 'header_first',
     );
-    
+
     $fp_blocks['boxes-iqss_projects_fp_features'] = array(
         'module' => 'boxes',
         'delta' => 'iqss_projects_fp_features',
         'weight' => 10,
         'region' => 'content_first',
     );
-    
+
     $fp_blocks['boxes-iqss_projects_fp_stats'] = array(
         'module' => 'os_stats',
         'delta' => 'os_stats',
         'weight' => 10,
         'region' => 'footer',
     );
-    
+
+    $fp_blocks['boxes-iqss_projects_fp_navblock'] = array(
+        'module' => 'boxes',
+        'delta' => 'iqss_projects_fp_navblock',
+        'weight' => -100,
+        'region' => 'header_second',
+    );
+
     if(isset($fp_blocks['vsite_register-get_your_site_block'])){
       //Move the get_your_site button to the content_top region
       $fp_blocks['vsite_register-get_your_site_block']['region'] = 'content_top';
     }
-    
+
     if(isset($fp_blocks['views-os_websites-block'])){
       //Move the websites grid to the content_top region
       $fp_blocks['views-os_websites-block']['region'] = 'content_bottom';
     }
   }
-}// end function 
+}// end function
 
 /**
  * Implement hook_strongarm
@@ -56,27 +63,27 @@ function iqss_projects_front_context_default_contexts_alter(&$contexts){
  */
 function iqss_projects_front_strongarm() {
 	$export = array();
-	
+
 	$strongarm = new stdClass();
   	$strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   	$strongarm->api_version = 1;
   	$strongarm->name = 'os_stats_cache_expiration';
   	$strongarm->value = (int)3600*24;
   	$export['os_stats_cache_expiration'] = $strongarm;
-	
+
 	$strongarm = new stdClass();
   	$strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   	$strongarm->api_version = 1;
   	$strongarm->name = 'os_stats_enabled';
   	$strongarm->value = serialize(array(
-  		'Publications'=>(bool)0, 
-  		'Vsites'=>(bool)1, 
-  		'Nodes'=>(bool)1, 
-  		'Files'=>(bool)1, 
-  		'Filesize'=>(bool)0, 
+  		'Publications'=>(bool)0,
+  		'Vsites'=>(bool)1,
+  		'Nodes'=>(bool)1,
+  		'Files'=>(bool)1,
+  		'Filesize'=>(bool)0,
   		'Users'=>(bool)0,
   	));
   	$export['os_stats_enabled'] = $strongarm;
-  	
+
   	return $export;
 }// end function

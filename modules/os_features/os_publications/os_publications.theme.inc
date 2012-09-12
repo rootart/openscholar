@@ -166,7 +166,7 @@ function _os_publications_plain_citation($node) {
   	div.select();
   }
 }', 'inline');
-  $citation = "<div class=\"biblio-citation\" onclick=\"if (event.target) {  selectText(event.target); else selectText(this);\">{$citation}</div>";}
+  $citation = "<div class=\"biblio-citation\" onclick=\"if (event.target) {  selectText(event.target); else selectText(this);\">{$citation}</div>";
 
   return $citation;
 }

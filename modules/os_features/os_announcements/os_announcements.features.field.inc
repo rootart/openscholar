@@ -1,7 +1,4 @@
 <?php
-// $Id$
-
-
 /**
  * @file
  * os_announcements.features.field.inc
@@ -237,11 +234,9 @@ function os_announcements_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
-          'module' => 'file_entity',
-          'settings' => array(
-            'file_view_mode' => 'default',
-          ),
-          'type' => 'file_rendered',
+          'module' => 'file',
+          'settings' => array(),
+          'type' => 'file_default',
           'weight' => '3',
         ),
         'teaser' => array(
@@ -253,7 +248,7 @@ function os_announcements_field_default_fields() {
       ),
       'entity_type' => 'node',
       'field_name' => 'field_upload',
-      'label' => 'upload',
+      'label' => 'Attach Files',
       'required' => 0,
       'settings' => array(
         'description_field' => 0,
@@ -314,10 +309,8 @@ function os_announcements_field_default_fields() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Body');
-  t('General group reference');
   t('Photo');
   t('upload');
 
   return $fields;
 }
-

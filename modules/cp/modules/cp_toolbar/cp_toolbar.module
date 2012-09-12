@@ -220,6 +220,7 @@ function cp_toolbar_fill_drawer() {
   // Bypass the node/add listing if only one content type is available.
 
   $bundles = os_get_bundles();
+  asort($bundles);
 
   $links = array();
   foreach ($bundles as $type => $name) {

@@ -229,7 +229,7 @@ function os_publications_settings() {
     '#default_value' => variable_get('scholar_publications_filter_publication_types', array_keys($results)),
     '#options' => $results,
     '#description' => t('The main list of publications on your publications page will list the types slected here.'),
-    '#attributes' => array("class" => "form-checkboxes-scrolling"),
+    '#attributes' => array('class' => array('form-checkboxes-scrolling')),
   );
 
   //Should urls in citations be shortened?

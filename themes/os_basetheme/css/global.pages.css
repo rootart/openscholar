@@ -144,12 +144,12 @@ div.messages {
    
 }
 
-#logo /* Wrapping link for logo */ {
+#boxes-box-site_logo /* Wrapping link for logo */ {
   padding: 10px 0;
 }
 
 
-#logo img {
+#boxes-box-site_logo img {
   vertical-align: bottom;
 }
 
@@ -292,6 +292,30 @@ ul.links li {
   padding: 0 10px 0 0; /* LTR */
 }
 
+/* BOOKLET ICONS */
+.node-book .links li.book_add_child a {
+    background: url("/sites/all/themes/openscholar/scholar_base/images/addChildpage_plus.png") no-repeat scroll left center transparent;
+    color: #3A6A8C;
+    margin-right: 12px;
+    padding-left: 15px;
+}
+
+.node-book .links li.book_printer a {
+    background: url("/sites/all/themes/openscholar/scholar_base/images/printPage.png") no-repeat scroll left center transparent;
+    color: #3A6A8C;
+    margin-right: 12px;
+    padding-left: 15px;
+}
+
+.node-book .links li.permalink a {
+    background: url("/sites/all/themes/openscholar/scholar_base/images/perma_link.png") no-repeat scroll left center transparent;
+    color: #3A6A8C;
+    margin-right: 12px;
+    padding-left: 15px;
+}
+
+
+bookiconsprite.png
 
 .feed-icon /* The link to the RSS or Atom feed for the current list of content */ {
 }

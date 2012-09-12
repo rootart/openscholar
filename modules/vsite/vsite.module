@@ -760,58 +760,58 @@ function vsite_user_view_alter(&$build) {
  * to users based on certain actions.
  */
 function vsite_mail_alter(&$message) {
-	global $base_url;
-	switch($message['id']) {
-	  // Account created during "Create this OS Site on behalf of another user".
-	  case 'user_register_no_approval_required':
-	    // Get the user id we just created.
-		$n_new_user = $message['params']['account']->uid;
-		// Load the user.
-		$o_user = user_load($n_new_user);
-		// Grab their first name, if it doesnt exist, use their user name.
-		if(!empty($o_user->field_first_name['und'][0]['value'])) {
-		  $first_name = $o_user->field_first_name['und'][0]['value'];
-		}else{
-		  $first_name = $o_user->name;
-		}
-		// Alter the subject.
-		$message['subject'] = t('An OpenScholar account has been created for you at !site_name', array('!site_name' => variable_get('site_name', 'OpenScholar')));
-      	$a_msg_variables = array(
+  global $base_url;
+  switch($message['id']) {
+    // Account created during "Create this OS Site on behalf of another user".
+    case 'user_register_no_approval_required':
+      // Get the user id we just created.
+    $n_new_user = $message['params']['account']->uid;
+    // Load the user.
+    $o_user = user_load($n_new_user);
+    // Grab their first name, if it doesnt exist, use their user name.
+    if(!empty($o_user->field_first_name['und'][0]['value'])) {
+      $first_name = $o_user->field_first_name['und'][0]['value'];
+    }else{
+      $first_name = $o_user->name;
+    }
+    // Alter the subject.
+    $message['subject'] = t('An OpenScholar account has been created for you at !site_name', array('!site_name' => variable_get('site_name', 'OpenScholar')));
+        $a_msg_variables = array(
           '!site' => variable_get('site_name', 'OpenScholar'),
           '!login_url' => user_pass_reset_url($o_user),
           '!mailto' => $o_user->mail,
           '!firstname' => $first_name,
           '!username' => $o_user->name,
-      	  '!futurelogin' => $base_url.'/user/',
+          '!futurelogin' => $base_url.'/user/',
         );
 
         // Alter the body message.
         $message['body'][0] = t("Dear !firstname,\n\nA site owner at the !site website has created an account for you. You may now log in by either clicking through on the following link or pasting it into your browser:\n\n !login_url\n\n(Note: This login can be used only once.)\n\nYour username is: !username \n\nAfter setting your password with the included link, you will be able to log in at !futurelogin in the future.\n\nSincerely,\nThe !site Team", $a_msg_variables);
-	  	break;
-	  // Account created by admin in the admin/people panel.
-	  case 'user_register_admin_created':
-	  	// Get the user id we just created.
-		$n_new_user = $message['params']['account']->uid;
-		// Load the user data.
-		$o_user = user_load($n_new_user);
-		// Grab their first name, if it doesnt exist, use their user name.
-		if(!empty($o_user->field_first_name['und'][0]['value'])) {
-		  $first_name = $o_user->field_first_name['und'][0]['value'];
-		}else{
-		  $first_name = $o_user->name;
-		}
-		// Alter the email subject.
-		$message['subject'] = t('An OpenScholar account has been created for you at !site_name', array('!site_name' => variable_get('site_name', 'OpenScholar')));
-      	$a_msg_variables = array(
+      break;
+    // Account created by admin in the admin/people panel.
+    case 'user_register_admin_created':
+      // Get the user id we just created.
+    $n_new_user = $message['params']['account']->uid;
+    // Load the user data.
+    $o_user = user_load($n_new_user);
+    // Grab their first name, if it doesnt exist, use their user name.
+    if(!empty($o_user->field_first_name['und'][0]['value'])) {
+      $first_name = $o_user->field_first_name['und'][0]['value'];
+    }else{
+      $first_name = $o_user->name;
+    }
+    // Alter the email subject.
+    $message['subject'] = t('An OpenScholar account has been created for you at !site_name', array('!site_name' => variable_get('site_name', 'OpenScholar')));
+        $a_msg_variables = array(
           '!site' => variable_get('site_name', 'OpenScholar'),
           '!login_url' => user_pass_reset_url($o_user),
           '!mailto' => $o_user->mail,
           '!firstname' => $first_name,
-      	  '!username' => $o_user->name,
-      	  '!futurelogin' => $base_url.'/user/',
+          '!username' => $o_user->name,
+          '!futurelogin' => $base_url.'/user/',
         );
-		// Alter the message body.
+    // Alter the message body.
         $message['body'][0] = t("Dear !firstname,\n\nA site owner at the !site website has created an account for you. You may now log in by either clicking through on the following link or pasting it into your browser:\n\n !login_url\n\n(Note: This login can be used only once.)\n\nYour username is: !username \n\nAfter setting your password with the included link, you will be able to log in at !futurelogin in the future.\n\nSincerely,\nThe !site Team", $a_msg_variables);
-	  	break;
-	}
+      break;
+  }
 }

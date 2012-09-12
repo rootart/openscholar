@@ -1,0 +1,168 @@
+<?php
+// $Id$
+
+
+/**
+ * @file
+ * Code for the OS Bio/CV feature.
+ */
+
+include_once 'os_biocv.features.inc';
+
+/**
+ * Drupal hooks
+ */
+
+/**
+ * Implements hook_block_info().
+ */
+function os_biocv_block_info() {
+  $blocks['os_biocv_bio'] = array(
+    'info' => t('OS Bio/CV: bio'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function os_biocv_block_configure($delta = '') {
+
+  $form = array();
+  if ($delta == 'os_biocv_bio') {
+    // $form['os_biocv_bio_show_pdf'] = array();
+  }
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function os_biocv_block_save($delta = '', $edit = array()) {
+  if ($delta == 'os_biocv_bio') {
+    // variable_set('os_biocv_string', $edit['os_biocv_string']);
+  }
+  return;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function os_biocv_block_view($delta = '') {
+  switch ($delta) {
+    case 'os_biocv_bio':
+      $block['subject'] = t('');
+      $block['content'] = _os_biocv_bio_block_contents();
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function os_biocv_theme() {
+  return array(
+    'os_biocv_bio_block_empty_text' => array(
+      'variables' => array('message' => _os_biocv_bio_block_empty_text()),
+      'template' => 'bio-block-empty-text',
+    ),
+  );
+}
+
+/**
+ * OpenScholar hooks
+ */
+
+/**
+ * Implements hook_os_widget().
+ *
+ * Exposes blocks as OpenScholar widgets.
+ */
+function os_biocv_os_widget() {
+  $items = array();
+
+  // Displays user's Bio node if available, otherwise prompts user.
+  $items['os_biocv-bio'] = array(
+      'module' => 'block',
+      'delta' => 'os_biocv_bio',
+      'region' => 'content_top',
+      'weight' => '-10',
+      'info' => 'Bio Teaser',
+  );
+
+  return $items;
+}
+
+/**
+ * Custom functions
+ */
+
+/**
+ * Returns block content for $blocks['os_biocv_bio']
+ */
+function _os_biocv_bio_block_contents() {
+  $type = 'bio';
+
+  $node = _os_biocv_get_bio_node($type);
+  // Renders the Bio node if it exists.
+  if ($node !== FALSE) {
+    return render(node_view($node, 'teaser'));
+  }
+
+  // Otherwise, displays a prompt message to admin users.
+  if (user_access('create ' . $type . ' content')) {
+    return theme('os_biocv_bio_block_empty_text');
+  }
+
+  // Otherwise, displays nothing to non-admin users.
+  return NULL;
+}
+
+/**
+ * Finds the Bio node of the user with the lowest NID value.
+ *
+ * @return bool|object
+ *   A Drupal node object in the current space, if found; otherwise FALSE.
+ */
+function _os_biocv_get_bio_node($type = 'bio') {
+
+  // Note that this EntityFieldQuery will filter for the current space iff
+  // vsite module is enabled. Otherwise it leaves out that condition and will
+  // tell us whether any published bio nodes exist on this installation at all.
+  // In case there are multiple bio nodes, defaults to order by nid ASC.
+  $query = new EntityFieldQuery();
+  $query
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', $type)
+    ->propertyCondition('status', 1)
+    ->propertyOrderBy('nid');
+
+  if (module_exists('vsite') && $space = spaces_get_space()) {
+    $query->fieldCondition(OG_AUDIENCE_FIELD, 'target_id', $space->id);
+  }
+
+  $result = $query->execute();
+
+  if (!isset($result['node']) || !sizeof($result['node'])) {
+    return FALSE;
+  }
+
+  $item = array_shift($result['node']);
+  $node = node_load($item->nid);
+  return $node;
+}
+
+/**
+ * Returns the empty text $message value.
+ */
+function _os_biocv_bio_block_empty_text() {
+  return t('Your sites front page is set to display your bio by default. @create_bio or @edit_layout for the front page of your site.',
+    array(
+      '@create_bio' => l(t('Create your bio now'), '/node/add/bio'),
+      '@edit_layout' => l(t('change what displays'), '/cp/build/layout', array('query' => array('page_type' => 'front'))),
+    )
+  );
+}

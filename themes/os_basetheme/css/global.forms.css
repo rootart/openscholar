@@ -435,3 +435,8 @@ form table .item-list ul {
 
 /* TINYMCE - WYSIWYG */
 #tinymce {background:#FFF;}
+
+
+.tabledrag-toggle-weight-wrapper {
+  display: none;
+}

@@ -273,7 +273,12 @@ function os_publications_biblio_entry_alter(&$entry, $node) {
       ),
     );
     $extra .= render($render);
-    $html = substr_replace($html, ' ' . $extra, $insert, 0);
+    if ($insert === FALSE) {
+      $html .= $extra;
+    }
+    else {
+      $html = substr_replace($html, ' ' . $extra, $insert, 0);
+    }
   }
 
   // add fields

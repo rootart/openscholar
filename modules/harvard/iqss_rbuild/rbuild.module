@@ -1,7 +1,6 @@
 <?php
 // $Id$
 
-
 /**
  * @file
  * Code for Rbuild module
@@ -40,6 +39,25 @@ function rbuild_form_software_project_node_form_alter(&$form, &$form_state, $for
   // Hides the Documentation text field unless user 1.
   global $user;
   $form['field_rbuild_docs']['#access'] = ((int)$user->uid === 1);
+}
+
+/**
+ * Implements hook_menu().
+ */
+function rbuild_menu() {
+  $items = array();
+
+  $items['node/%node/rbuild_documentation'] = array(
+    'title' => 'Documentation',
+    'page callback' => '_rbuild_docs_page_contents',
+    'page arguments' => array(1),
+    'access callback' => '_rbuild_docs_exist',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+  );
+
+  return $items;
 }
 
 /**
@@ -370,11 +388,14 @@ function _rbuild_get_file_headers($url) {
  */
 function _rbuild_query_all_rbuild_project_nodes() {
   $query = new EntityFieldQuery();
-  // Published
-  $query->entityCondition('entity_type', 'node')->propertyCondition('type', 'software_project')->propertyCondition('status', 1)
-  // run the query as user 1
-  ->fieldCondition('field_software_method', 'value', 'Rbuild repository', '=')->fieldCondition('field_software_repo', 'value', '', '!=')
-  ->addMetaData('account', user_load(1));
+
+  $query
+    ->entityCondition('entity_type', 'node')
+    ->propertyCondition('type', 'software_project')
+    ->propertyCondition('status', 1)
+    ->fieldCondition('field_software_method', 'value', 'Rbuild repository')
+    ->fieldCondition('field_software_repo', 'value', '', '!=')
+    ->addMetaData('account', user_load(1));
 
   $result = $query->execute();
   $project_nodes = _rbuild_query_load_nodes($result);
@@ -391,17 +412,19 @@ function _rbuild_query_release_node_exists($project_nid, $version) {
   $exists = FALSE;
 
   $query = new EntityFieldQuery();
-  // Published
-  $query->entityCondition('entity_type', 'node')->propertyCondition('type', 'software_release')->propertyCondition('status', 1)
-  // run the query as user 1
-  ->fieldCondition('field_software_project', 'target_id', $project_nid, '=')->fieldCondition('field_software_version', 'value', $version, '=')
-  ->addMetaData('account', user_load(1));
+
+  $query
+    ->entityCondition('entity_type', 'node')
+    ->propertyCondition('type', 'software_release')
+    ->propertyCondition('status', 1)
+    ->fieldCondition('field_software_project', 'target_id', $project_nid, '=')
+    ->fieldCondition('field_software_version', 'value', $version, '=')
+    ->addMetaData('account', user_load(1));
+
   $result = $query->execute();
 
   if (isset($result['node'])) {
-
     $exists = TRUE;
-
   }
 
   return $exists;
@@ -539,3 +562,99 @@ function _rbuild_docs_source_path($short_name, $version = '') {
   return $url;
 }
 
+/**
+ * Checks whether
+ *
+ * @param object $node
+ *   The Project node accessed at /node/%/rbuild_documentation
+ *
+ * @see rbuild_menu()
+ */
+function _rbuild_docs_exist($node) {
+  if ($node->type != 'scholar_software_project') {
+    return FALSE;
+  }
+
+  $field_name = 'field_software_method';
+  $items = field_get_items('node', $node, $field_name);
+  $field_value = strtolower($items[0]['value']);
+  if ($field_value != 'rbuild repository') {
+    return FALSE;
+  }
+
+  // @todo what is happening here? -oren
+  $drupal_path = arg();
+  if (in_array('rbuild_documentation', $drupal_path)) {
+    while ((array_shift($drupal_path)) != 'rbuild_documentation');
+
+    $path = implode("/", $drupal_path);
+  }
+
+  if (!strlen($path)) {
+    $path = "index.html";
+  }
+
+  if (!_rbuild_get_doc($node, $path)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+ * Get a doc for a specified URL
+ *
+ * @param $o_project
+ * @param $s_url_extra
+ * @return unknown_type
+ *
+ * @todo verify works -oren
+ */
+function _rbuild_get_doc($o_project,$s_url_extra = 'index.html'){
+
+  $s_featured_version = _rbuild_get_featured_release($o_project);
+  if(!$s_featured_version) return false;
+
+  $s_key = $o_project->nid.$s_url_extra;
+
+	static $a_doc_data;
+	if(!isset($a_doc_data)) $a_doc_data = array();
+
+	if(!array_key_exists($s_key,$a_doc_data)){
+		//Get data from cache
+		$o_cache_obj = cache_get($s_key,'cache_iqss_rbuild');
+		$a_cache = $o_cache_obj->data;
+
+		if(!$a_cache || $a_cache['version'] != $s_featured_version){
+			$a_cache = array('version' => $s_featured_version);
+			$a_cache['content'] = _iqss_rbuild_retrieve_doc($o_project,$s_featured_version,$s_url_extra);
+			if(!$a_cache['content'] && $s_url_extra == 'index.html'){
+			   $a_cache['content'] = _iqss_rbuild_retrieve_doc($o_project,$s_featured_version,$s_url_extra);
+			}//If the index file is not present try one with the package name which is a default
+			cache_set($s_key,$a_cache,'cache_iqss_rbuild', time() + IQSS_RBUILD_DOC_CACHE_LEN); //Third param can be expire time
+		}//Validate cache and get new if required
+		$a_doc_data[$s_key] = $a_cache;
+	}
+
+	return $a_doc_data[$s_key]['content'];
+}
+
+/**
+ * @param unknown_type $o_project
+ *
+ * @todo verify working
+ */
+function _iqss_rbuild_get_featured_release($o_project){
+  //Load Featured Version
+  $s_version = false;
+  $view = views_get_view('scholar_software_releases');
+  $view->set_arguments(array($o_project->nid));
+  $view->execute('block_1');
+  if(count($view->result)){
+    $data = current($view->result);
+    $release = node_load($data->nid);
+    $s_version = scholar_software_generate_version($release,true);
+  }
+
+  return $s_version;
+}

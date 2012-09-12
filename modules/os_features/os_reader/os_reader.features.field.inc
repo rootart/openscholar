@@ -122,7 +122,7 @@ function os_reader_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
-          'module' => 'os_reader',
+          'module' => 'google_feedapi',
           'settings' => array(
             'content_summary' => FALSE,
             'num_to_show' => 10,
@@ -132,7 +132,7 @@ function os_reader_field_default_fields() {
         ),
         'teaser' => array(
           'label' => 'hidden',
-          'module' => 'os_reader',
+          'module' => 'google_feedapi',
           'settings' => array(
             'content_summary' => 1,
             'num_to_show' => '3',

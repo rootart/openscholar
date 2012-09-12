@@ -167,7 +167,7 @@ dl.bibliomultiselect .form-item {
   border: none;
   }
 
-.biblio-abstract-link {
+a.biblio-abstract-link {
   text-align: left;
   text-decoration: none;
   font-style: normal;
@@ -175,15 +175,17 @@ dl.bibliomultiselect .form-item {
   }
   
   
-.biblio-abstract-link.toggle {
+a.biblio-abstract-link.toggle {
 	padding-left:12px;
 	background:url('../images/scholarbase-sprite.png') 0 -404px no-repeat;
+	text-decoration: none;
 	
 }
 
-.biblio-abstract-link.toggle.expanded {
+a.biblio-abstract-link.toggle.expanded {
 	padding-left:12px;
 	background:url('../images/scholarbase-sprite.png') 0 -415px no-repeat;
+	text-decoration: none;
 }
 
 

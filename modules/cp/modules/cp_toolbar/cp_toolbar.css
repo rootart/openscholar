@@ -257,6 +257,10 @@
   padding-top: 0;
 }
 
+#toolbar .toolbar-drawer.collapsed + .toolbar-tooltips {
+  display: none;
+}
+
 #toolbar #toolbar-user li {
   margin: 0;
 }

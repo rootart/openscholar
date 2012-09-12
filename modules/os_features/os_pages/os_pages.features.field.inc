@@ -119,11 +119,9 @@ function os_pages_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
-          'module' => 'file_entity',
-          'settings' => array(
-            'file_view_mode' => 'default',
-          ),
-          'type' => 'file_rendered',
+          'module' => 'file',
+          'settings' => array(),
+          'type' => 'file_default',
           'weight' => '3',
         ),
         'teaser' => array(
@@ -135,7 +133,7 @@ function os_pages_field_default_fields() {
       ),
       'entity_type' => 'node',
       'field_name' => 'field_upload',
-      'label' => 'upload',
+      'label' => 'Attach Files',
       'required' => 0,
       'settings' => array(
         'description_field' => 0,

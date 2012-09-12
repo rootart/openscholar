@@ -567,6 +567,7 @@ function _biblio_sort_tabs() {
     'title' => 'asc',
     'type' => 'asc',
     'year' => 'desc',
+    'keyword' => 'asc',
   );
 
   if (isset($uri['query']['s'])) {

@@ -750,7 +750,15 @@ function og_field_widget_form(&$form, &$form_state, $field, $instance, $langcode
       }
     }
 
-    $new_element = ctools_field_invoke_field($mocked_instance, 'form', $entity_type, $dummy_entity, $form, $form_state, array('default' => TRUE));
+    $dummy_form_state = $form_state;
+    if (empty($form_state['rebuild'])) {
+      // Form is "fresh" (i.e. not call from field_add_more_submit()), so
+      // re-set the items-count, to show the correct amount for the mocked
+      // instance.
+      $dummy_form_state['field'][$field_name][LANGUAGE_NONE]['items_count'] = !empty($dummy_entity->{$field_name}[LANGUAGE_NONE]) ? count($dummy_entity->{$field_name}[LANGUAGE_NONE]) : 0;
+    }
+
+    $new_element = ctools_field_invoke_field($mocked_instance, 'form', $entity_type, $dummy_entity, $form, $dummy_form_state, array('default' => TRUE));
     $element[$field_mode] = $new_element[$field_name][LANGUAGE_NONE];
 
     if (in_array($mocked_instance['widget']['type'], array('entityreference_autocomplete', 'entityreference_autocomplete_tags'))) {
@@ -958,12 +966,33 @@ function og_field_create_instance($instance) {
 
   // Check if we need to add a group audience on the user's entity.
   // We add a different field, so each field can be set differently.
-  if (!og_is_group_content_type('user', 'user')) {
-    $og_field = og_fields_info(OG_AUDIENCE_FIELD);
-    $og_field['field']['settings']['target_type'] = $instance['entity_type'];
-    $og_field['instance']['label'] = t('Group membership');
-    og_create_field('og_user_group_ref', 'user', 'user', $og_field);
+  $entity_type = $instance['entity_type'];
+  $bundle = $instance['bundle'];
+  foreach (array_keys(og_get_group_audience_fields()) as $field_name) {
+    $field = field_info_field($field_name);
+
+    if ($field['settings']['target_type'] == $entity_type  && empty($field['settings']['handler_settings']['target_bundles'])) {
+      return;
+    }
+
+    if ($field['settings']['target_type'] == $entity_type && in_array($bundle, $field['settings']['handler_settings']['target_bundles'])) {
+      return;
+    }
   }
+
+  // If we reached here, it means we need to create a field.
+  // Pick an unused name.
+  $field_name = substr("og_user_$entity_type", 0, 32);
+  $i = 1;
+  while (field_info_field($field_name)) {
+    $field_name = substr("og_user_$entity_type", 0, 32 - strlen($i)) . $i;
+    ++$i;
+  }
+
+  $og_field = og_fields_info(OG_AUDIENCE_FIELD);
+  $og_field['field']['settings']['target_type'] = $entity_type;
+  $og_field['instance']['label'] = t('Group membership');
+  og_create_field($field_name, 'user', 'user', $og_field);
 }
 
 /**
@@ -2329,7 +2358,7 @@ function og_get_group_audience_fields($entity_type = 'user', $bundle_name = 'use
   if (isset($return[$identifier])) {
     return $return[$identifier];
   }
-  $return[$identifier] = FALSE;
+  $return[$identifier] = array();
   // field_info_instances() doesn't give the field type, so we have to use
   // field_info_fields().
   foreach (field_info_fields() as $field_name => $field_info) {

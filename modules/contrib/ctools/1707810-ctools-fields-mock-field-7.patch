@@ -1,5 +1,5 @@
 diff --git a/includes/fields.inc b/includes/fields.inc
-index dcd6139..a7b9542 100644
+index dcd6139..162262c 100644
 --- a/includes/fields.inc
 +++ b/includes/fields.inc
 @@ -170,6 +170,8 @@ function ctools_field_label($field_name) {
@@ -15,7 +15,7 @@ index dcd6139..a7b9542 100644
  function ctools_field_invoke_field($field_name, $op, $entity_type, $entity, &$a = NULL, &$b = NULL, $options = array()) {
    if (is_array($field_name)) {
      $instance = $field_name;
-+    $field = empty($field_name['field']) ? field_info_field($field_name) : $field_name['field'];
++    $field = empty($field_name['field']) ? field_info_field($instance['field_name']) : $field_name['field'];
      $field_name = $instance['field_name'];
    }
    else {

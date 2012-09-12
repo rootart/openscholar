@@ -1,7 +1,6 @@
 <?php
 // $Id$
 
-
 /**
  * Perform some setup items for the feed / feed_item content types provided by the feeds module
  */

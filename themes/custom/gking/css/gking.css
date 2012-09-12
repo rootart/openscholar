@@ -194,10 +194,10 @@ a.more {
   padding-left: 0 !important;
   }
   
-.front  #content .context-links {
+.front  #content-column .contextual-controls-wrapper {
     margin-top: 5px;
     position: absolute;
-    right: -215px;
+    right: -260px;
     top: -40px;
     z-index: 10;
 }
@@ -239,6 +239,19 @@ a.more {
   border-top: 1px solid #E5E5E5;
   text-align: center;
   }
+  
+.block-boxes-twitter ul {
+	margin-left:0;
+}
+
+div.tweets-pulled-listing div.tweet-divider {
+    border-bottom: 1px dashed #CCCCCC;
+}
+  
+.tweet-authorphoto,
+.tweet-author {
+	display:none;
+}
 
 .block .item-list .pager li {
   margin-bottom: 0;

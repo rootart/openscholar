@@ -116,35 +116,6 @@ class vsite extends space_og {
   }
 
   /**
-   * Returns the vocabularies associated with a vsite.
-   * If a content type is provided, return vocabs associated
-   * with that content type only.
-   * @param $node_type
-   * @return array
-   */
-  public function get_vocabs($node_type = NULL){
-
-    if ($this->group) {
-
-      if (isset($this->group->og_vocabularies)) {
-        if (! $node_type) {
-          return $this->group->og_vocabularies;
-        }
-
-        $result = array();
-
-        foreach ( $this->group->og_vocabularies as $v ) {
-          if (in_array($node_type, array_keys($v->nodes))) {
-            $result[$v->vid] = $v;
-          }
-        }
-
-        return $result;
-      }
-    }
-  }
-
-  /**
    * Override of access_feature().
    */
   function access_feature($op = 'view', $feature, $account = NULL){

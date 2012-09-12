@@ -113,16 +113,20 @@ h2 {
   }
   
   
-.region-header-second #block-os-primary-menu {
+.region-header-second #boxes-box-iqss_projects_fp_navblock {
 	float:right;
-	margin-top:20px;
+	margin-top:30px;
 	}
 	
-.region-header-second #block-os-primary-menu ul li {
+.region-header-second #boxes-box-iqss_projects_fp_navblock ul li {
 	margin-left:15px;
+	display:inline;
+	font-size:14px;
 	}	
 
 /* SEARCH FORM */
+
+.block-os-search-db {margin-top:25px;}
 
 #block-search-0 h3, .block-search h3 {
   display:none;

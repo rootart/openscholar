@@ -745,18 +745,20 @@ function os_system_info_alter(&$info, $file, $type){
   if ((isset($info['base theme']) && $info['base theme'] == 'os_basetheme') || (isset($info['os']['theme_type']) && $info['os']['theme_type'] == 'vsite')) {
 
     $info['regions'] += array(
-        'header_top' => 'Header Top',
-        'header_first' => 'Header Main',
-        'header_second' => 'Header Left',
-        'header_third' => 'Header Right',
-        'header_bottom' => 'Header Bottom',
-        'menu_bar' => 'Menu Bar',
-        'content_top' => 'Content Top',
-        'content_first' => 'Content Left',
-        'content_second' => 'Content Right',
-        'content_bottom' => 'Content Bottom',
-        'sidebar_first' => 'SideBar Left',
-        'sidebar_second' => 'SideBar Right',
+      'branding_header' => 'Branding Header',
+      'branding_footer' => 'Branding Footer',
+      'header_top' => 'Header Top',
+      'header_first' => 'Header Main',
+      'header_second' => 'Header Left',
+      'header_third' => 'Header Right',
+      'header_bottom' => 'Header Bottom',
+      'menu_bar' => 'Menu Bar',
+      'content_top' => 'Content Top',
+      'content_first' => 'Content Left',
+      'content_second' => 'Content Right',
+      'content_bottom' => 'Content Bottom',
+      'sidebar_first' => 'SideBar Left',
+      'sidebar_second' => 'SideBar Right',
     );
   }
 }
