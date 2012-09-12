@@ -40,9 +40,9 @@ function os_user_create($user_info){
     return false;
   }
 
-  if(module_exists('vsite')){
-    module_load_include('inc', 'vsite', 'includes/user');
-    vsite_user_add($account);
+  if (module_exists('vsite')){
+    module_load_include('inc', 'vsite', 'includes/vsite');
+    return vsite_add_entity('user', $account);
   }
 
   return $account;

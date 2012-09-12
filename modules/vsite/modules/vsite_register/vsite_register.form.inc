@@ -223,9 +223,9 @@ function vsite_register_form_submit(&$form, &$state) {
 
   //create the vsite
   if ($vsite = vsite_create_vsite($values['domain'], $values['domain'], $site_owner->uid, $values['preset'])) {
-    //add user to vsite
-    module_load_include('inc', 'vsite', 'includes/user');
-    vsite_user_add($site_owner);
+
+    module_load_include('inc', 'vsite', 'includes/vsite');
+    vsite_add_entity('user', $site_owner, $vsite->id);
 
     os_role_grant($site_owner->uid, 'vsite admin', $vsite->id);
 
