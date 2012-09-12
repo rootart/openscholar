@@ -43,12 +43,14 @@ function vsite_add_entity($entity_type , $entity, $vsite_id = FALSE) {
     return;
   }
 
+  $vsite_id = $vsite_id ? $vsite_id : $og_context['gid'];
+
   $values = array(
     'entity_type' => $entity_type,
     'entity' => $entity,
   );
 
-  return og_group($og_context['group_type'], $og_context['gid'], $values);
+  return og_group('node', $vsite_id, $values);
 }
 
 /**
@@ -72,8 +74,9 @@ function vsite_remove_entity($entity_type , $entity, $vsite_id = FALSE) {
     // Can't get a group context.
     return;
   }
+  $vsite_id = $vsite_id ? $vsite_id : $og_context['gid'];
 
-  og_ungroup($og_context['group_type'], $og_context['gid'], $entity_type, $id);
+  og_ungroup('node', $vsite_id, $entity_type, $id);
 }
 
 /**
