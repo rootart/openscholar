@@ -583,10 +583,6 @@ function boxes_box_form_submit($form, $form_state) {
   $box->options['additional_classes'] = isset($form_state['values']['additional_classes']) ?
   $form_state['values']['additional_classes'] : array();
 
-  foreach (array('vocabulary') as $setting) {
-    $box->options['settings'][$setting] = $form_state['values'][$setting];
-  }
-
   if (module_exists('spaces') && $space = spaces_get_space()) {
     $space->controllers->boxes->set($box->delta, $box);
   }

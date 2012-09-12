@@ -31,8 +31,8 @@ function os_taxonomy_theme() {
     'taxonomy_term_list_row' => array(
       'function' => 'theme_taxonomy_term_tagged_node',
       'variables' => array(
-        'taxonomy_term' => NULL,
         'options' => array(),
+        'taxonomy_term' => NULL,
       ),
     ),
     'taxonomy_term_node_render' => array(
@@ -94,7 +94,7 @@ function theme_volcabulary_term_list_row($variables) {
  *      - link_to_empty_terms: Show en empty term name as a link to the term.
  *      - terms_description: Show to term descprition under the title.
  *      - tid_active_class: The term id that will get the active class.
- *      - simple_view: Display a simple view of the vocabulary with no concern
+ *      - views: Display a simple view of the vocabulary with no concern
  *        to the vocabulary terms hierarchy ordering.
  *      - show_childs: Controll if to show the childrens with their father term.
  *        Also, the number of the tagged nodes to the childs term will not be
@@ -104,31 +104,35 @@ function theme_volcabulary_term_list($variables) {
   $options = $variables['options'] + array(
     'range' => 10,
     'offset' => 0,
+    'views' => TRUE,
     'depth' => NULL,
     'bundles' => array(),
     'add_childs' => FALSE,
-    'simple_view' => TRUE,
     'show_childs' => TRUE,
     'tid_active_class' => 0,
     'show_empty_terms' => TRUE,
-    'link_to_empty_terms' => TRUE,
     'terms_description' => TRUE,
+    'link_to_empty_terms' => TRUE,
   );
 
   // Displaying the volcabulary term in a simple display using views.
-  if ($options['simple_view']) {
+  if ($options['views']) {
     return views_embed_view('os_taxonomy_vocabulary_term_list', 'vocabulary_list', $variables['vid']);
   }
 
   $vocabulary = taxonomy_vocabulary_load($variables['vid']);
 
   $query = new entityFieldQuery();
-  $result = $query
+  $query
     ->entityCondition('entity_type', 'taxonomy_term')
     ->propertyCondition('vid', $variables['vid'])
-    ->range($options['offset'], $options['offset'] + $options['range'])
-    ->propertyOrderBy('name')
-    ->execute();
+    ->propertyOrderBy('name');
+
+  if (!empty($options['range'])) {
+    $query->range($options['offset'], $options['offset'] + $options['range']);
+  }
+
+  $result = $query->execute();
 
   if (empty($result['taxonomy_term'])) {
     return;
@@ -139,10 +143,10 @@ function theme_volcabulary_term_list($variables) {
     $items[$tid] = array(
       'term_name' => $term->name,
       'description' => $term->description,
-      'tagged_items' => os_taxonomy_count_term_tagged_items(array($term), $options['bundles']),
       'url' => entity_uri('taxonomy_term', $term),
       'class' => $options['tid_active_class'] == $tid ? 'active' : '',
       'is_child' => taxonomy_get_parents($tid) ? TRUE : FALSE,
+      'tagged_items' => os_taxonomy_count_term_tagged_items(array($term), $options['bundles']),
     );
 
     // Add the number of tagged nodes to the childrens when needed.
@@ -152,7 +156,7 @@ function theme_volcabulary_term_list($variables) {
     }
   }
 
-  $data = array();
+  $data = $options['bundles'] = array();
 
   foreach($items as $tid => $item) {
     // Skip on this if we don't dispaly empty childs term.
@@ -174,8 +178,8 @@ function theme_volcabulary_term_list($variables) {
 
     $data[] = array(
       'data' => theme('volcabulary_term_list_row', array(
-        'name' => $item['term_name'],
         'number' => $number,
+        'name' => $item['term_name'],
         'link_options' => $link_options,
         'url_path' => $item['url']['path'],
         'description' => $item['description'],
@@ -213,13 +217,13 @@ function theme_taxonomy_term_tagged_node($variables) {
     'range' => 0,
     'offset' => 0,
     'tree' => FALSE,
+    'max_depth' => NULL,
     'indentation' => 10,
     'bundles' => array(),
     'view_mode' => 'full',
     'description' => FALSE,
     'child_element' => TRUE,
     'indentation_type' => 'px',
-    'max_depth' => NULL,
   );
   $taxonomy_term = $variables['taxonomy_term'];
 
@@ -440,5 +444,36 @@ function os_taxonomy_views_pre_render(&$view) {
     }
 
     $rendered_content[$key]['#view_mode'] = $view->args[2]['view_mode'];
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function os_taxonomy_form_boxes_box_form_alter(&$form, $form_state) {
+  $form['#submit'][] = 'os_taxonomy_save_os_taxonomy_plugin_settings';
+}
+
+/**
+ * Custom submit function for saving the taxonomy plugin settings.
+ */
+function os_taxonomy_save_os_taxonomy_plugin_settings($form, &$form_state) {
+  if ($form_state['clicked_button']['#value'] == t('Cancel') || !method_exists('os_taxonomy_fbt', 'form_elements')) {
+    return;
+  }
+
+  $box = boxes_factory($form_state['values']['plugin_key'], $form_state['values']);
+
+  // Saving settings.
+  foreach (array_keys(os_taxonomy_fbt::form_elements()) as $setting) {
+    $box->options['settings'][$setting] = $form_state['values'][$setting];
+  }
+
+  // Let's set the additional_classes as an option
+  if (module_exists('spaces') && $space = spaces_get_space()) {
+    $space->controllers->boxes->set($box->delta, $box);
+  }
+  else {
+    $box->save();
   }
 }
