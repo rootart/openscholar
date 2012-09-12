@@ -8,7 +8,5 @@
  * Implements hook_views_api().
  */
 function os_taxonomy_views_api() {
-  return array(
-    'api' => 3,
-  );
+  return array("version" => "3.0");
 }

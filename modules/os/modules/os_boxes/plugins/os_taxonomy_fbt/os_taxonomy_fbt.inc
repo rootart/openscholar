@@ -23,13 +23,13 @@ class os_taxonomy_fbt extends os_boxes_default {
   public function options_form(&$form_state){
     $form = array();
 
-
     $vocabularies = $this->get_all_volcabularies();
 
     $form['vocabulary'] = array(
-      '#type' => 'checkboxes',
+      '#type' => 'select',
       '#title' => t('Vocabularies'),
       '#options' => $vocabularies,
+      '#default_value' => $this->options['settings']['vocabulary'],
       '#required' => TRUE,
       '#description' => t('Which vocabularies would you like to use to filter posts.'),
     );
@@ -41,15 +41,14 @@ class os_taxonomy_fbt extends os_boxes_default {
   /**
    * Implementation of boxes_content::render().
    */
-  public function render(){
+  public function render() {
     $block = parent::render();
-
     $block['content'] = "Filter By Category Block [STUB]";
     // For now - display the first vocabulary terms.
     $block['content'] .= theme('volcabulary_term_list', array(
-      'vid' => 1,
+      'vid' => $this->options['settings']['vocabulary'],
       'options' => array(
-        'simple_view' => FALSE,
+        'simple_view' => TRUE,
       ),
     ));
 

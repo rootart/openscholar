@@ -5,7 +5,7 @@
  * Taxonomy terms API for OpenScholar.
  */
 
-include_once 'os_taxonomy.views.inc';
+include_once 'os_taxonomy.features.inc';
 
 /**
  * Implements hook_theme().
@@ -422,11 +422,15 @@ function os_taxonomy_list_attached_nodes($tid, $node_bundles = array(), $range =
  * of the rendered entity.
  */
 function os_taxonomy_views_pre_render(&$view) {
-  if ($view->name != 'os_taxonomy_vocabulary_term_list' && empty($view->args[2]['view_mode'])) {
+  if ($view->name != 'os_taxonomy_vocabulary_term_list' && $view->current_display != 'term_list' && empty($view->args[2]['view_mode'])) {
     return;
   }
 
   $rendered_content = &$view->display['term_list']->handler->view->style_plugin->row_plugin->rendered_content;
+
+  if (empty($rendered_content)) {
+    return;
+  }
 
   foreach (array_keys($rendered_content) as $key) {
     // Processing only integer keys, therefore skip on the key that contain the

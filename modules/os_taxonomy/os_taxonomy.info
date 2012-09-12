@@ -1,10 +1,9 @@
 name = OS Taxonomy
 description = Managing OS taxonomy terms.
-
-dependencies[] = views
-
-features[views_view][] = os_taxonomy_vocabulary_term_list
-
+core = 7.x
 package = OpenScholar
 php = 5.2.4
-core = 7.x
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:1
+features[views_view][] = os_taxonomy_vocabulary_term_list

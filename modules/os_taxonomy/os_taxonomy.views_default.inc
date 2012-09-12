@@ -1,8 +1,7 @@
 <?php
-
 /**
  * @file
- * Defined view for OS taxonomy module.
+ * os_taxonomy.views_default.inc
  */
 
 /**
@@ -24,7 +23,6 @@ function os_taxonomy_views_default_views() {
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'OS taxonomy taxonomy term list';
-  $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
@@ -73,18 +71,15 @@ function os_taxonomy_views_default_views() {
 
   /* Display: OS taxonomy vocabulary term list */
   $handler = $view->new_display('panel_pane', 'OS taxonomy vocabulary term list', 'vocabulary_list');
-  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
 
   /* Display: OS taxonomy taxonomy term list */
   $handler = $view->new_display('panel_pane', 'OS taxonomy taxonomy term list', 'term_list');
-  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['defaults']['style_options'] = FALSE;
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
   $handler->display->display_options['row_plugin'] = 'entity';
   $handler->display->display_options['defaults']['row_options'] = FALSE;
-
   $export['os_taxonomy_vocabulary_term_list'] = $view;
 
   return $export;
