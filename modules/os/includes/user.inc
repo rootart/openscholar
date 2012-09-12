@@ -58,24 +58,27 @@ function os_user_create($user_info){
  * @param $site_id
  *   Group ID (OPTIONAL multi-tenant only)
  */
-function os_role_grant($uid, $role_name, $site_id = false) {
-
-  if(module_exists('vsite')){
-    module_load_include('inc', 'vsite', 'includes/user');
-    return vsite_role_grant($uid, $role_name, $site_id);
+function os_role_grant($uid, $role_name, $site_id = FALSE) {
+  if (module_exists('vsite') && $site_id) {
+    // Add role via OG.
+    foreach (og_roles('node', 'vsite', $site_id) as $rid => $role) {
+      if ($role == $role_name){
+        og_role_grant('node', $site_id, $uid, $rid);
+        return TRUE;
+      }
+    }
   }
-
-  //Add role via standard drupal
-  $role = user_role_load_by_name($role_name);
-  if($role){
+  elseif ($role = user_role_load_by_name($role_name)) {
+    // Add role via standard Drupal.
     $user = user_load($uid,TRUE);
     $user->role[$role->rid] = $role;
     user_save($user);
-    return true;
+    return TRUE;
   }
 
-  //Invalid Role
-  return false;
+
+  // Invalid Role.
+  return FALSE;
 }
 
 /**
@@ -88,30 +91,26 @@ function os_role_grant($uid, $role_name, $site_id = false) {
  * @param $site_id
  *   Group ID (OPTIONAL multi-tenant only)
  */
-function os_role_revoke($uid, $role_name, $site_id = false) {
-
-  if(module_exists('vsite')){
-    //Remove role via vsite API
-    module_load_include('inc', 'vsite', 'includes/user');
-    return vsite_role_revoke($uid, $role_name, $site_id);
-
-  }else{
-    //Add role via standard drupal
-    $role = user_role_load_by_name($role_name);
-    if($role){
-      $user = user_load($uid,TRUE);
-      if(isset($user->role[$role->rid])){
-        unset($user->role[$role->rid]);
-        user_save($user);
+function os_role_revoke($uid, $role_name, $site_id = FALSE) {
+  if (module_exists('vsite') && $site_id) {
+    // Add role via OG.
+    foreach (og_roles('node', 'vsite', $site_id) as $rid => $role) {
+      if ($role == $role_name){
+        og_role_revoke('node', $site_id, $uid, $rid);
+        return TRUE;
       }
-      return true;
     }
   }
+  elseif (($role = user_role_load_by_name($role_name)) && isset($user->role[$role->rid])) {
+    // Add role via standard Drupal.
+    $user = user_load($uid,TRUE);
+    unset($user->role[$role->rid]);
+    user_save($user);
+    return TRUE;
+  }
 
-  return false;
-
-
-
+  // Invalid role.
+  return FALSE;
 }
 
 /**
