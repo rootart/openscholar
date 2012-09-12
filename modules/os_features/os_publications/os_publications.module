@@ -383,7 +383,7 @@ function _os_publications_clear_cache($node) {
 function _os_publications_handle_import($node) {
   if ($node->type == 'biblio' && isset($node->nid) && !isset($node->og_group_ref) && module_exists('vsite') && $space = spaces_get_space()) {
     module_load_include('inc', 'vsite', 'includes/vsite');
-    vsite_add_entity($node);
+    vsite_add_entity('node', $node);
   }
 }
 

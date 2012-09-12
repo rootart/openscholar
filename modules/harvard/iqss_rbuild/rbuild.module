@@ -262,7 +262,7 @@ function _rbuild_add_release_node($project_node, $version, $filename, $package, 
   $node = node_load($node->nid);
   if (module_exists('vsite')) {
     include_once (drupal_get_path('module', 'vsite') . '/includes/vsite.inc');
-    vsite_add_entity($node);
+    vsite_add_entity('node', $node);
   }
 
   // Prepares field values

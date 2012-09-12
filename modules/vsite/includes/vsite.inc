@@ -19,86 +19,61 @@
 
 
 /**
- * Add the passed entity to a vsite
+ * Add the passed entity to a vsite.
  *
- *  The entity that you wish to add to the vsite
- *  @param entity $entity
+ * @param $entity_type
+ *   The entity type. Defaults to node.
+ * @param $entity
+ *   The entity that you wish to add to the vsite
+ * @param $vsite_id
+ *   The site ID (i.e. group ID).
  *
- *  The type of entity you are passing (default node)
- *  @param string $entity_type
- *
- *  The vsite object to add the entity to
- *  @param space $vsite
+ * @return
+ *   An OgMembership entity if created, or NULL.
  */
-function vsite_add_entity($entity, $entity_type = 'node', $vsite = false){
-
-  //Make sure the entity is valid
+function vsite_add_entity($entity_type , $entity, $vsite_id = FALSE) {
   list($id) = entity_extract_ids($entity_type, $entity);
-
-  //Get the active space
-  if(!$vsite){
-    $vsite = spaces_get_space();
+  if (!$id) {
+    // Entity is not valid.
+    return;
   }
 
-  if($id && $vsite){
-
-    $values = array(
-        'entity_type' => $entity_type,
-        'entity' => $entity,
-    );
-
-    //Add this entity to the active group
-    $subscription = og_group($vsite->group_type, $vsite->id, $values);
-    $gids[] = $subscription->gid;
-
-    $wrapper = entity_metadata_wrapper($entity_type, $entity);
-    $field = field_info_field($subscription->field_name);
-
-    //If this was a member of other groups add them to the field
-    if ($field['cardinality'] != 1) {
-      foreach ($wrapper->{$subscription->field_name . '__og_membership'}->value() as $og_membership) {
-        $gids[] = $og_membership->gid;
-      }
-    }
-
-    //Add the new group to the entity
-    $wrapper->{$subscription->field_name}->set(array_unique($gids));
-
-    return $subscription;
+  if (!$vsite_id && !$og_context = og_context()) {
+    // Can't get a group context.
+    return;
   }
 
-  return false;
+  $values = array(
+    'entity_type' => $entity_type,
+    'entity' => $entity,
+  );
+
+  return og_group($og_context['group_type'], $og_context['gid'], $values);
 }
 
 /**
- * Remove the passed entity from a vsite
+ * Remove the passed entity from a vsite.
  *
- *  The entity that you wish to remove from a vsite
- *  @param entity $entity
- *
- *  The type of entity you are passing (default node)
- *  @param string $entity_type
- *
- *  The vsite object to add the entity to
- *  @param space $vsite
+ * @param $entity_type
+ *   The entity type. Defaults to node.
+ * @param $entity
+ *   The entity that you wish to add to the vsite
+ * @param $vsite_id
+ *   The site ID (i.e. group ID).
  */
-function vsite_remove_entity($entity, $entity_type = 'node', $vsite = false){
-
-  //Make sure the entity is valid
+function vsite_remove_entity($entity_type , $entity, $vsite_id = FALSE) {
   list($id) = entity_extract_ids($entity_type, $entity);
-
-  //Get the active space
-  if(!$vsite){
-    $vsite = spaces_get_space();
+  if (!$id) {
+    // Entity is not valid.
+    return;
   }
 
-  if($id && $vsite){
-
-    //Remove this entity from the group
-    return og_ungroup($vsite->group_type, $vsite->id, $entity_type, $id);
+  if (!$vsite_id && !$og_context = og_context()) {
+    // Can't get a group context.
+    return;
   }
 
-  return false;
+  og_ungroup($og_context['group_type'], $og_context['gid'], $entity_type, $id);
 }
 
 /**

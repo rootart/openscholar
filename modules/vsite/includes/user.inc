@@ -21,71 +21,54 @@
 
 
 /**
- * Add users to a OpenScholar vsite
+ * Add users to a OpenScholar vsite.
  *
  * @param $account
- * The user ID or object
- *
+ *   The user ID or object.
  * @param $site_id
- * Site ID
+ *   Site ID.
  *
- * @return bool
- * Success
+ * @return
+ *   Ther return value of vsite_add_entity().
  */
-function vsite_user_add($account, $site_id = false){
-
-  $vsite = false;
-  if($site_id){
-    $vsite = spaces_load('og', $site_id);
+function vsite_user_add($account, $site_id = FALSE){
+  if (!$site_id && !$og_conext = og_context()) {
+    return;
   }
 
-  if(is_int($account)){
-    $account = user_load($uid);
-  }
-  //Do some basic validation
-  if (!is_object($account)) {
-    //An invalid user has been passed
-    return false;
+  $account = is_object($account) ? $account : user_load($account);
+  if (!$account) {
+    return;
   }
 
   module_load_include('inc', 'vsite', 'includes/vsite');
 
-  //Add the user to this site
-  return vsite_add_entity($account, 'user', $vsite);
+  //Add the user to this site.
+  return vsite_add_entity('user', $account, $site_id);
 }
 
 /**
- * Remove a user from a OpenScholar vsite
+ * Remove a user from a OpenScholar vsite.
  *
  * @param $account
- * The user ID or object
- *
+ *   The user ID or object.
  * @param $site_id
- * Site ID
- *
- * @return bool
- * Success
+ *   Site ID.
  */
-function vsite_user_remove($account, $site_id = false){
-
-  $vsite = false;
-  if($site_id){
-    $vsite = spaces_load('og', $site_id);
+function vsite_user_remove($account, $site_id = FALSE){
+  if (!$site_id && !$og_conext = og_context()) {
+    return;
   }
 
-  if(is_int($account)){
-    $account = user_load($uid);
-  }
-  //Do some basic validation
-  if (!is_object($account)) {
-    //An invalid user has been passed
-    return false;
+  $account = is_object($account) ? $account : user_load($account);
+  if (!$account) {
+    return;
   }
 
   module_load_include('inc', 'vsite', 'includes/vsite');
 
-  //Remove the user from this site
-  return vsite_remove_entity($account, 'user', $vsite);
+  // Remove the user from this site.
+  return vsite_remove_entity('user', $account, $site_id);
 }
 
 /**
