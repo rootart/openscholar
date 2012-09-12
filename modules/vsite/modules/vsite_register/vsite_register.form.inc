@@ -227,8 +227,6 @@ function vsite_register_form_submit(&$form, &$state) {
     module_load_include('inc', 'vsite', 'includes/vsite');
     vsite_add_entity('user', $site_owner, $vsite->id);
 
-    os_role_grant($site_owner->uid, 'vsite admin', $vsite->id);
-
     $message = vsite_register_message($form, $values['domain']);
     $commands[] = ajax_command_replace ('#submit-suffix', $message );
     $commands[] = ajax_command_remove('#edit-submit');
