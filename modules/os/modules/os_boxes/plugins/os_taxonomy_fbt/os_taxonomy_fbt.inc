@@ -153,7 +153,7 @@ class os_taxonomy_fbt extends os_boxes_default {
    */
   public function render() {
     // Reset the keys.
-    foreach ($this->form_settings_keys() as $setting) {
+    foreach (array_keys($this->form_elements()) as $setting) {
       $this->options['settings'][$setting] = !empty($this->options['settings'][$setting]) ? $this->options['settings'][$setting] : NULL;
     }
 
