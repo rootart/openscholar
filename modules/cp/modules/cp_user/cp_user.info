@@ -1,5 +1,5 @@
 name = Control Panel: Users
-description = OpenScholar User Management UI
+description = OpenScholar User Management UI.
 core = 7.x
 package = Control Panel
 php = 5.2.4

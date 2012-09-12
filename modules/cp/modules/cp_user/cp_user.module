@@ -1,7 +1,12 @@
 <?php
 
 /**
- * Implements Hook Menu
+ * @file
+ * OpenScholar User Management UI.
+ */
+
+/**
+ * Implements hook_menu().
  */
 function cp_user_menu(){
   $items = array();
