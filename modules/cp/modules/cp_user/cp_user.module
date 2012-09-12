@@ -5,67 +5,113 @@
  */
 function cp_user_menu(){
   $items = array();
-  
+
   $items['cp/users'] = array(
-      'title' => 'Users',
-      'description' => 'Find and manage site members.',
-      'page callback' => 'cp_user_admin',
-      'access arguments' => array(
-          'administer users'
-      ),
-      'file' => 'cp_user.form.inc',
-      'weight' => 50,
-      'menu_name' => 'cp',
+    'title' => 'Users',
+    'description' => 'Find and manage site members.',
+    'page callback' => 'cp_user_admin',
+    'access arguments' => array(
+        'administer users'
+    ),
+    'weight' => 50,
+    'menu_name' => 'cp',
   );
-  
+
   $items['cp/users/members'] = array(
-      'title' => 'Manage Members',
-      'description' => 'Find and manage site members.',
-      'page callback' => 'cp_user_admin',
-      'access arguments' => array(
-          'administer users'
-      ),
-      'file' => 'cp_user.form.inc',
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'weight' => 20
+    'title' => 'Manage Members',
+    'description' => 'Find and manage site members.',
+    'page callback' => 'cp_user_admin',
+    'access arguments' => array('administer users'),
+    'file' => 'cp_user.form.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 20,
   );
-  
+
   $items['cp/users/add'] = array(
-      'title' => 'Add User to Site',
-      'page arguments' => array(
-          'add'
-      ),
-      'access arguments' => array(
-          'administer users'
-      ),
-      'type' => MENU_LOCAL_ACTION,
-      'context' => MENU_CONTEXT_PAGE
+    'title' => 'Add User to Site',
+    'page arguments' => array('add'),
+    'access arguments' => array('administer users'),
+    'type' => MENU_LOCAL_ACTION,
+    'context' => MENU_CONTEXT_PAGE,
   );
-  
+
   $items['cp/users/create'] = array(
-      'title' => 'Create New User',
-      'page arguments' => array(
-          'create'
-      ),
-      'access arguments' => array(
-          'administer users'
-      ),
-      'type' => MENU_LOCAL_ACTION,
-      'context' => MENU_CONTEXT_PAGE
+    'title' => 'Create New User',
+    'page arguments' => array('create'),
+    'access arguments' => array('administer users'),
+    'type' => MENU_LOCAL_ACTION,
+    'context' => MENU_CONTEXT_PAGE,
   );
-  
+
   return $items;
 }
 
-///**
-// * Adds contextual links to the user page
-// */
-//function cp_user_page_build(&$page) {
-//
-//  if(!is_array($page['#contextual_links'])) $page['#contextual_links'] = array();
-//
-//  $page['#contextual_links']['cp_user'] = array(
-//    'cp/users',
-//    array(),
-//  );
-//}
+
+/**
+ * Page callback; CP user admin delegator.
+ *
+ * @param $op
+ *   The operation needed. Defaults to "members".
+ */
+function cp_user_admin($op = 'members') {
+  $og_context = og_context();
+
+  switch ($op) {
+    case 'add':
+      module_load_include('inc', 'og_ui', 'og_ui.admin');
+      $build['user_add'] = drupal_get_form('og_ui_add_users', 'node', $og_context['gid']);
+      break;
+
+    case 'create':
+      $build['user_register'] = drupal_get_form('user_register_form');
+      break;
+
+    case 'members':
+    default:
+      module_load_include('inc', 'og_ui', 'og_ui.admin');
+      $build = og_ui_admin_account('node', $og_context['gid']);
+  }
+  return $build;
+}
+
+function cp_user_form_alter(&$form, $form_state, $form_id) {
+  //dpm($form_id);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Change the title and set default values for adding user to group.
+ */
+function cp_user_form_og_ui_add_users_alter(&$form, $form_state) {
+  $node = node_load($form['gid']['#value']);
+  $form['og_user']['#title'] = t('Add an existing user to %label', array('%label' => $node->title));
+
+  $form['og_user']['state'] = array(
+    '#type' => 'value',
+    '#value' => OG_STATE_ACTIVE,
+  );
+  $form['og_user']['field_name'] = array(
+    '#type' => 'value',
+    '#value' => 'og_user_node',
+  );
+}
+
+/**
+ * Implements hook_field_access().
+ */
+function cp_user_field_access($op, $field, $entity_type, $entity, $account) {
+  if ($op == 'edit' &&  $field['field_name'] == OG_MEMBERSHIP_REQUEST_FIELD) {
+    return FALSE;
+  }
+}
+
+
+/**
+ * Add a new user to your site that does not already exist
+ *
+ * @todo Combine this with add user
+ */
+function cp_user_create_new_user(){
+
+}
