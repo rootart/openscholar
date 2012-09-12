@@ -74,10 +74,6 @@ function cp_user_admin($op = 'members') {
   return $build;
 }
 
-function cp_user_form_alter(&$form, $form_state, $form_id) {
-  //dpm($form_id);
-}
-
 /**
  * Implements hook_form_FORM_ID_alter().
  *
