@@ -61,7 +61,7 @@ function _os_activity_message_node_create($node) {
     ),
   );
 
-  $message = message_create('os_activity_message', $param);
+  $message = message_create('os_activity_message', $values);
   $wrapper = entity_metadata_wrapper('message', $message);
   $wrapper->field_node_reference->set($group_node);
 
