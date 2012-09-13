@@ -27,9 +27,9 @@ function os_activity_default_message_type() {
     "arguments" : null,
     "message_text" : { "und" : [
         {
-          "value" : "\\u003Cp\\u003E@{message:field-node-reference:message_owner_name} has @action\\u0026nbsp;\\u003Ca href=\\u0022[message:field-node-reference:url]\\u0022\\u003E[message:field-node-reference:title]\\u003C\\/a\\u003E\\u003C\\/p\\u003E",
-          "format" : "filtered_html",
-          "safe_value" : " \\u003Cp\\u003E@{message:field-node-reference:message_owner_name} has @action\\u00a0\\u003Ca href=\\u0022url]\\u0022\\u003E[message:field-node-reference:title]\\u003C\\/a\\u003E\\u003C\\/p\\u003E "
+          "value" : "@{message:field-node-reference:message_owner_name} has @action \\u003Ca href=\\u0027[message:field-node-reference:url]\\u0027\\u003E[message:field-node-reference:title]\\u003C\\/a\\u003E",
+          "format" : "full_html",
+          "safe_value" : "\\u003Cp\\u003E@{message:field-node-reference:message_owner_name} has @action \\u003Ca href=\\u0022[message:field-node-reference:url]\\u0022\\u003E[message:field-node-reference:title]\\u003C\\/a\\u003E\\u003C\\/p\\u003E\\n"
         }
       ]
     },
