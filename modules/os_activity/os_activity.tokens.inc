@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Tokens for the module OS Activity.
+ * Tokens integration for the module OS Activity.
  */
 
 /**
@@ -24,7 +24,7 @@ function os_activity_tokens($type, $tokens, array $data = array(), array $option
 
   $replacements = array();
 
-  // Only handeling comment and nodes.
+  // Only handeling messages.
   if ($type != 'message') {
     return;
   }

@@ -9,12 +9,20 @@
  * Implements hook_node_insert().
  */
 function os_activity_node_insert($node) {
-  $message = message_create('os_activity_message', array('uid' => $node->uid));
-  $message = entity_metadata_wrapper('message', $message);
-  $message->field_node_reference->set($node);
-  $private = $message->field_node_reference->author->og_user_node->get(0)->field_private_messages->value() ? 1 : 0;
-  $message->field_private_message->set($private);
-  $message->save();
+  if (!og_is_group_content_type('node', $node->type)) {
+    return;
+  }
+  _os_activity_message_node_create($node);
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function os_activity_node_update($node) {
+  if (!og_is_group_content_type('node', $node->type)) {
+    return;
+  }
+  _os_activity_message_node_create($node);
 }
 
 /**
@@ -26,14 +34,38 @@ function os_activity_node_insert($node) {
 function os_activity_message_owner_name(Message $message) {
   $wrapper = entity_metadata_wrapper('message', $message);
 
-  // Show the username in the message.
+  // The virtual site owner can decide of he want to present the username or the
+  // virtual site name as the message owner.
   if ($wrapper->field_node_reference->author->og_user_node->get(0)->field_message_display_name->value() == 'username') {
     $display_name = $wrapper->field_node_reference->author->label();
   }
   else {
-
     $display_name = $wrapper->field_node_reference->author->og_user_node->get(0)->label();
   }
 
   return $display_name;
+}
+
+/**
+ * Helper function; Create a message when a node is created or updated.
+ */
+function _os_activity_message_node_create($node) {
+  $node_wrapper = entity_metadata_wrapper('node', $node);
+  $group_node = $node_wrapper->{OG_AUDIENCE_FIELD}->get(0)->value();
+
+  $action = empty($node->original) ? t('posted') : t('edited');
+  $values = array(
+    'uid' => $node->uid,
+    'arguments' => array(
+      '@action' => $action,
+    ),
+  );
+
+  $message = message_create('os_activity_message', $param);
+  $wrapper = entity_metadata_wrapper('message', $message);
+  $wrapper->field_node_reference->set($group_node);
+
+  $is_private = $node_wrapper->og_group_ref->get(0)->{OG_ACCESS_FIELD}->value();
+  $wrapper->field_private_message->set($is_private);
+  $wrapper->save();
 }
