@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ * OS Activity module file.
+ */
+
+/**
+ * Implements hook_node_insert().
+ */
+function os_activity_node_insert($node) {
+  $message = message_create('os_activity_message', array('uid' => $node->uid));
+  $message = entity_metadata_wrapper('message', $message);
+  $message->field_node_reference->set($node);
+  $private = $message->field_node_reference->author->og_user_node->get(0)->field_private_messages->value() ? 1 : 0;
+  $message->field_private_message->set($private);
+  $message->save();
+}
+
+/**
+ * Return the message owner name acording to the virtual site configuration.
+ *
+ *  @param $message
+ *    The message object.
+ */
+function os_activity_message_owner_name(Message $message) {
+  $wrapper = entity_metadata_wrapper('message', $message);
+
+  // Show the username in the message.
+  if ($wrapper->field_node_reference->author->og_user_node->get(0)->field_message_display_name->value() == 'username') {
+    $display_name = $wrapper->field_node_reference->author->label();
+  }
+  else {
+
+    $display_name = $wrapper->field_node_reference->author->og_user_node->get(0)->label();
+  }
+
+  return $display_name;
+}
