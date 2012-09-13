@@ -51,7 +51,6 @@ function os_activity_message_owner_name(Message $message) {
  */
 function _os_activity_message_node_create($node) {
   $node_wrapper = entity_metadata_wrapper('node', $node);
-  $group_node = $node_wrapper->{OG_AUDIENCE_FIELD}->get(0)->value();
 
   $action = empty($node->original) ? t('posted') : t('edited');
   $values = array(
@@ -63,9 +62,9 @@ function _os_activity_message_node_create($node) {
 
   $message = message_create('os_activity_message', $values);
   $wrapper = entity_metadata_wrapper('message', $message);
-  $wrapper->field_node_reference->set($group_node);
+  $wrapper->field_node_reference->set($node);
 
-  $is_private = $node_wrapper->og_group_ref->get(0)->{OG_ACCESS_FIELD}->value();
+  $is_private = $node_wrapper->og_group_ref->get(0)->{OG_ACCESS_FIELD}->value() ? 1 : 0;
   $wrapper->field_private_message->set($is_private);
   $wrapper->save();
 }

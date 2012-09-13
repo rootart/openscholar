@@ -117,7 +117,7 @@ function os_activity_field_default_fields() {
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(
-          0 => 'Private message',
+          0 => 'Public message',
           1 => 'Private message',
         ),
         'allowed_values_function' => '',
