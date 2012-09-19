@@ -15,9 +15,7 @@ function cp_user_menu(){
     'title' => 'Users',
     'description' => 'Find and manage site members.',
     'page callback' => 'cp_user_admin',
-    'access arguments' => array(
-        'administer users'
-    ),
+    'access arguments' => array('administer users'),
     'weight' => 50,
     'menu_name' => 'cp',
   );
@@ -26,7 +24,7 @@ function cp_user_menu(){
     'title' => 'Manage Members',
     'description' => 'Find and manage site members.',
     'page callback' => 'cp_user_admin',
-    'access arguments' => array('administer users'),
+    'access callback' => 'cp_user_admin_access',
     'file' => 'cp_user.form.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 20,
@@ -35,7 +33,7 @@ function cp_user_menu(){
   $items['cp/users/add'] = array(
     'title' => 'Add User to Site',
     'page arguments' => array('add'),
-    'access arguments' => array('administer users'),
+    'access callback' => 'cp_user_admin_access',
     'type' => MENU_LOCAL_ACTION,
     'context' => MENU_CONTEXT_PAGE,
   );
@@ -51,6 +49,12 @@ function cp_user_menu(){
   return $items;
 }
 
+/**
+ * Menu access; Return TRUE if user can access user admin page.
+ */
+function cp_user_admin_access() {
+  return user_access('administer users') && spaces_get_space();
+}
 
 /**
  * Page callback; CP user admin delegator.
