@@ -24,6 +24,8 @@ function os_taxonomy_theme() {
       'variables' => array(
         'name' => NULL,
         'number' => NULL,
+        'childs' => NULL,
+        'menu-class' => NULL,
         'description' => NULL,
         'terms_description' => NULL,
       ),
@@ -61,19 +63,43 @@ function os_taxonomy_theme() {
  *    - terms_description: Controll switch for displaying the taxonomy term
  *      desscription.
  *    - description: The taxonomy term description.
+ *    - childs: The html menu item list for the term child's
+ *    - menu-class: Class for ul element.
  */
 function theme_volcabulary_term_list_row($variables) {
   $number = !$variables['number'] ? '' : ' <span class="count">(' . $variables['number'] . ')</span>';
   $name = check_plain($variables['name']);
 
   $name = !$number && !$variables['link_to_empty_terms'] ? $name : l($name, $variables['url_path'], $variables['link_options']);
-  $output = '<div class="term-' . check_plain($variables['name']) . '">' . $name . $number;
+  $item_content = "<div class='term-head'>" . $name . $number;
 
   if ($variables['terms_description'] && !empty($variables['description'])) {
-    $output .= '<div class="description">  - ' . check_plain($variables['description']) . '</div>';
+    $item_content .= '<div class="description">  - ' . check_plain($variables['description']) . '</div>';
   }
 
-  $output .= '</div>';
+  $item_content .= "</div>";
+
+  if (!empty($variables['childs'])) {
+    $item_content .= $variables['childs'];
+  }
+
+  $params = array(
+    'type' => 'ul',
+    'items' => array(
+      array(
+        'data' => $item_content,
+        'class' => 'term-' . check_plain($variables['name'])
+      )
+    ),
+  );
+
+  if (!empty($variables['menu-class'])) {
+    $params['attributes'] = array(
+      'class' => array($variables['menu-class']),
+    );
+  }
+
+  $output = theme('item_list', $params);
 
   return $output;
 }
@@ -141,6 +167,59 @@ function theme_volcabulary_term_list($variables) {
   }
 
   $terms = taxonomy_term_load_multiple(array_keys($result['taxonomy_term']));
+  $items = os_taxonomy_build_terms_items($terms, $options);
+
+  $data = $options['bundles'] = array();
+
+  foreach($items as $tid => $item) {
+    // Skip on this if we don't dispaly empty childs term.
+    if (!$options['show_empty_terms'] && !$item['tagged_items'] && !$item['child_number']) {
+      continue;
+    }
+
+    // Don't show the a term which is a child of another term.
+    if ($item['is_child']) {
+      continue;
+    }
+
+    // The attached number to the term name.
+    $number = $item['tagged_items'];
+    $number += $options['add_childs'] && isset($item['child_number']) ? $item['child_number'] : 0;
+
+    // Check if we need to disable the link to the term base on the child number.
+    $link_options = empty($item['class']) ? array() : array('attributes' => array('class' => $item['class']));
+
+    $child_content = !empty($item['childs']) ? os_taxonomy_build_child_item($item['childs'], $item, $options) : '';
+
+    $data[$tid] = array(
+      'data' => theme('volcabulary_term_list_row', array(
+        'number' => $number,
+        'name' => $item['term_name'],
+        'link_options' => $link_options,
+        'url_path' => $item['url']['path'],
+        'description' => $item['description'],
+        'link_to_empty_terms' => $options['link_to_empty_terms'],
+        'terms_description' => $options['terms_description'],
+        'childs' => $child_content,
+      )),
+    );
+  }
+
+  return theme('item_list', array('type' => 'ul', 'items' => $data));
+}
+
+/**
+ * Return array of items for the function volcabulary_term_list_row().
+ *
+ *  @param $terms
+ *    Array of taxonomy term obejcts.
+ *
+ *  @param $options
+ *    Settings variable of the theme function.
+ */
+function os_taxonomy_build_terms_items($terms, $options) {
+  $items = array();
+
   foreach ($terms as $tid => $term) {
     $items[$tid] = array(
       'term_name' => $term->name,
@@ -152,46 +231,55 @@ function theme_volcabulary_term_list($variables) {
     );
 
     // Add the number of tagged nodes to the childrens when needed.
-    if ($options['add_childs'] && !$options['show_childs']) {
-      $tree = taxonomy_get_tree($variables['vid'], $term->tid, $options['depth']);
-      $items[$tid]['child_number'] = os_taxonomy_count_term_tagged_items($tree, $options['bundles']);
+    if ($options['show_childs']) {
+      $depth = !isset($options['depth']) == 0 ? NULL : $options['depth'];
+      $tree = taxonomy_get_tree($term->vid, $term->tid, $depth, TRUE);
+      if ($options['add_childs']) {
+        $items[$tid]['child_number'] = os_taxonomy_count_term_tagged_items($tree, $options['bundles']);
+      }
+      $items[$tid]['childs'] = os_taxonomy_build_terms_items($tree, $options);
     }
   }
 
-  $data = $options['bundles'] = array();
+  return $items;
+}
 
-  foreach($items as $tid => $item) {
-    // Skip on this if we don't dispaly empty childs term.
-    if (!$options['show_empty_terms'] && !$item['tagged_items'] && !$item['child_number']) {
-      continue;
+/**
+ * Recursive function for the term's childs item list.
+ *
+ *  @param $items
+ *    The taxonomy term childrens
+ *
+ *  @param $parent
+ *    The parent term object.
+ *
+ *  @param $options
+ *    The options settings variable of the theme function.
+ */
+function os_taxonomy_build_child_item($items, $parent, $options) {
+  $content = '';
+
+  foreach ($items as $item) {
+    $child_content = '';
+    if (!empty($item['childs'])) {
+      $child_content = os_taxonomy_build_child_item($item['childs'], $item, $options);
     }
 
-    // Don't show the a term which is a child of another term.
-    if ($item['is_child'] && !$options['show_childs']) {
-      continue;
-    }
-
-    // The attached number to the term name.
     $number = $item['tagged_items'];
     $number += $options['add_childs'] && isset($item['child_number']) ? $item['child_number'] : 0;
-
-    // Check if we need to disable the link to the term base on the child number.
-    $link_options = empty($item['class']) ? array() : array('attributes' => array('class' => $item['class']));
-
-    $data[] = array(
-      'data' => theme('volcabulary_term_list_row', array(
-        'number' => $number,
-        'name' => $item['term_name'],
-        'link_options' => $link_options,
-        'url_path' => $item['url']['path'],
-        'description' => $item['description'],
-        'link_to_empty_terms' => $options['link_to_empty_terms'],
-        'terms_description' => $options['terms_description'],
-      )),
-    );
+    $content .= theme('volcabulary_term_list_row', array(
+      'number' => $number,
+      'name' => $item['term_name'],
+      'link_options' => empty($item['class']) ? array() : array('attributes' => array('class' => $item['class'])),
+      'url_path' => $item['url']['path'],
+      'description' => $item['description'],
+      'link_to_empty_terms' => $options['link_to_empty_terms'],
+      'terms_description' => $options['terms_description'],
+      'menu-class' => 'term-' . check_plain($parent['term_name']),
+      'childs' => $child_content,
+    ));
   }
-
-  return theme('item_list', array('type' => 'ul', 'items' => $data));
+  return $content;
 }
 
 /**
