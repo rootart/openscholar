@@ -37,7 +37,7 @@ function os_activity_tokens($type, $tokens, array $data = array(), array $option
 
     // The virtual site owner can decide of he want to present the username or the
     // virtual site name as the message owner.
-    $replacements[$original] = $wrapper->value() == 'username' ? $wrapper->author->label() : $wrapper->label();
+    $replacements[$original] = $wrapper->field_message_display_name->value() == 'username' ? $wrapper->author->label() : $wrapper->label();
   }
 
   return $replacements;
