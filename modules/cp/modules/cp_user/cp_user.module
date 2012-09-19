@@ -15,7 +15,7 @@ function cp_user_menu(){
     'title' => 'Users',
     'description' => 'Find and manage site members.',
     'page callback' => 'cp_user_admin',
-    'access arguments' => array('administer users'),
+    'access callback' => 'cp_user_admin_access',
     'weight' => 50,
     'menu_name' => 'cp',
   );
