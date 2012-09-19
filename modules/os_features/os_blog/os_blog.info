@@ -9,6 +9,7 @@ dependencies[] = features
 dependencies[] = file_entity
 dependencies[] = filefield_paths
 dependencies[] = media
+dependencies[] = os_files
 dependencies[] = strongarm
 dependencies[] = views
 features[box][] = os_blog-blog_rss_feed

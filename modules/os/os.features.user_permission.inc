@@ -54,6 +54,7 @@ function os_user_default_permissions() {
     'roles' => array(
       0 => 'administrator',
       1 => 'manager',
+      2 => 'vsite admin',
     ),
     'module' => 'node',
   );
@@ -77,16 +78,6 @@ function os_user_default_permissions() {
       3 => 'vsite user',
     ),
     'module' => 'overlay',
-  );
-
-  // Exported permission: access printer-friendly version.
-  $permissions['access printer-friendly version'] = array(
-    'name' => 'access printer-friendly version',
-    'roles' => array(
-      0 => 'anonymous user',
-      1 => 'authenticated user',
-    ),
-    'module' => 'book',
   );
 
   // Exported permission: access site in maintenance mode.
@@ -168,6 +159,8 @@ function os_user_default_permissions() {
     'roles' => array(
       0 => 'administrator',
       1 => 'manager',
+      2 => 'vsite admin',
+      3 => 'vsite user',
     ),
     'module' => 'comment',
   );
@@ -290,15 +283,6 @@ function os_user_default_permissions() {
     'module' => 'search',
   );
 
-  // Exported permission: administer shortcuts.
-  $permissions['administer shortcuts'] = array(
-    'name' => 'administer shortcuts',
-    'roles' => array(
-      0 => 'administrator',
-    ),
-    'module' => 'shortcut',
-  );
-
   // Exported permission: administer site configuration.
   $permissions['administer site configuration'] = array(
     'name' => 'administer site configuration',
@@ -412,6 +396,15 @@ function os_user_default_permissions() {
     'module' => 'user',
   );
 
+  // Exported permission: create boxes.
+  $permissions['create boxes'] = array(
+    'name' => 'create boxes',
+    'roles' => array(
+      0 => 'authenticated user',
+    ),
+    'module' => 'boxes',
+  );
+
   // Exported permission: create url aliases.
   $permissions['create url aliases'] = array(
     'name' => 'create url aliases',
@@ -424,13 +417,11 @@ function os_user_default_permissions() {
     'module' => 'path',
   );
 
-  // Exported permission: customize shortcut links.
-  $permissions['customize shortcut links'] = array(
-    'name' => 'customize shortcut links',
-    'roles' => array(
-      0 => 'administrator',
-    ),
-    'module' => 'shortcut',
+  // Exported permission: delete boxes.
+  $permissions['delete boxes'] = array(
+    'name' => 'delete boxes',
+    'roles' => array(),
+    'module' => 'boxes',
   );
 
   // Exported permission: delete revisions.
@@ -442,6 +433,15 @@ function os_user_default_permissions() {
       2 => 'vsite admin',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: edit all regions.
+  $permissions['edit all regions'] = array(
+    'name' => 'edit all regions',
+    'roles' => array(
+      0 => 'authenticated user',
+    ),
+    'module' => 'os',
   );
 
   // Exported permission: edit file.
@@ -544,15 +544,6 @@ function os_user_default_permissions() {
       3 => 'vsite user',
     ),
     'module' => 'comment',
-  );
-
-  // Exported permission: switch shortcut sets.
-  $permissions['switch shortcut sets'] = array(
-    'name' => 'switch shortcut sets',
-    'roles' => array(
-      0 => 'administrator',
-    ),
-    'module' => 'shortcut',
   );
 
   // Exported permission: use advanced search.

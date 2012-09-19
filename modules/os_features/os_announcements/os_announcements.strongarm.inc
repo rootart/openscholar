@@ -104,7 +104,7 @@ function os_announcements_strongarm() {
   $strongarm->disabled = FALSE;
   $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_announcement';
-  $strongarm->value = '1';
+  $strongarm->value = '0';
   $export['node_preview_announcement'] = $strongarm;
 
   $strongarm = new stdClass();

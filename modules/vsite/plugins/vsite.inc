@@ -87,7 +87,7 @@ class vsite extends space_og {
 
             $current_url = url($_GET['q'], array(
                 'absolute' => TRUE,
-                'query' => drupal_http_build_query(drupal_get_query_parameters())
+                'query' => drupal_get_query_parameters(),
             ));
             if ($current_url != rtrim($space->get_absolute_url(), "/")) {
               purl_goto("<front>", array(
@@ -132,7 +132,7 @@ class vsite extends space_og {
       switch ($features[$feature]) {
         //Private
         case 2 :
-          if (! og_is_member_group_member($this->type, $this->id, TRUE, $account->uid)) {
+          if (! og_is_member($this->group_type, $this->id , 'user', $account)) {
             $access = false;
           } //Admin or group member?
           break;

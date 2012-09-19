@@ -434,7 +434,11 @@ class BoxPorter {
       ->execute()
       ->fetchCol();
 
-    if ($shield_path = unserialize($value)) {
+    if (is_array($value)) {
+      $value = (count($value)) ? $value[0] : '' ;
+    }
+
+    if (strlen($value) && ($shield_path = @unserialize($value))) {
       $shield_file = end(explode('/', $shield_path));
       $box->options['shield'] = $shield_file;
     } else {

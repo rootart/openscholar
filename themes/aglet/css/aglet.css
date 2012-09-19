@@ -1,5 +1,5 @@
 @import "aglet.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 
 body {
@@ -51,8 +51,6 @@ p.copy {
    -moz-box-shadow: 0 10px 10px 3px #222222;
    -webkit-box-shadow: 0 10px 10px 3px #222222;
    box-shadow: 0 10px 10px 3px #222222;
-  margin:auto;
-  padding-top:0;
   background:#FFF;
   }
 /*
@@ -82,9 +80,7 @@ p.copy {
   padding-top:1px;
   }
 
-#content-column {
-  padding:15px;
-  }
+
   
 #columns {
   overflow:hidden;
@@ -102,7 +98,7 @@ padding-bottom: 2000px;
   padding-left: 0;
   padding-right:0;
  background:#e0ece8;
-  left: 0;
+
   }
 
 .region-sidebar-second {

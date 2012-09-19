@@ -1,5 +1,5 @@
 @import "eloquent.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 body {
   background-color: #44514f;
@@ -252,13 +252,6 @@ ul.nice-menu-left li.menuparent:hover, ul.nice-menu-left li li.menuparent:hover 
   padding-top: 30px;
   }
 
-body.sidebar-first #content {
-  margin-left: 30px;
-  }
-
-body.sidebar-second #content {
-  margin-right: 30px;
-  }
 
 
 /* Footer*/

@@ -1,5 +1,5 @@
 @import "rcss.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../../os_basetheme/css/d6buffer.css";
 
 body {
   margin:0;
@@ -27,7 +27,6 @@ h4 {
 
 
 #header-container, #block-os-primary-menu, #columns, #footer {
-  width: 1006px;
   margin: 0 auto;
   }
 
@@ -120,6 +119,10 @@ ul.nice-menu ul {
   color: #0A0A0A;
   background-color:#C2D45B;
   }
+
+#menu-bar li li a {
+  line-height: 35px;
+}
 
 #menu-bar li.last a {
   border: none;

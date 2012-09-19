@@ -23,7 +23,7 @@ function os_boxes_boxes_plugins() {
  * Implements hook_menu().
  */
 function os_boxes_menu() {
-  $items['os/boxes/add/%os_boxes'] = array(
+  $items['os/widget/add/%os_boxes'] = array(
     'title' => 'Add Widget',
     'page callback' => 'os_boxes_edit_widget',
     'page arguments' => array(3),
@@ -33,45 +33,27 @@ function os_boxes_menu() {
     'file' => 'os_boxes.admin.inc',
   );
 
-  $items['os/boxes/%os_boxes/edit'] = array(
+  $items['os/widget/%/%os_boxes/edit'] = array(
     'title' => 'Edit Widget',
     'page callback' => 'os_boxes_edit_widget',
-    'page arguments' => array(2),
+    'page arguments' => array(3),
     'access callback' => 'boxes_access_edit',
-    'access arguments' => array(2),
+    'access arguments' => array(3),
     'type' => MENU_LOCAL_TASK,
     'file' => 'os_boxes.admin.inc',
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 1,
   );
 
-  // This item is just a helper for contextual links
-  // It should always be accessible, and just not go anywhere.
-  $items['os/boxes/%os_boxes'] = array(
-    'access callback' => 'os_boxes_access_region',  // for contextual links
-    'access arguments' => array(2),
-    'page callback' => 'os_boxes_placeholder',
-  ) + $items['os/boxes/%os_boxes/edit'];
-
-  $items['os/boxes/%os_boxes/delete'] = array(
+  $items['os/widget/%/%os_boxes/delete'] = array(
     'title' => 'Delete Widget',
     'page callback' => 'os_boxes_delete_widget',
-    'page arguments' => array(2),
+    'page arguments' => array(3),
     'access callback' => 'boxes_access',
-    'access arguments' => array('delete', 2),
+    'access arguments' => array('delete', 3),
     'type' => MENU_CALLBACK,
     'file' => 'os_boxes.admin.inc',
     'weight' => 2,
-  );
-  $items['os/boxes/%os_boxes/remove'] = array(
-    'title' => 'Remove Widget',
-    'page callback' => 'os_boxes_remove_widget',
-    'page arguments' => array(2),
-    'access callback' => 'boxes_access_admin',
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'os_boxes.admin.inc',
-    'context' => MENU_CONTEXT_INLINE,
-    'weight' => 3,
   );
   return $items;
 }
@@ -166,7 +148,7 @@ function os_boxes_os_widget_alter(&$widget) {
       $widget['class'] = $plugin['tags'];
 
     $widget['can_edit'] = boxes_access_edit($box);  // all boxes should be editable. If they aren't, why are they a box
-    $widget['path'] = 'os/boxes/'.$widget['delta'];
+    $widget['path'] = 'os/widget/boxes/'.$widget['delta'];
 
     // deletion is easier now.
     // just refer to the permission.
@@ -190,7 +172,7 @@ function os_boxes_get_factories() {
         'module' => 'boxes',
         'delta' => "boxes_add__$p",
         'label' => $info['title'],
-        'block_config_path' => "os/boxes/add/{$p}",
+        'block_config_path' => "os/widget/add/{$p}",
         'factory' => true,
       );
     }
@@ -219,7 +201,7 @@ function os_boxes_get_tags() {
  */
 function os_boxes_admin_paths() {
   $paths = array(
-    'os/boxes/*' => TRUE,
+    'os/widget/*' => TRUE,
   );
 
   return $paths;
@@ -234,30 +216,14 @@ function os_boxes_preprocess_boxes_box(&$variables) {
 }
 
 /**
- * Adds contextual links to our box widgets
- */
-function os_boxes_block_view_alter(&$array, $block) {
-  if ($block->module == 'boxes') {
-    if (!is_array($array['content'])) {
-      $array['content'] = array('#markup' => $array['content']);
-    }
-
-    $array['content']['#contextual_links']['box'] = array(
-      'os/boxes',
-      array($block->delta),
-    );
-  }
-}
-
-/**
  * Remove core block link from contextual
  */
 function os_boxes_menu_contextual_links_alter(&$links, $router_item, $path) {
   unset($links['block-configure']);
 
-  if (isset($links['box-remove'])) {
+  if (isset($links['widget-remove'])) {
     $ctxs = array_keys(context_active_contexts());
-    $links['box-remove']['localized_options']['query']['contexts'] = $ctxs;
+    $links['widget-remove']['localized_options']['query']['contexts'] = $ctxs;
   }
 }
 
@@ -267,41 +233,6 @@ function os_boxes_menu_contextual_links_alter(&$links, $router_item, $path) {
  * Regional permissions
  * this may be spun off into its own module, so I'm putting it all in one place
  */
-
-/**
- * Given a box and a set of contexts, return the region the box is in
- * This function will be called multiple times per page, so we get all the
- * regions at once and cache them in a static var.
- */
-function os_boxes_get_region($box, $contexts = array()) {
-  if (empty($contexts)) {
-    $contexts = context_active_contexts();
-  }
-
-  $plugin = context_get_plugin('reaction', 'block');
-
-  $blocks = &drupal_static(__FUNCTION__, array());
-  if (empty($blocks)) {
-    foreach ($contexts as $c) {
-      foreach ($plugin->get_blocks(null, $c) as $bid => $block) {
-        if ($block->module == 'boxes' && isset($block->region)){
-          $blocks[$block->delta] = $block->region;
-        }
-      }
-    }
-  }
-
-  return isset($blocks[$box->delta])?$blocks[$box->delta]:false;
-}
-
-/**
- * Given a box, return whether it can be editted based on its region.
- */
-function os_boxes_access_region($box) {
-  $region = os_boxes_get_region($box);
-
-  return user_access('edit region '.$region) || user_access('edit all regions');
-}
 
 /**
  * Implementation of hook_permission()
@@ -314,18 +245,8 @@ function os_boxes_permission() {
     'use boxes advanced settings' => array(
       'title' => t('Use Boxes Advanced Settings'),
       'description' => t('Enable use of a boxes\' advanced settings'),
-    ),
-    'edit all regions' => array(
-      'title' => t('Edit All Regions'),
-      'description' => t('Edit the contents of all regions'),
     )
   );
-  foreach ($regions as $r) {
-    $perms['edit region '.$r] = array(
-      'title' => t('Edit Region !region', array('!region' => $r)),
-      'description' => t('Edit the contents of the region !region', array('!region' => $r)),
-    );
-  }
 
   return $perms;
 }

@@ -1,21 +1,21 @@
 /**
- * Sets up a linkage between the links in a Table of Contents block 
+ * Sets up a linkage between the links in a Table of Contents block
  * or the book links in the content area and the actual contents of a book page
  */
 (function($){
 	var container, header, content = {}, active, orig_nid, blocks = $().not("*");
-	
+
 	Drupal.behaviors.os_book_linkage = {
 		attach: function(ctx) {
 			if (!$('body.node-type-book').length) return;
 			var nid, url;
-			
+
 			if (ctx == document) {
-				content = Drupal.settings.os_books.pages;			
+				content = Drupal.settings.os_books.pages;
 				orig_nid = active = $('body').attr('class').match(/page-node-(\d+)/)[1];
 				container = $('#content');
-				header = $('#page-title');	
-				
+				header = $('#page-title');
+
 				try {
 					history.replaceState({nid: orig_nid}, header.text(), location.href);
 				}
@@ -23,9 +23,9 @@
 					// do nothing
 				}
 			}
-			
-			// pages is a list of every page in the book
-			// we parse this content and assign the contents to an nid in a js object
+
+			// Pages is a list of every page in the book.
+			// We parse this content and assign the contents to an nid in a js object
 			// as we do this, we check for links that have the same title and assign
 			// the nid as an attribute.
 			for (nid in content) {
@@ -40,10 +40,10 @@
 					blocks = blocks.add(parents);
 				});
 			}
-			
+
 			// attach click handler to blocks
 			blocks.click(toc_click);
-			
+
 			window.onpopstate = history_change;
 		},
 		detach: function(ctx) {
@@ -57,7 +57,7 @@
 		var nid = e.target.getAttribute('data-nid');
 		if (content[nid]) {
 			e.preventDefault();
-			
+
 			try {
 				history.pushState({nid: nid}, content[nid].title, e.target.href);
 			}
@@ -67,14 +67,14 @@
 			page_swap(nid);
 		}
 	}
-	
+
 	function history_change(e) {
 		if (e.state !== null) {
 			var nid = e.state.nid;
 			page_swap(nid);
 		}
 	}
-	
+
 	function page_swap(nid) {
 		Drupal.detachBehaviors($('.node', container)[0]);
 		$('#comments', container).remove();
@@ -86,16 +86,16 @@
 
 		// change drupal settings
 		Drupal.settings.getQ = "node/"+nid;
-		if (typeof Drupal.settings.disqus == 'object') 
+		if (typeof Drupal.settings.disqus == 'object')
 			Drupal.settings.disqus.identifier = "node/"+nid;	//TODO: Find a better way to do this
-		
+
 		Drupal.attachBehaviors(node[0]);
-		
+
 		// deal with the 'active' class
 		$('a[data-nid="'+active+'"], a[data-nid="'+orig_nid+'"]').removeClass('active');
 		$('a[data-nid="'+nid+'"]').addClass('active');
 		active = nid;
-		
+
 		if ($('.fb-social-comments-plugin').length) {
 			fbAsyncInit();
 		}

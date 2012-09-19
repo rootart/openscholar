@@ -1,4 +1,4 @@
 <?php
 function os_files_install() {
-	
+  _os_files_clean_up_fields();
 }

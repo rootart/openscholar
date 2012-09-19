@@ -1,5 +1,5 @@
 @import "scholars-harvard.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../../os_basetheme/css/d6buffer.css";
 
 @import url('http://fonts.googleapis.com/css?family=PT+Sans');
 @import url('http://fonts.googleapis.com/css?family=Radley');
@@ -26,6 +26,10 @@ font-family: helvetica, arial, serif;
 
 #content-column h1#page-title {
   margin-top:1em;
+  }
+  
+.page-user #content-column h1#page-title {
+  margin-top:-20px;
   }
 
 #footer {
@@ -165,19 +169,25 @@ p.os-leadin {
 }
 
 #block-vsite-register-get-your-site-block {
-	margin-top:31px;
+	width:491px;
+	height:80px;
+	background: url('../images/getsitenowButton.png')no-repeat;
+	padding: 20px 75px;
+	margin-bottom:0;
 	}
 
 #block-vsite-register-get-your-site-block a {
-
-	 padding: 34px 199px;
-	background: url('/profiles/openscholar/themes/custom/scholars_harvard/images/getsitenowButton.png')no-repeat;
-	text-indent:-9999px;
-	position: relative;
+     font-size:30px;
+     color:#FFF;
 }
 
+#block-vsite-register-get-your-site-block a:hover {
+     color: #FEF1AB;
+}
+   
+
 .os-rightcol .os-learnmore a {
-    background: url("/profiles/openscholar/themes/custom/scholars_harvard/images/arrow2.png") no-repeat scroll 100% 50% transparent;
+    background: url("../images/arrow2.png") no-repeat scroll 100% 50% transparent;
     color: #B23325;
     margin-left: 20px;
     padding-right: 30px;
@@ -619,6 +629,11 @@ font-size: 1.2em;
 	float:left; width:100%; margin: -65px 0 12px 18px;
 }
 
+.logged-in .block-os-stats dl {
+	margin: 55px 0 12px 18px;
+}
+
+
 .block-os-stats dt, .block-os-stats dd {
 float:left; width: auto; margin:0; padding:0 .5em 0 0; 
 color:#FFF;
@@ -654,15 +669,22 @@ p.copy a:hover {
   position:relative;
   top: -115px;
   }
+ 
+ .front.logged-in #footer #block-os-powered-by {
+  top: -85px;
+  } 
+  
+   
 
 .front #block-os-powered-by a {
-  background: url('/profiles/openscholar/themes/custom/scholars_harvard/images/powered_by.png') 19px 37px no-repeat #234f6e;
+  background: url('../images/powered_by.png') 19px 37px no-repeat #234f6e;
   display:block;
   width: 119px;
   height:115px;
   text-indent: -9999px;
-  
   }
+  
+
 
 
 /* REASONS PAGE */

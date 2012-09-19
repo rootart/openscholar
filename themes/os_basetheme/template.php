@@ -49,6 +49,11 @@ function os_basetheme_preprocess_page(&$vars) {
       $vars['classes_array'][] = $var.'-none';
     }
   }
+
+  if (module_exists('overlay') && overlay_get_mode() == 'child') {
+    // overlay does this, but adaptive theme renders them in a different way that overlay doesn't expect
+    $vars['primary_local_tasks'] = $vars['title'] = false;
+  }
 }
 
 /**
@@ -73,4 +78,9 @@ function os_basetheme_preprocess_status_messages(&$vars) {
       unset ($_SESSION['messages']['warning']);
     }
   }
+}
+
+function os_basetheme_preprocess_overlay(&$vars) {
+  // we never want these. They look awful
+ $vars['tabs'] = false;
 }

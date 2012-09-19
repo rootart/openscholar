@@ -18,11 +18,6 @@ h2, h1#page-title {
   color: #fff;
   }
 
-#content-main {
-  -moz-box-shadow: 0 3px 2em #666;
-  -webkit-box-shadow: 0 3px 2em #666;
-  box-shadow: 0 3px 2em #666;
-  }
 
 .region-sidebar-first a:hover,
 .region-sidebar-second a:hover,

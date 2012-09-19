@@ -1,17 +1,17 @@
 /*FRONT PAGE */
 
-.front {
+.front,
+.front #columns
+ {
   background: #4d300e;
   }
 
  #extradiv {
   display:none;
   }
-/*
-#header-container, #menu-bar, #columns {
-  	 background: #FF0000;
-}
-*/
+
+
+
 
 
 .front.no-sidebars.navbar-off #block-boxes-site-info {

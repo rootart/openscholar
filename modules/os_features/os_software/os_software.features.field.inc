@@ -46,9 +46,9 @@ function os_software_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
-          'module' => 'text',
+          'module' => 'os_files',
           'settings' => array(),
-          'type' => 'text_default',
+          'type' => 'os_files_image_list',
           'weight' => '2',
         ),
         'teaser' => array(
@@ -201,7 +201,7 @@ function os_software_field_default_fields() {
       'settings' => array(
         'description_field' => 0,
         'file_directory' => '',
-        'file_extensions' => 'jpg jpeg gif png txt doc docx gz xls pdf ppt pps odt ods odp tex tgz xml zip',
+        'file_extensions' => 'jpg jpeg gif png txt doc docx gz xls xlsx pdf ppt pptx pps odt ods odp tex tgz xml zip',
         'filefield_paths' => array(
           'active_updating' => 0,
           'file_name' => array(
