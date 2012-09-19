@@ -59,12 +59,12 @@ function cp_user_menu(){
  *   The operation needed. Defaults to "members".
  */
 function cp_user_admin($op = 'members') {
-  $og_context = og_context();
+  $vsite = spaces_get_space();
 
   switch ($op) {
     case 'add':
       module_load_include('inc', 'og_ui', 'og_ui.admin');
-      $build['user_add'] = drupal_get_form('og_ui_add_users', 'node', $og_context['gid']);
+      $build['user_add'] = drupal_get_form('og_ui_add_users', 'node', $vsite->id);
       break;
 
     case 'create':
@@ -74,7 +74,7 @@ function cp_user_admin($op = 'members') {
     case 'members':
     default:
       module_load_include('inc', 'og_ui', 'og_ui.admin');
-      $build = og_ui_admin_account('node', $og_context['gid']);
+      $build = og_ui_admin_account('node', $vsite->id);
   }
   return $build;
 }
