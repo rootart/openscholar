@@ -16,9 +16,9 @@ function os_activity_views_api() {
  */
 function os_activity_default_message_type() {
   $items = array();
-  $items['os_activity_message'] = entity_import('message_type', '{
-    "name" : "os_activity_message",
-    "description" : "OS Activity message",
+  $items['os_node'] = entity_import('message_type', '{
+    "name" : "os_node",
+    "description" : "OS node",
     "argument_keys" : [],
     "argument" : [],
     "category" : "message_type",
