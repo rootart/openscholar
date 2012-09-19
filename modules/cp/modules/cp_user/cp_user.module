@@ -80,6 +80,7 @@ function cp_user_admin($op = 'members') {
       module_load_include('inc', 'og_ui', 'og_ui.admin');
       $build = og_ui_admin_account('node', $vsite->id);
   }
+
   return $build;
 }
 
