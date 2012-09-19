@@ -4,19 +4,20 @@
  * Implementation of hook_install
  */
 function vsite_install(){
+
   // Add the base vsite roles as OG roles
   $vsite_roles = array(
-      'member',
-      'non-member',
-      'vsite user',
-      'vsite admin'
+    'member',
+    'non-member',
+    'vsite user',
+    'vsite admin'
   );
-  
+
   foreach ( $vsite_roles as $name ) {
     $role = og_role_create($name, 'node', 0, 'vsite');
     og_role_save($role);
   }
-  
+
   $roles = og_roles($group_type = 'node', $bundle = 'vsite');
   $manager_roles = array();
   //Set OG specific roles
@@ -25,20 +26,20 @@ function vsite_install(){
       case 'vsite admin' :
         $manager_roles[] = $rid;
         og_role_grant_permissions($rid, array(
-            'view users outside groups',
-            'update group',
-            'unsubscribe',
-            'manage group space',
-            'approve and deny subscription',
-            'administer group',
-            'add user',
-            'access administration pages'
+          'view users outside groups',
+          'update group',
+          'unsubscribe',
+          'manage group space',
+          'approve and deny subscription',
+          'administer group',
+          'add user',
+          'access administration pages'
         ));
         break;
       case 'vsite user' :
         og_role_grant_permissions($rid, array(
-            'view users outside groups',
-            'unsubscribe'
+          'view users outside groups',
+          'unsubscribe'
         ));
         break;
       case 'manager' :
@@ -46,9 +47,49 @@ function vsite_install(){
         break;
     }
   }
-  
+
   variable_set('og_group_manager_default_rids_node_vsite', $manager_roles);
-  
+
   //Set the default OG preset to be os_personal
-  variable_set('spaces_preset_og','os_personal');
+  variable_set('spaces_preset_og', 'os_personal');
+
+  _vsite_initilize_group_fields();
+}
+
+/**
+ * Add the default group and group content fields to existing content that
+ * implements hook_vsite_og_node_type_info.
+ */
+function _vsite_initilize_group_fields(){
+
+  $bundles = vsite_get_type_from_bundle();
+
+  //Get installed nodes
+  $info = entity_get_info('node');
+
+  //Exclude nodes managed by this module, these are the only nodes that will not require action
+  if(function_exists('vsite_node_info')){
+  	$info['bundles'] = array_diff_key($info['bundles'], vsite_node_info());
+  }
+
+  foreach ( $bundles as $bundle => $type ) {
+    if(!isset($info['bundles'][$bundle])){
+      //This bundle has not been created
+      continue;
+    }
+
+    if ($type == 'group') {
+      vsite_attach_fields_to_group($bundle);
+    }
+    else {
+      // Group content.
+      vsite_attach_fields_to_group_content('node', $bundle);
+    }
+  }
+
+  $info = entity_get_info('file');
+  foreach ($info['bundles'] as $bundle => $type) {
+    drupal_set_message('Creating og_group_ref for file type '.$bundle.' in install hook.');
+    vsite_attach_fields_to_group_content('file', $bundle);
+  }
 }

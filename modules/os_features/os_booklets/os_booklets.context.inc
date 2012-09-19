@@ -27,7 +27,7 @@ function os_booklets_context_default_contexts() {
         'book' => 'book',
       ),
       'options' => array(
-        'node_form' => '1',
+        'node_form' => '0',
       ),
     ),
     'path' => array(

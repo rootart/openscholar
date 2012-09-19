@@ -167,15 +167,35 @@ dl.bibliomultiselect .form-item {
   border: none;
   }
 
-.biblio-abstract-link {
+a.biblio-abstract-link {
   text-align: left;
   text-decoration: none;
   font-style: normal;
   font-weight: normal;
+  margin-left:8px;
   }
+  
+  
+a.biblio-abstract-link.toggle {
+	padding-left:12px;
+	background:url('../images/scholarbase-sprite.png') 0 -404px no-repeat;
+	text-decoration: none;
+	
+}
+
+a.biblio-abstract-link.toggle.expanded {
+	padding-left:12px;
+	background:url('../images/scholarbase-sprite.png') 0 -415px no-repeat;
+	text-decoration: none;
+}
+
 
 .biblio-abstract-display {
   line-height: 1.5em;
+  display:none;
+  background:#FAFAFA;
+  padding:8px;
+  border:1px solid #CCC;
   }
 
 .biblio-export-links {

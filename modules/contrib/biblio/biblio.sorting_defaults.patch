@@ -33,6 +33,7 @@ index c326b86..0e8cc9e 100644
 +    'title' => 'asc',
 +    'type' => 'asc',
 +    'year' => 'desc',
++    'keyword' => 'asc',
 +  );
 +
    if (isset($uri['query']['s'])) {

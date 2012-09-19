@@ -444,7 +444,7 @@ function _vsite_menu_get_menu_links($menu){
   }
 
   //If there is no menu override avalible get the default links from the menu_link table
-  if (! is_array($existing_menu)) {
+  if (!isset($existing_menu) || !is_array($existing_menu)) {
     $menu_links = menu_load_links($menu);
     $existing_menu = array();
     foreach ($menu_links as $link){

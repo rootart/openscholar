@@ -77,6 +77,45 @@ function vsite_context_default_contexts() {
   t('Active on the frontpage in multi-tenant installs');
   t('OpenScholar');
   $export['os_sitewide_front'] = $context;
+  
+  $context = new stdClass();
+  $context->disabled = FALSE; /*
+                               * Edit this to true to make a default context
+                               * disabled initially
+                               */
+  $context->api_version = 3;
+  $context->name = 'os_users';
+  $context->description = 'Context that is active when in a user area of an Openscholar site, like user profile or log in screen';
+  $context->tag = 'OpenScholar';
+  $context->conditions = array(
+      'path' => array(
+          'values' => array(
+              	'user' => 'user',
+				'users' => 'users',
+              	'user/*' => 'user/*',
+          )
+      )
+  );
+  $context->reactions = array(
+      'block' => array(
+          'blocks' => array(
+              'os-powered-by' => array(
+                  'module' => 'os',
+                  'delta' => 'powered-by',
+                  'region' => 'footer',
+                  'weight' => '10',
+              ),
+          )
+      )
+  );
+  $context->condition_mode = 0;
+
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('Context that is active when in a user area of an Openscholar site, like user profile or log in screen');
+  t('OpenScholar');
+  $export['os_users'] = $context;
+  
 
   return $export;
 }

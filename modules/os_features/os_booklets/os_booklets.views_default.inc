@@ -126,7 +126,6 @@ function os_booklets_views_default_views() {
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'primary-menu';
   $handler->display->display_options['menu']['context'] = 0;
-
   $export['os_booklets'] = $view;
 
   return $export;

@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_reader.views_default.inc
@@ -10,17 +13,19 @@
 function os_reader_views_default_views() {
   $export = array();
 
-  $view = new view();
-  $view->name = 'reader';
+  $view              = new view();
+  $view->name        = 'reader';
   $view->description = '';
-  $view->tag = 'default';
-  $view->base_table = 'node';
-  $view->human_name = 'Reader feed';
-  $view->core = 7;
+  $view->tag         = 'default';
+  $view->base_table  = 'node';
+  $view->human_name  = 'Reader feed';
+  $view->core        = 7;
   $view->api_version = '3.0';
-  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+  /* Edit this to true to make a default view disabled initially */
+  $view->disabled = FALSE;
 
   /* Display: Master */
+
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Reader';
   $handler->display->display_options['access']['type'] = 'spaces_feature';
@@ -33,6 +38,7 @@ function os_reader_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'node';
   /* Field: Content: Title */
+
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -40,6 +46,7 @@ function os_reader_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   /* Field: Content: URL */
+
   $handler->display->display_options['fields']['field_url']['id'] = 'field_url';
   $handler->display->display_options['fields']['field_url']['table'] = 'field_data_field_url';
   $handler->display->display_options['fields']['field_url']['field'] = 'field_url';
@@ -51,11 +58,13 @@ function os_reader_views_default_views() {
     'num_to_show' => '3',
   );
   /* Sort criterion: Content: Post date */
+
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
   /* Filter criterion: Content: Published */
+
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -63,6 +72,7 @@ function os_reader_views_default_views() {
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
   /* Filter criterion: Content: Type */
+
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -70,11 +80,13 @@ function os_reader_views_default_views() {
     'feed' => 'feed',
   );
   /* Filter criterion: Spaces: Content in current space */
+
   $handler->display->display_options['filters']['current']['id'] = 'current';
   $handler->display->display_options['filters']['current']['table'] = 'spaces';
   $handler->display->display_options['filters']['current']['field'] = 'current';
 
   /* Display: Page */
+
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['path'] = 'reader';
   $handler->display->display_options['menu']['type'] = 'normal';
@@ -82,6 +94,7 @@ function os_reader_views_default_views() {
   $handler->display->display_options['menu']['name'] = 'primary-menu';
 
   /* Display: Block */
+
   $handler = $view->new_display('block', 'Block', 'block');
   $handler->display->display_options['defaults']['title'] = FALSE;
   $handler->display->display_options['title'] = 'Latest Feed Items';
@@ -98,3 +111,4 @@ function os_reader_views_default_views() {
 
   return $export;
 }
+

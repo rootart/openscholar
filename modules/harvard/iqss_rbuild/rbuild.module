@@ -1,19 +1,24 @@
 <?php
+// $Id$
+
 /**
  * @file
  * Code for Rbuild module
- * 
+ *
  * Rbuild extends the OS Software feature module, providing a new field option
  * called "Rbuild repository", which OS Software provides to the field
  * field_software_method.
- * 
+ *
  * OS Software responds to this field to show/hide the "Add new > Software
  * Release" contextual link, and also to show/hide a second field
  * field_software_repo on the node edit form.
- * 
+ *
  * Rbuild also checks for regular updates, fetches any new packages, and creates
  * new Software Release nodes if a newer version exists.
  */
+
+// Sets module to cache documentation for 1 year.
+define('RBUILD_DOC_CACHE_LEN', 31536000);
 
 /**
  * Drupal hooks
@@ -23,59 +28,122 @@
  * Implements hook_form_FORM_ID_form_alter() for software_project_node_form
  */
 function rbuild_form_software_project_node_form_alter(&$form, &$form_state, $form_id) {
+  // Only shows the rbuild fields if "Rbuild repository" method is selected
   $form['#attached'] = array(
-  	'js' => array(
-  		'type' => 'file',
-  		'data' => drupal_get_path('module', 'rbuild') . '/rbuild.js',
-  	),
+    'js' => array(
+      'type' => 'file',
+      'data' => drupal_get_path('module', 'rbuild') . '/rbuild.js',
+    ),
+  );
+
+  // Checks that the provided Repository URL and Short Name are valid
+  $form['#validate'][] = '_rbuild_project_node_validate';
+
+  // Prevents users from changing packaging method info after creating node.
+  global $user;
+  $is_user_1 = ((int)$user->uid === 1);
+  $is_new = (!isset($form['#node']->nid));
+  if ($is_new || $is_user_1) {
+    return;
+  }
+  $form['field_software_method']['#disabled'] = TRUE;
+  $form['field_software_repo']['#disabled'] = TRUE;
+  $form['field_rbuild_short_name']['#disabled'] = TRUE;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function rbuild_menu() {
+  $items = array();
+
+  $items['node/%node/rbuild_documentation'] = array(
+    'title' => 'Documentation',
+    'page callback' => '_rbuild_docs_page_contents',
+    'page arguments' => array(1),
+    'access callback' => '_rbuild_docs_page_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function rbuild_theme() {
+  return array(
+    'rbuild_docs_iframe' => array(
+      'variables' => array('docs_url' => NULL),
+      'template' => 'rbuild-docs-iframe',
+    ),
   );
 }
 
-
-
 /**
  * Implements hook_node_insert().
- * 
+ *
  * Triggers init_releases() for new rBuild Software Project nodes.
  */
 function rbuild_node_insert($node) {
-  if ($node->type !== 'software_project') return;
-  
-  $software_method = $node->field_software_method['und'][0]['value'];
-  if ($software_method !== 'Rbuild repository') return;
-  
+  if ($node->type !== 'software_project') {
+    return;
+  }
+
+  // Initializes releases only for Projects whose Method field == "rBuild".
+  $field_items = field_get_items('node', $node, 'field_software_method');
+  $field_value = $field_items[0]['value'];
+  if ($field_value !== 'Rbuild repository') {
+    return;
+  }
+
   _rbuild_init_releases($node);
 }
 
 /**
  * Implements hook_node_update()
- * 
+ *
  * Triggers init_releases() if updated 'Rbuild repository' or 'rBuild Short Name'
  */
 function rbuild_node_update($node) {
-  if ($node->type !== 'software_project') return;
+  if ($node->type !== 'software_project') {
+    return;
+  }
 
   // Ignores new nodes; hook_node_insert() takes care of new Software Projects
   $node_original = node_load($node->nid);
-  if (!isset($node_original->title)) return;
-  
+  if (!isset($node_original->title)) {
+    return;
+  }
+
   // Exits if the updated packaging method is not 'Rbuild repository'
-  $software_method = $node->field_software_method['und'][0]['value'];
-  if ($software_method !== 'Rbuild repository') return;
+  $field_items = field_get_items('node', $node, 'field_software_method');
+  $field_value = $field_items[0]['value'];
+  if ($field_value !== 'Rbuild repository') {
+    return;
+  }
 
   // Compares original and updated field values
-  $node_updated = $node;
-  $repo_value_original = $node_original->field_software_repo['und'][0]['value'];
-  $repo_value_updated = $node_updated->field_software_repo['und'][0]['value'];
-  $same_repo = ($repo_value_updated === $repo_value_original);
-  
-  $short_name_value_original = $node_original->field_rbuild_short_name['und'][0]['value'];
-  $short_name_value_updated = $node_updated->field_rbuild_short_name['und'][0]['value'];
+  $node_updated        = $node;
+  $field_items         = field_get_items('node', $node_original, 'field_software_repo');
+  $repo_value_original = $field_items[0]['value'];
+  $field_items         = field_get_items('node', $node_updated, 'field_software_repo');
+  $repo_value_updated  = $field_items[0]['value'];
+  $same_repo           = ($repo_value_updated === $repo_value_original);
+
+  $field_items = field_get_items('node', $node_original, 'field_rbuild_short_name');
+  $short_name_value_original = $field_items[0]['value'];
+  $field_items = field_get_items('node', $node_updated, 'field_rbuild_short_name');
+  $short_name_value_updated = $field_items[0]['value'];
   $same_short_name = ($short_name_value_updated === $short_name_value_original);
-  
+
   // Exits if the rBuild fields have not changed.
-  if ($same_repo && $same_short_name) return;
-  
+  if ($same_repo && $same_short_name) {
+    return;
+  }
+
   _rbuild_init_releases($node);
 }
 
@@ -90,7 +158,7 @@ function rbuild_os_packaging_method_option() {
   $options = array(
     'Rbuild repository' => t('Rbuild repository'),
   );
-  
+
   return $options;
 }
 
@@ -100,14 +168,15 @@ function rbuild_os_packaging_method_option() {
 function rbuild_os_software_process_remote_release() {
 
   // Checks for new releases every 20 minutes, invoked by cron.
-  $default_interval = 20; //20 * 60;
-  $interval = variable_get('rbuild_cron_update_interval', $default_interval);
-  $now = time();
+  //20 * 60;
+  $default_interval = 20;
+  $interval         = variable_get('rbuild_cron_update_interval', $default_interval);
+  $now              = time();
 
   $rbuild_project_nodes = _rbuild_query_all_rbuild_project_nodes();
-  
+
   foreach ($rbuild_project_nodes as $project_node) {
-    $time_to_check = (bool)(($project_node->changed + $interval) < $now); 
+    $time_to_check = (bool)(($project_node->changed + $interval) < $now);
     if ($time_to_check === TRUE) {
       // Imports any new file and creates Software Release node
       _rbuild_fetch_new_releases($project_node);
@@ -121,41 +190,47 @@ function rbuild_os_software_process_remote_release() {
 
 /**
  * Checks for and imports any new releases.
- * 
+ *
  * @param object $project_node
  *   An individual project node with packaging method "Rbuild repository"
- *   
+ *
  * @see rbuild_os_software_process_remote_release()
  */
 function _rbuild_fetch_new_releases($project_node) {
   $handler = _rbuild_new_handler($project_node);
-  if (!method_exists($handler, 'find_new_releases')) return;
+  if (!method_exists($handler, 'find_new_releases')) {
+    return;
+  }
 
   // Saves the project node if new releases are found
   $found_new_releases = $handler->find_new_release($project_node);
-  if ($found_new_releases) node_save($project_node);
+  if ($found_new_releases) {
+    node_save($project_node);
+  }
 }
 
 /**
  * Checks for and imports any new releases.
- * 
+ *
  * @param object $project_node
  *   An individual project node with packaging method "Rbuild repository"
- *   
+ *
  * @see rbuild_os_software_process_remote_release()
  */
 function _rbuild_init_releases($project_node) {
   $handler = _rbuild_new_handler($project_node);
-  if (!method_exists($handler, 'init_releases')) return;
+  if (!method_exists($handler, 'init_releases')) {
+    return;
+  }
 
   // Saves the project node if new releases are found
   $init_releases = $handler->init_releases($project_node);
-  if ($init_releases) node_save($project_node);
+  // if ($init_releases) {   node_save($project_node); }
 }
 
 /**
  * Creates a new Software Release node if the version is new.
- * 
+ *
  * @param object $project_node
  *   The parent Software Project node, which will be referenced by a field.
  * @param string $version
@@ -168,15 +243,17 @@ function _rbuild_init_releases($project_node) {
  */
 function _rbuild_add_release_node_wrapper($project_node, $version, $filename, $package, $url, &$context = array()) {
   $node_exists = _rbuild_query_release_node_exists($project_node->nid, $version);
-  if ($node_exists) return FALSE;
-  
+  if ($node_exists) {
+    return FALSE;
+  }
+
   _rbuild_add_release_node($project_node, $version, $filename, $package, $url, &$context);
   return TRUE;
 }
 
 /**
  * Creates a new Software Release node.
- * 
+ *
  * @param object $project_node
  *   The parent Software Project node, which will be referenced by a field.
  * @param string $version
@@ -189,37 +266,51 @@ function _rbuild_add_release_node_wrapper($project_node, $version, $filename, $p
  */
 function _rbuild_add_release_node($project_node, $version, $filename, $package, $url, &$context = array()) {
   $start_time = time();
-  
-	// Prepares basic node settings and fields
-  $release_node = new stdClass();
-  $release_node->type = 'software_release';
-  $release_node->uid = $project_node->uid;
-  $release_node->language = 'und';
-  $release_node->og_group_ref['und'][0]['target_id'] = $project_node->og_group_ref['und'][0]['target_id'];
-  $release_node->status = 1;
-  $release_node->active = 1;
-  $release_node->field_software_project['und'][0]['target_id'] = $project_node->nid;
-  $release_node->field_software_version['und'][0]['value'] = $version;
-  $release_node->field_software_recommended['und'][0]['value'] = ($version == $package['version']) ? 1 : 0;
-  
-  // Prepares file field
-  $file = _rbuild_import_file($url, $filename, $project_node->uid);
-  if ($file === FALSE) return;
+  $default_language = 'und';
 
-  $release_node->field_software_package['und'][0] = (array)$file;
-  
-  if($file->timestamp < $start_time) $release_node->created = $file->timestamp;
-  
-  // Saves the new Software Release node to the database
-  node_save($release_node);
-  
-  $context['results'][] = $release_node->nid .' : '. $release_node->title;
-  $context['message'] = $release_node->title;
+  // Prepares basic settings of our new Software Release node
+  $node           = new stdClass();
+  $node->type     = 'software_release';
+  $node->uid      = $project_node->uid;
+  $node->language = $default_language;
+  $node->status   = 1;
+  $node->active   = 1;
+
+  // Adds $node->nid and more properties
+  node_save($node);
+  $node = node_load($node->nid);
+  if (module_exists('vsite')) {
+    include_once (drupal_get_path('module', 'vsite') . '/includes/vsite.inc');
+    vsite_add_entity($node);
+  }
+
+  // Prepares field values
+  $recommended = ($version == $package['version']) ? 1 : 0;
+  $file = _rbuild_import_file($url, $filename, $project_node->uid);
+  if ($file === FALSE) {
+    return;
+  }
+
+  // Sets field values using entity_metadata_wrapper
+  $wrapper = entity_metadata_wrapper('node', $node);
+
+  if ($file->timestamp < $start_time) {
+    $wrapper->created->set($file->timestamp);
+  }
+
+  $wrapper->field_software_project->set($project_node->nid);
+  $wrapper->field_software_version->set($version);
+  $wrapper->field_software_recommended->set($recommended);
+  $wrapper->field_software_package->set((array)$file);
+  $wrapper->save();
+
+  $context['results'][] = $node->nid . ' : ' . $node->title;
+  $context['message'] = $node->title;
 }
 
 /**
  * Creates a new Drupal File object for a remote file.
- * 
+ *
  * @param string $path
  *   The external path of the file to import.
  * @param string $filename
@@ -228,12 +319,12 @@ function _rbuild_add_release_node($project_node, $version, $filename, $package, 
  *   The Drupal user ID who owns the returned file
  * @param bool $get_contents
  *   Whether or not to retrieve the file contents.
- *   
+ *
  * @return object $file
  *   A Drupal File object to attach to a new Software Release node.
  */
 function _rbuild_import_file($url, $filename, $uid, $get_contents = FALSE) {
-  
+
   $filepath = $url . '/' . $filename;
 
   // Only allows import of Gzip files
@@ -242,85 +333,83 @@ function _rbuild_import_file($url, $filename, $uid, $get_contents = FALSE) {
     drupal_set_message(t('Expected file mimetype "application/octet-stream", not' . $file->filemime), 'error');
     return FALSE;
   }
-  
+
   // Saves file to the root of the files directory.
-  $contents = file_get_contents($filepath);
-  $file = file_save_data($contents, 'public://' . $filename, FILE_EXISTS_RENAME);
+  $contents      = file_get_contents($filepath);
+  $file          = file_save_data($contents, 'public://' . $filename, FILE_EXISTS_RENAME);
   $file->display = 1;
-  
+
   return $file;
 }
 
 /**
  * Gets the file contents of a remote file using curl.
- * 
+ *
  * @param string $url
  *   The URL to fetch data from.
- * 
+ *
  * @return mixed
  *   If the response is 404, returns FALSE
  *   Else, returns the output from curl_exec()
  */
 function _rbuild_get_file_contents($url) {
-	// Initializes curl session
+  // Initializes curl session
   $ch = curl_init();
 
   // Set curl to return the data instead of printing it to the browser.
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($ch, CURLOPT_URL, $url);
-  
+
   // Executes curl fetch
   $data = curl_exec($ch);
-  
+
   $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
   curl_close($ch);
-  
+
   // Exits if HTTP status not OK
-  if ((int)$http_code !== (int)200) return FALSE; 
-	
+  if ((int)$http_code !== (int)200) {
+    return FALSE;
+  }
+
   return $data;
 }
 
 /**
  * Returns file headers on a URL using curl.
- * 
+ *
  * @param string $url
  *   The URL to fetch headers for.
- * 
+ *
  * @return array $headers
  *   An array of strings containing header information.
  */
 function _rbuild_get_file_headers($url) {
-	$ch = curl_init();
+  $ch = curl_init();
 
-	curl_setopt($ch, CURLOPT_URL,            $url);
-	curl_setopt($ch, CURLOPT_HEADER,         TRUE);
-	curl_setopt($ch, CURLOPT_NOBODY,         TRUE);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	curl_setopt($ch, CURLOPT_TIMEOUT,        10);
-	
-	$response = curl_exec($ch);
-	$headers = explode('\n', $response);
-	curl_close($ch);
-	
-	return $headers;
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_HEADER, TRUE);
+  curl_setopt($ch, CURLOPT_NOBODY, TRUE);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+  curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
+  $response = curl_exec($ch);
+  $headers = explode('\n', $response);
+  curl_close($ch);
+
+  return $headers;
 }
 
 /**
  * Finds all Software Project nodes set to Rbuild.
- * 
+ *
  * @return array $project_nodes
  *   An array of loaded Software Project node objects.
  */
 function _rbuild_query_all_rbuild_project_nodes() {
   $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node')
-    ->propertyCondition('type', 'software_project')
-    ->propertyCondition('status', 1) // Published
-    ->fieldCondition('field_software_method', 'value', 'Rbuild repository', '=')
-    ->fieldCondition('field_software_repo', 'value', '', '!=')
-    ->addMetaData('account', user_load(1)); // run the query as user 1
-  
+
+  $query->entityCondition('entity_type', 'node')->propertyCondition('type', 'software_project')->propertyCondition('status', 1)->fieldCondition('field_software_method', 'value', 'Rbuild repository')->fieldCondition('field_software_repo', 'value', '', '!=')->addMetaData('account', user_load(1));
+
   $result = $query->execute();
   $project_nodes = _rbuild_query_load_nodes($result);
   return $project_nodes;
@@ -328,24 +417,23 @@ function _rbuild_query_all_rbuild_project_nodes() {
 
 /**
  * Finds all Software Release nodes for a given Project and Version.
- * 
+ *
  * @return bool $exists
  *   Only TRUE if query returns at least 1 result, otherwise FALSE.
  */
 function _rbuild_query_release_node_exists($project_nid, $version) {
   $exists = FALSE;
-  
+
   $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node')
-    ->propertyCondition('type', 'software_release')
-    ->propertyCondition('status', 1) // Published
-    ->fieldCondition('field_software_project', 'target_id', $project_nid, '=')
-    ->fieldCondition('field_software_version', 'value', $version, '=')
-    ->addMetaData('account', user_load(1)); // run the query as user 1
+
+  $query->entityCondition('entity_type', 'node')->propertyCondition('type', 'software_release')->propertyCondition('status', 1)->fieldCondition('field_software_project', 'target_id', $project_nid, '=')->fieldCondition('field_software_version', 'value', $version, '=')->addMetaData('account', user_load(1));
+
   $result = $query->execute();
 
-  if (isset($result['node'])) $exists = TRUE;
-  
+  if (isset($result['node'])) {
+    $exists = TRUE;
+  }
+
   return $exists;
 }
 
@@ -354,10 +442,10 @@ function _rbuild_query_release_node_exists($project_nid, $version) {
  *
  * @param object $query_result
  *   An EntityFieldQuery where entity_type = node
- * @return mixed $result 
+ *
+ * @return mixed $result
  *   An array of node entity objects, or empty array if no results.
- *   
- * @todo possibly rename and move elsewhere as a generic helper function.
+ *
  * @see _rbuild_query_all_rbuild_project_nodes()
  */
 function _rbuild_query_load_nodes($result) {
@@ -366,25 +454,30 @@ function _rbuild_query_load_nodes($result) {
     $nodes = entity_load('node', $nids);
     return $nodes;
   }
-  
+
   return array();
 }
 
 /**
- * 
+ *
  * Enter description here ...
- * @param object $project_node
- * 
+ *
+ * @param object $node
+ *   A Software Project [software_project] type node.
+ *
  * @return object $handler
  */
-function _rbuild_new_handler($project_node) {
+function _rbuild_new_handler($node) {
   // Requires the [:rbuild_handler:] PHP class
-  require_once('rbuild.handler.inc');
-  
+  require_once ('rbuild.handler.inc');
+
   // Prepares parameters to construct an Rbuild Handler object
-  $repo_url = $project_node->field_software_repo['und'][0]['value'];
-  $short_name = $project_node->field_rbuild_short_name['und'][0]['value'];
-  
+  $field_items = field_get_items('node', $node, 'field_software_repo');
+  $repo_url = $field_items[0]['value'];
+
+  $field_items = field_get_items('node', $node, 'field_rbuild_short_name');
+  $short_name = $field_items[0]['value'];
+
   // Instantiates a handler object to process cron
   $handler = new rbuild_handler($repo_url, $short_name);
   return $handler;
@@ -392,14 +485,213 @@ function _rbuild_new_handler($project_node) {
 
 /**
  * Responds to batch import completion
- * 
+ *
  * @see rbuild_handler::init_releases()
  */
 function _rbuild_batch_finished($success, $results, $operations) {
-	if ($success) {
-		drupal_set_message(format_plural(count($results), '1 release processed.', '@count releases processed.'));
-	}
-	else {
-		drupal_set_message(t('Unable to import all release information.'));
-	}
+  if ($success) {
+    drupal_set_message(format_plural(count($results), '1 release processed.', '@count releases processed.'));
+  }
+  else {
+    drupal_set_message(t('Unable to import all release information.'));
+  }
 }
+
+/**
+ * Checks that the provided Repository URL and Short Name are valid.
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function _rbuild_project_node_validate($form, &$form_state) {
+  $lang = $form_state['values']['language'];
+  if ($form_state['values']['field_software_method'][$lang][0]['value'] !== 'Rbuild repository') {
+    return;
+  }
+
+  $repo_url = $form_state['values']['field_software_repo'][$lang][0]['value'];
+  $short_name = $form_state['values']['field_rbuild_short_name'][$lang][0]['value'];
+
+  // Requires the [:rbuild_handler:] PHP class
+  require_once ('rbuild.handler.inc');
+
+  // Instantiates a handler object to validate
+  $handler = new rbuild_handler($repo_url, $short_name);
+  $handler->validate();
+}
+
+/**
+ * Formats a documentation URL
+ *
+ * @param string $short_name
+ * @param string $version
+ *
+ * @return string $url
+ *
+ * @see _rbuild_node_save_modify_docs_field_value()
+ */
+function _rbuild_format_docs_url($short_name, $version, $path) {
+  $short_name = strtolower($short_name);
+
+  if (!strlen($path)) {
+    $path = 'index.html';
+  }
+
+  $url_parts = array(
+    'http://r.iq.harvard.edu/docs/',
+    $short_name,
+    '/',
+    $version,
+    '/',
+    $path,
+  );
+
+  $url = implode('', $url_parts);
+  return $url;
+}
+
+/**
+ * Page access callback; returns whether rBuild docs exist for project node.
+ *
+ * @param object $node
+ *   The Software Project node accessed at /node/%/rbuild_documentation/[...]
+ *
+ * @return bool $has_content
+ *   TRUE if file contents of formatted docs url are available.
+ *
+ * @see rbuild_menu()
+ */
+function _rbuild_docs_page_access($node) {
+  // Returns FALSE if this is not a Software Project node.
+  if ($node->type != 'software_project') {
+    return FALSE;
+  }
+
+  // Verifies all necessary field values are available.
+  $field_name  = 'field_software_method';
+  $items       = field_get_items('node', $node, $field_name);
+  $field_value = strtolower($items[0]['value']);
+  if ($field_value !== 'rbuild repository') {
+    return FALSE;
+  }
+
+  $version = _rbuild_get_recommended_release_version($node->nid);
+  if (strlen($version) === 0) {
+    return FALSE;
+  }
+
+  $field_name = 'field_rbuild_short_name';
+  $items      = field_get_items('node', $node, $field_name);
+  $short_name = $items[0]['value'];
+  if (strlen($short_name) === 0) {
+    return FALSE;
+  }
+
+  $field_name = 'field_software_repo';
+  $items      = field_get_items('node', $node, $field_name);
+  $repo       = $items[0]['value'];
+  if (strlen($repo) === 0) {
+    return FALSE;
+  }
+
+  // Prepares external path and version information to request remote page.
+  $drupal_path = arg();
+  $path = '';
+  if (in_array('rbuild_documentation', $drupal_path)) {
+    // Removes the first parts of the path, leaves just the docs path.
+    while ((array_shift($drupal_path)) != 'rbuild_documentation');
+    $path = implode("/", $drupal_path);
+  }
+  $docs_url = _rbuild_format_docs_url($short_name, $version, $path);
+  $contents = _rbuild_get_file_contents($docs_url);
+  if (!strlen($contents)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+ * Returns whether rBuild docs exist for project node.
+ *
+ * @param object $node
+ *   The Software Project node accessed at /node/%/rbuild_documentation/[...]
+ *
+ * @return string $docs_url
+ *   The full URL of the remote documentation
+ *
+ * @see rbuild_menu()
+ */
+function _rbuild_docs_url($node) {
+
+  $version = _rbuild_get_recommended_release_version($node->nid);
+
+  $field_name = 'field_rbuild_short_name';
+  $items      = field_get_items('node', $node, $field_name);
+  $short_name = $items[0]['value'];
+
+  // Prepares external path and version information to request remote page.
+  $drupal_path = arg();
+  $path = '';
+  if (in_array('rbuild_documentation', $drupal_path)) {
+    // Removes the first parts of the path, leaves just the docs path.
+    while ((array_shift($drupal_path)) != 'rbuild_documentation');
+    $path = implode("/", $drupal_path);
+  }
+  $docs_url = _rbuild_format_docs_url($short_name, $version, $path);
+  return $docs_url;
+}
+
+/**
+ * Finds the recommended release version value of a Software Project node.
+ *
+ * @param int $nid
+ *   A Software Project node ID.
+ *
+ * @return string $version
+ *   The Version field value of the Software Project node's recommended release.
+ *
+ * @todo verify works -oren
+ */
+function _rbuild_get_recommended_release_version($nid, $type = 'software_release') {
+  $version = '';
+
+  // Includes class OSNodeFieldQuery (extends EntityFieldQuery)
+  include_once drupal_get_path('module', 'os') . '/includes/node.inc';
+
+  $query = new OSNodeFieldQuery('software_release');
+  $query
+    ->propertyOrderBy('nid')
+    ->fieldCondition('field_software_project', 'target_id', $nid)
+    ->fieldCondition('field_software_recommended', 'value', '1');
+  $result = $query->execute();
+
+  // Returns '' (empty string) if no results.
+  if (!isset($result['node']) || !sizeof($result['node'])) {
+    return $version;
+  }
+
+  $item = array_shift($result['node']);
+  $node = node_load($item->nid);
+  $items = field_get_items('node', $node, 'field_software_version');
+  $version = $items[0]['value'];
+
+  return $version;
+}
+
+/**
+ * Page callback; returns an iframe of the remote docs page.
+ *
+ * @param object $node
+ *  A Project Node with field Packaging Method "Rbuild repository"
+ *
+ * @return string $contents
+ *
+ * @see _rbuild_docs_page_access()
+ */
+function _rbuild_docs_page_contents($node) {
+  $docs_url = _rbuild_docs_url($node);
+
+  return theme('rbuild_docs_iframe', array('docs_url' => $docs_url));
+}
+

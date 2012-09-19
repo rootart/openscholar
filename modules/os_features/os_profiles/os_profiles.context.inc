@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_profiles.context.inc
@@ -11,18 +14,35 @@ function os_profiles_context_default_contexts() {
   $export = array();
 
   $context = new stdClass();
-  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  /* Edit this to true to make a default context disabled initially */
+  $context->disabled = FALSE;
   $context->api_version = 3;
   $context->name = 'profiles_profiles';
   $context->description = '';
   $context->tag = 'OS features';
   $context->conditions = array(
+    'menu' => array(
+      'values' => array(
+        'people' => 'people',
+      ),
+    ),
     'node' => array(
       'values' => array(
         'person' => 'person',
       ),
       'options' => array(
         'node_form' => '0',
+      ),
+    ),
+    'path' => array(
+      'values' => array(
+        'people' => 'people',
+      ),
+    ),
+    'views' => array(
+      'values' => array(
+        'os_profiles' => 'os_profiles',
+        'os_profiles:page' => 'os_profiles:page',
       ),
     ),
   );
@@ -36,3 +56,4 @@ function os_profiles_context_default_contexts() {
 
   return $export;
 }
+

@@ -40,6 +40,7 @@ dependencies[] = pathauto
 dependencies[] = biblio
 
 ; media / files / wysiwyg
+dependencies[] = imagefield_crop
 dependencies[] = media
 dependencies[] = oembed
 dependencies[] = file_entity
@@ -62,6 +63,7 @@ dependencies[] = os_wysiwyg
 dependencies[] = os_search_db
 dependencies[] = os_shields
 dependencies[] = os_comments
+dependencies[] = os_taxonomy
 
 ; Control Panel
 dependencies[] = cp
@@ -71,7 +73,6 @@ dependencies[] = cp_menu
 dependencies[] = cp_user
 dependencies[] = cp_content
 dependencies[] = cp_toolbar
-dependencies[] = cp_settings
 
 ; Features
 dependencies[] = os_links
@@ -86,6 +87,8 @@ dependencies[] = os_presentations
 dependencies[] = os_software
 dependencies[] = os_dataverse
 dependencies[] = os_booklets
+dependencies[] = os_profiles
+dependencies[] = os_taxonomy
 
 ; other
 dependencies[] = diff

@@ -1,66 +1,51 @@
 <?php
 
 /**
- * Implementation of hook menu
+ * Implement hook_form_FORM_ID_alter
+ * Need to hook into the openscholar settings form
+ * to allow admins to set the global Google Analytics ID
+ * 
  */
-function os_ga_menu(){
-  $items = array();
-
-  $items['admin/settings/scholar_ga'] = array(
-    'type' => MENU_NORMAL_ITEM,
-    'title' => 'Google Analytics for OpenScholar',
-    'description' => 'Settings for Global Google Analytics.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('os_ga_settings_form'),
-    'file' => 'os_ga.admin.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer site configuration'),
-    'weight' => 10,
-  );
-/*
- * Do we really need this?
-  $items['admin/settings/scholar_ga/settings'] = array(
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'title' => 'Settings for OpenScholar Google Analytics',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('vsite_ga_settings_form'),
-    'file' => 'vsite_ga.admin.inc',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer site configuration'),
-    'weight' => 0,
-	// test commit
-  ); */
-
-  return $items;
-}
+function os_ga_form_os_settings_form_alter(&$form, &$form_state, $form_id) {
+	$form['os_ga_global_id'] = array(
+		'#type' => 'textfield',
+  		'#title' => t('Enter your Google Analytics ID'),
+  		'#size' => 20,
+  		'#maxlength' => 255,
+  		'#default_value' => variable_get('os_ga_global_id', ''),
+  		'#description' => t("Entering your ID this will enable the sending of your OpenScholar sitewide page and visitor data to your Google Analytics account. Go to the <a href=\"http://www.google.com/analytics/\">Google Analytics site</a> to set one up. Your ID will be in the format UA-XXXXXXX-XX."),
+  		'#element_validate' => array('os_ga_analytics_id_validate')
+	);
+}// end function
 
 /**
  * Implementation hook os_ga_cp_settings()
  * @return array
  */
 function os_ga_cp_settings(){
-  $a_settings = array();
+  	$a_settings = array();
 	
-  $a_settings['os_ga_google_analytics_id'] = array(
-    'form' => array(
-      '#type' => 'textfield',
-      '#title' => t('Enter your Google Analytics ID'),
-      '#size' => 20,
-      '#maxlength' => 255,
-      '#default_value' => variable_get('os_ga_google_analytics_id',''),
-      '#description' => t("Entering your ID this will send page and visitor data to your Google Analytics account. Go to the <a href=\"http://www.google.com/analytics/\">Google Analytics site</a> to set one up. Your ID will be in the format UA-XXXXXXX-XX."),
-      '#element_validate' => array('os_ga_analytics_id_validate')
+  	$a_settings['os_ga_google_analytics_id'] = array(
+    	'form' => array(
+      	'#type' => 'textfield',
+      	'#title' => t('Enter your Google Analytics ID'),
+      	'#size' => 20,
+      	'#maxlength' => 255,
+      	'#default_value' => variable_get('os_ga_google_analytics_id',''),
+      	'#description' => t("Entering your ID this will send page and visitor data to your Google Analytics account. Go to the <a href=\"http://www.google.com/analytics/\">Google Analytics site</a> to set one up. Your ID will be in the format UA-XXXXXXX-XX."),
+      	'#element_validate' => array('os_ga_analytics_id_validate')
   	),
-  	'group' => array(
-  	  '#id' => 'ga',
-  	  '#title' => t('Google Analytics'),
-  	  '#weight' => 0,
+  		'group' => array(
+  	  	'#id' => 'ga',
+  	  	'#title' => t('Google Analytics'),
+  	  	'#weight' => 0,
   	),
-  );
-  return $a_settings;
+  	);
+  	return $a_settings;
 }
 
 function os_ga_init() {
+
 	$ga_vars = _os_ga_ga_id_vars();
 	if(!count($ga_vars)) return;  //if no ga ids are saved, then return
 	

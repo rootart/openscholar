@@ -20,7 +20,7 @@
 			if (document.getElementById) {
 				var windowHeight = getWindowHeight();
 				if (windowHeight > 0) {
-					var headerHeight = document.getElementById('header').offsetHeight;
+					var headerHeight = document.getElementById('header-container').offsetHeight;
 					var contentHeight = document.getElementById('columns').offsetHeight;
 					var navHeight = document.getElementById('menu-bar').offsetHeight;
 					var footerElement = document.getElementById('footer');

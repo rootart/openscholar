@@ -27,8 +27,9 @@ class VsiteNodeOSMigration extends AbstractNodeOSMigration {
     $this->addFieldMapping('field_site_logo:cropbox_width', 'field_site_logo:cropbox_width')->defaultValue(200);
     $this->addFieldMapping('field_site_logo:cropbox_height', 'field_site_logo:cropbox_height')->defaultValue(150);
          
-    $this->addUnmigratedDestinations(parent::subfields('field_site_logo', array('file_class', 'destination_dir', 'destination_file', 'file_replace', 'preserve_files')), t('DNM'));
+    $this->addUnmigratedDestinations(parent::subfields('field_site_logo', array('file_class', 'destination_dir', 'file_replace', 'preserve_files')), t('DNM'));
     $this->addFieldMapping('field_site_logo:source_dir')->defaultValue(variable_get('os_migrate_files', ''));
+    $this->addFieldMapping('field_site_logo:destination_file', 'field_site_logo:destination_file'); 
    
     
     //undo what nodeabstract has done
@@ -61,6 +62,11 @@ class VsiteNodeOSMigration extends AbstractNodeOSMigration {
     $query->join('og', 'og', 'n.nid = og.nid');
     $query->fields('og', parent::subfields('og', array('description', 'language', 'private'), '_'));    
     
+    if (isset($this->restrict_vsites)) {
+      $query->condition('n.nid', $this->restrict_vsites, 'IN'); //dancabral, jlepore, jsagotsky, gary
+    }
+    
+    
     return $query;
   }
   
@@ -71,7 +77,7 @@ class VsiteNodeOSMigration extends AbstractNodeOSMigration {
     $fields['format_name'] = t('Format name');
     $fields['field_site_logo'] = t('Site Logo');
 
-    foreach(parent::subfields('field_site_logo', array('alt','title','cropbox_x','cropbox_y','language','cropbox_width','cropbox_height')) as $field) {
+    foreach(parent::subfields('field_site_logo', array('alt','title','cropbox_x','cropbox_y','language','cropbox_width','cropbox_height', 'destination_file')) as $field) {
       $fields[$field] = t('Site logo subfield: @field', array('@field' => $field));
     } 
     
@@ -82,7 +88,17 @@ class VsiteNodeOSMigration extends AbstractNodeOSMigration {
      
      if (isset($row->field_vsite_logo_fid)) {
        $file = parent::get_file_by_fid($row->field_vsite_logo_fid);
-
+       $row->{'field_site_logo:destination_file'} = $file->filepath;
+       
+       //if we have crop data and the original image still exists, use that instead of the pre-cropped image.
+       $original_file = $file->filepath . '.crop_display.jpg';
+       if (is_readable(variable_get('os_migrate_files', '') . '/' . $original_file) && strlen($row->field_vsite_logo_data)) {
+         $file->filepath = $original_file;
+       } else {       
+         //only the cropped remains.  don't crop it anymore.
+       }
+       //$row->{'field_site_logo:destination_file'} = $file->filepath;
+       
        if (!is_readable(variable_get('os_migrate_files', '') . '/' . $file->filepath)) {
          Migration::saveMessage(t('Could not read file @file.  Ignoring it.', array('@file' => $file->filepath)), Migration::MESSAGE_NOTICE);
        } else {
@@ -106,19 +122,21 @@ class VsiteNodeOSMigration extends AbstractNodeOSMigration {
            }
                        
            if (isset($data['crop']['height'], $data['crop']['width'])) {
-             $row->{'field_site_logo:cropbox_height'} = min((int)$data['crop']['height'], 150);
-             $row->{'field_site_logo:cropbox_width'} = min((int)$data['crop']['width'], 200);
+             $row->{'field_site_logo:cropbox_height'} = (int)$data['crop']['height'];
+             $row->{'field_site_logo:cropbox_width'} = (int)$data['crop']['width'];
            } else {
              //assume defaults
-             $row->{'field_site_logo:cropbox_height'} = 150;
-             $row->{'field_site_logo:cropbox_width'} = 200;
+             $row->{'field_site_logo:cropbox_height'} = 140;
+             $row->{'field_site_logo:cropbox_width'} = 180;
            }
          } else {
-           //image provided, but no data.  
-           $row->{'field_site_logo:cropbox_height'} = 150;
-           $row->{'field_site_logo:cropbox_width'} = 200;
-           $row->{'field_site_logo:cropbox_x'} = 0;
-           $row->{'field_site_logo:cropbox_y'} = 0;
+           if (!$this->_get_missing_coords($row)) {
+             //image provided, but no data.  
+             $row->{'field_site_logo:cropbox_height'} = 140;
+             $row->{'field_site_logo:cropbox_width'} = 180;
+             $row->{'field_site_logo:cropbox_x'} = 0;
+             $row->{'field_site_logo:cropbox_y'} = 0;
+           }
          }
        }       
      } else {
@@ -137,5 +155,44 @@ class VsiteNodeOSMigration extends AbstractNodeOSMigration {
      );
    }
    
+  //some vsites have logos, but no coords.  if they're here and hardcoded, use them.
+  function _get_missing_coords(&$row) {
+    $known_missing = array(
+      //nid => x, y, w, h
+      2 => array(0, 0, 1114, 836),
+      5 => array(0, 0, 789, 592),
+      7 => array(0, 0, 2304, 1728),
+      13 => array(0, 0, 350, 263),
+      17 => array(0, 0, 180, 140),
+      19 => array(0, 0, 251, 188),
+      21 => array(0, 0, 180, 140),
+      25 => array(0, 0, 581, 436),
+      26 => array(0, 0, 312, 243),
+      541 => array(0, 0, 99, 77),
+      619 => array(0, 0, 595, 463),
+      660 => array(0, 0, 140 , 105),      
+      1487 => array(0, 0, 175, 128),     
+      1791 => array(0, 0, 180, 140),      
+      1793 => array(0, 0, 180, 140),
+      1813 => array(0, 0, 180, 140),
+      1815 => array(0, 0, 180, 140),
+      1836 => array(0, 0, 180, 140), //doesn't use the widget.  assuming default.
+      1857 => array(0, 0, 180, 140),     
+    );
+    
+    if (isset($known_missing[$row->nid])) {
+      $crop = $known_missing[$row->nid];
+      $row->{'field_site_logo:cropbox_x'} = $crop[0];
+      $row->{'field_site_logo:cropbox_y'} = $crop[1];
+      $row->{'field_site_logo:cropbox_width'} = $crop[2];
+      $row->{'field_site_logo:cropbox_height'} = $crop[3];
+      return TRUE;
+      
+    } else {
+      return FALSE;
+    }
+    
+  }
+
 
 }

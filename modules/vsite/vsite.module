@@ -1,5 +1,6 @@
 <?php
 include_once ('vsite.features.inc');
+include_once ('includes/vsite.inc');
 
 /**
  * Public Functions
@@ -50,21 +51,6 @@ function vsite_get_purl($vsite = false){
  * Runs on every node form
  */
 function vsite_form_node_form_alter(&$form, &$form_state, $form_id){
-  $vsite = spaces_get_space();
-  $os_bundles = array_keys(os_get_bundles(true));
-
-  if ($vsite && in_array($form['#bundle'], $os_bundles)) {
-    // Set the og_group_ref value to automatically be the current active site
-    $form[OG_AUDIENCE_FIELD][LANGUAGE_NONE][0]['target_id'] = array(
-        '#type' => 'value',
-        '#default_value' => $vsite->group->nid,
-        '#field_name' => OG_AUDIENCE_FIELD,
-        '#language' => LANGUAGE_NONE,
-        '#entity_type' => 'node',
-        '#bundle' => $form['#bundle']
-    );
-  }
-
   if (og_is_group_type('node', $form['#bundle'])) {
     // Hide the comment settings form
     $form['comment_settings']['#access'] = false;
@@ -127,39 +113,6 @@ function vsite_spaces_presets_alter(&$presets){
     if (substr($name, 0, 3) == "os_") {
       $preset->value['variable'] = array_merge($pathauto_settings, $preset->value['variable']);
     }
-  }
-}
-
-/**
- * Alter information returned from module/theme info files
- */
-function vsite_system_info_alter(&$info, $file, $type){
-  static $working;
-
-  // Only alter the vsite info file
-  if ($type != 'module' || $file->name != 'vsite' || $working) {
-    return;
-  }
-
-  $working = true;
-
-  // Add the feature settings for the dynamically managed og reference fields
-  if (! is_array($info['features']['field']))
-    $info['features']['field'] = array();
-
-  include_once ('vsite.features.field.inc');
-  foreach ( vsite_get_group_fields() as $field => $definition ) {
-    if (! in_array($field, $info['features']['field'])) {
-      $info['features']['field'][] = $field;
-    }
-  }
-
-  $working = false;
-}
-
-function vsite_field_default_fields_alter(&$fields) {
-  if (isset($fields['node-vsite-field_group_path'])) {
-    $fields += vsite_get_group_fields();
   }
 }
 
@@ -260,121 +213,412 @@ function vsite_admin_paths_alter(&$paths){
 }
 
 /**
- * Add the entity reference fields to the vsite feature bundles
+ * Implements hook_vsite_og_node_type_info().
  */
-function vsite_get_group_fields(){
-  $fields = array();
+function vsite_vsite_og_node_type_info() {
+  return array(
+    'vsite' => 'group',
+  );
+}
 
-  $bundles = array_keys(os_get_bundles(true, 'og', true));
-  foreach ( $bundles as $bundle ) {
-    // Exported field: 'node-BUNDLE-og_group_ref'
-    $fields["node-{$bundle}-og_group_ref"] = array(
-        'field_config' => array(
-            'active' => '1',
-            'cardinality' => '1',
-            'deleted' => '0',
-            'entity_types' => array(),
-            'field_name' => 'og_group_ref',
-            'foreign keys' => array(
-                'node' => array(
-                    'columns' => array(
-                        'target_id' => 'nid'
-                    ),
-                    'table' => 'node'
-                )
-            ),
-            'indexes' => array(
-                'target_id' => array(
-                    0 => 'target_id'
-                )
-            ),
-            'module' => 'entityreference',
-            'settings' => array(
-                'handler' => 'og',
-                'handler_settings' => array(
-                    'behaviors' => array(
-                        'og_behavior' => array(
-                            'status' => TRUE
-                        ),
-                        'views-select-list' => array(
-                            'status' => 0
-                        )
-                    ),
-                    'hide_secondary_field' => 1,
-                    'membership_type' => 'og_membership_type_default',
-                    'primary_field' => '0',
-                    'reference_type' => 'all_groups',
-                    'sort' => array(
-                        'direction' => 'ASC',
-                        'field' => 'body:value',
-                        'property' => 'nid',
-                        'type' => 'none'
-                    ),
-                    'target_bundles' => array(
-                        'vsite' => 'vsite'
-                    )
-                ),
-                'handler_submit' => 'Change handler',
-                'target_type' => 'node'
-            ),
-            'translatable' => '0',
-            'type' => 'entityreference'
-        ),
-        'field_instance' => array(
-            'bundle' => $bundle,
-            'default_value' => NULL,
-            'deleted' => '0',
-            'description' => '',
-            'display' => array(
-                'default' => array(
-                    'label' => 'above',
-                    'module' => 'og_ui',
-                    'settings' => array(),
-                    'type' => 'og_list_default',
-                    'weight' => 1
-                ),
-                'teaser' => array(
-                    'label' => 'above',
-                    'settings' => array(),
-                    'type' => 'hidden',
-                    'weight' => 0
-                )
-            ),
-            'entity_type' => 'node',
-            'field_name' => 'og_group_ref',
-            'label' => 'Groups audience',
-            'required' => 0,
-            'settings' => array(
-                'user_register_form' => FALSE
-            ),
-            'view modes' => array(
-                'full' => array(
-                    'custom settings' => FALSE,
-                    'label' => 'Full',
-                    'type' => 'og_list_default'
-                ),
-                'teaser' => array(
-                    'custom settings' => FALSE,
-                    'label' => 'Teaser',
-                    'type' => 'og_list_default'
-                )
-            ),
-            'widget' => array(
-                'active' => 1,
-                'module' => 'entityreference',
-                'settings' => array(
-                    'match_operator' => 'CONTAINS',
-                    'path' => '',
-                    'size' => '60'
-                ),
-                'type' => 'entityreference_autocomplete',
-                'weight' => '-3'
-            )
-        )
-    );
+/**
+ * Return if the bundle is a group or a group content.
+ *
+ *  @param $bundle
+ *    The node type bundle.
+ *
+ *  @return
+ *    group/group content. If $bundle is empty, all the node types info will be
+ *    returned.
+ */
+function vsite_get_type_from_bundle($bundle = NULL) {
+  $info = module_invoke_all('vsite_og_node_type_info');
+
+  if (empty($bundle)) {
+    return $info;
   }
 
-  return $fields;
+  return isset($info[$bundle]) ? $info[$bundle] : FALSE;
+}
+
+/**
+ * Implements hook_field_attach_create_bundle().
+ *
+ * When creating a new node bundle check if the bundle is defined as a group or
+ * group content and attach the right fields.
+ *
+ * @see hook_vsite_og_node_type_info().
+ */
+function vsite_field_attach_create_bundle($entity_type, $bundle) {
+  switch ($entity_type) {
+    case 'file':
+      // every file is group content
+      drupal_set_message('Adding og_group_ref field to file type '.$bundle.' in create_bundle');
+      vsite_attach_fields_to_group_content('file', $bundle);
+    break;
+    case 'node':
+      if (!$type = vsite_get_type_from_bundle($bundle)) {
+        return;
+      }
+
+      if ($type == 'group') {
+        vsite_attach_fields_to_group($bundle);
+      }
+      else {
+        // Group content.
+        vsite_attach_fields_to_group_content('node', $bundle);
+      }
+    break;
+  }
+}
+
+/**
+ * Add group content fields to bundle.
+ *
+ * @param $entity_type
+ *   The entity type of the bundle we want to attach the field to
+ *
+ * @param $bundle
+ *   The bundle to attach the fields to.
+ */
+function vsite_attach_fields_to_group_content($entity_type, $bundle) {
+  $og_field = og_fields_info(OG_AUDIENCE_FIELD);
+  $og_field['instance']['default_value_function'] = 'vsite_group_audience_field_default_value';
+  og_create_field(OG_AUDIENCE_FIELD, $entity_type, $bundle, $og_field);
+}
+
+/**
+ * Add group fields to bundle
+ *
+ * @param $bundle
+ *   The node-type to attach the fields to.
+ */
+function vsite_attach_fields_to_group($bundle) {
+  og_create_field(OG_GROUP_FIELD, 'node', $bundle);
+  og_create_field(OG_ACCESS_FIELD, 'node', $bundle);
+
+  if (!field_info_field('field_site_address')) {
+    // field_site_address.
+    $field = array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_site_address',
+      'foreign keys' => array(
+        'format' => array(
+          'columns' => array(
+            'format' => 'format',
+          ),
+          'table' => 'filter_format',
+        ),
+      ),
+      'indexes' => array(
+        'format' => array(
+          0 => 'format',
+        ),
+      ),
+      'module' => 'text',
+      'settings' => array(
+        'max_length' => '255',
+      ),
+      'translatable' => '0',
+      'type' => 'text',
+    );
+    $field = field_create_field($field);
+  }
+
+  if (!field_info_instance('node', 'field_site_address', $bundle)) {
+    $instance = array(
+      'bundle' => $bundle,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => 3,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_site_address',
+      'label' => 'Site Address',
+      'required' => 0,
+      'settings' => array(
+        'text_processing' => '0',
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'text',
+        'settings' => array(
+          'size' => '30',
+        ),
+        'type' => 'text_textfield',
+        'weight' => '32',
+      ),
+    );
+    field_create_instance($instance);
+  }
+
+  if (!field_info_field('field_site_description')) {
+    // field_site_description.
+    $field = array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_site_description',
+      'foreign keys' => array(
+        'format' => array(
+          'columns' => array(
+            'format' => 'format',
+          ),
+          'table' => 'filter_format',
+        ),
+      ),
+      'indexes' => array(
+        'format' => array(
+          0 => 'format',
+        ),
+      ),
+      'module' => 'text',
+      'settings' => array(
+        'max_length' => '255',
+      ),
+      'translatable' => '0',
+      'type' => 'text',
+    );
+    $field = field_create_field($field);
+  }
+
+  if (!field_info_instance('node', 'field_site_description', $bundle)) {
+    $instance = array(
+      'bundle' => $bundle,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => 2,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_site_description',
+      'label' => 'Site Description',
+      'required' => FALSE,
+      'settings' => array(
+        'text_processing' => 0,
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'module' => 'text',
+        'settings' => array(
+          'size' => 60,
+        ),
+        'type' => 'text_textfield',
+        'weight' => '31',
+      ),
+    );
+    field_create_instance($instance);
+  }
+
+  if (!field_info_field('field_site_logo')) {
+    // field_site_logo.
+    $field = array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_site_logo',
+      'foreign keys' => array(
+        'fid' => array(
+          'columns' => array(
+            'fid' => 'fid',
+          ),
+          'table' => 'file_managed',
+        ),
+      ),
+      'indexes' => array(
+        'fid' => array(
+          0 => 'fid',
+        ),
+      ),
+      'module' => 'imagefield_crop',
+      'settings' => array(
+        'default_image' => 0,
+        'uri_scheme' => 'public',
+      ),
+      'translatable' => '0',
+      'type' => 'imagefield_crop',
+    );
+    $field = field_create_field($field);
+  }
+
+  if (!field_info_instance('node', 'field_site_logo', $bundle)) {
+    $instance = array(
+      'bundle' => $bundle,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'image',
+          'settings' => array(
+            'image_link' => '',
+            'image_style' => '',
+          ),
+          'type' => 'image',
+          'weight' => 4,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_site_logo',
+      'label' => 'Site Logo',
+      'required' => FALSE,
+      'settings' => array(
+        'alt_field' => 0,
+        'file_directory' => '',
+        'file_extensions' => 'png gif jpg jpeg',
+        'max_filesize' => '',
+        'max_resolution' => '',
+        'min_resolution' => '',
+        'title_field' => 0,
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'module' => 'imagefield_crop',
+        'settings' => array(
+          'collapsible' => 2,
+          'croparea' => '500x500',
+          'custom_ratio' => '',
+          'enforce_minimum' => TRUE,
+          'enforce_ratio' => TRUE,
+          'gif_processing' => 'convert',
+          'preview_image_style' => 'thumbnail',
+          'progress_indicator' => 'throbber',
+          'resolution' => '200x150',
+          'select_maximum_area' => TRUE,
+          'validate_resolution' => 0,
+        ),
+        'type' => 'imagefield_crop_widget',
+        'weight' => '33',
+      ),
+    );
+    field_create_instance($instance);
+  }
+
+  if (!field_info_field('field_group_path')) {
+    // field_group_path.
+    $field = array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_group_path',
+      'foreign keys' => array(),
+      'indexes' => array(),
+      'module' => 'link',
+      'settings' => array(
+        'attributes' => array(
+          'class' => '',
+          'rel' => '',
+          'target' => 'default',
+        ),
+        'display' => array(
+          'url_cutoff' => 80,
+        ),
+        'enable_tokens' => 1,
+        'title' => 'optional',
+        'title_maxlength' => 128,
+        'title_value' => '',
+        'url' => 0,
+      ),
+      'translatable' => '0',
+      'type' => 'link_field',
+    );
+    $field = field_create_field($field);
+  }
+
+  if (!field_info_instance('node', 'field_group_path', $bundle)) {
+    $instance = array(
+      'bundle' => $bundle,
+      'default_value' => NULL,
+      'default_value_function' => 'vsite_group_default_homepage_value',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '5',
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_group_path',
+      'label' => 'Group Homepage Path',
+      'required' => 0,
+      'settings' => array(
+        'attributes' => array(
+          'class' => '',
+          'configurable_title' => 0,
+          'rel' => '',
+          'target' => 'default',
+          'title' => '',
+        ),
+        'display' => array(
+          'url_cutoff' => '80',
+        ),
+        'enable_tokens' => 0,
+        'rel_remove' => 'default',
+        'title' => 'none',
+        'title_maxlength' => '128',
+        'title_value' => '',
+        'url' => 0,
+        'user_register_form' => FALSE,
+        'validate_url' => 0,
+      ),
+      'widget' => array(
+        'active' => 0,
+        'module' => 'link',
+        'settings' => array(),
+        'type' => 'link_field',
+        'weight' => '2',
+      ),
+    );
+    field_create_instance($instance);
+  }
+
 }
 
 /**
@@ -409,4 +653,218 @@ function _vsite_purl_init(){
   else {
     unset($conf['theme_link']);
   }
+}
+
+/**
+ * Sets the default value for the group audience fields.
+ * This works even if the widget is not shown, e.g. due to restricted field access.
+ */
+function vsite_group_audience_field_default_value(){
+
+  $vsite = spaces_get_space();
+
+  if ($vsite) {
+    // Set the group audience value to automatically be the current active site
+    $default[] = array('target_id' => $vsite->group->nid);
+
+    return $default;
+  }
+}
+
+/**
+ * Implements hook_field_access().
+ */
+function vsite_field_access($op, $field, $entity_type, $entity, $account) {
+  if ($op != 'edit' || $field['type'] != 'entityreference' || !og_is_group_audience_field($field['field_name'])) {
+    return;
+  }
+
+  //If we are not on the field settings form, then deny access
+  if (!empty($entity)) {
+    return false;
+  }
+}
+
+/**
+ * Implements hook_menu_alter().
+ * Using this function to remove the "Groups" link
+ * from the users 'edit' form.
+ */
+function vsite_menu_alter(&$items) {
+  $items['user/%user/edit/groups']['access callback'] = false;
+}
+
+/**
+ * Function to return all sites a user owns.
+ */
+function vsite_load_user_sites($user_id) {
+  $sites = array();
+  $sites_array = array();
+  // Grab their sites.
+
+  $vsites_owner = vsite_get_vsite_by_owner($user_id);
+  // Create each site as a link.
+  foreach($vsites_owner as $site) {
+    $sites = array('#title'=>$site->group->title, '#type'=>'link','#href'=>$site->get_absolute_url());
+    // Prepare them for theme_list_item.
+    $sites_array[] = array('data'=>drupal_render($sites));
+  }
+
+  return $sites_array;
+}
+
+/**
+ * Function to return all sites the user is a member of of.
+ */
+function vsite_load_user_membership($user_id) {
+  $member_sites = array();
+  $member_array = array();
+
+  $vsites_member = vsite_get_user_vsites($user_id);
+  // This function is returning 'all' sites, both member and admin sites.
+  // Loop through and create links for the sites, but also check if they're the owner
+  // or not, ignore them if they are.
+  foreach($vsites_member as $m_site) {
+  	// Check against the uid of the site
+  	if($user_id != $m_site->group->uid) {
+      $member_sites = array('#title'=>$m_site->group->title, '#type'=>'link','#href'=>$m_site->get_absolute_url());
+      // Prepare them for theme_list_item.
+      $member_array[] = array('data'=>drupal_render($member_sites));
+    }
+  }
+
+  return $member_array;
+}
+
+/**
+ * Implements hook_user_view_alter().
+ * Altering the user view to remove history, groups and other groups
+ * also altering to add in "My Websites" for all sites the user belongs to.
+ */
+function vsite_user_view_alter(&$build) {
+  global $user;
+  // Removal section.
+  // Remove the "history" and "member for" info if it's there.
+  if(isset($build['summary'])) {
+    unset($build['summary']);
+  }
+  // Remove the og_user_group_ref.
+  if(isset($build['og_user_group_ref'])) {
+    $build['og_user_group_ref']['#access'] = FALSE;
+  }
+  // Remove the og_other_user_group_ref.
+  if(isset($build['og_other_user_group_ref'])) {
+    $build['og_other_user_group_ref']['#access'] = FALSE;
+  }
+  // Remove the og_user_node.
+  if(isset($build['og_user_node'])) {
+    $build['og_user_node']['#access'] = FALSE;
+  }
+
+  // Additions section.
+  // Load data of their sites.
+  $owner_sites = vsite_load_user_sites($build['#account']->uid);
+  $member_sites = vsite_load_user_membership($build['#account']->uid);
+
+  $vsites_list = '';
+  // Websites item build.
+  if(!empty($owner_sites) || !empty($member_sites)) {
+    // Pass the items to theme_item_list.
+    if(!empty($owner_sites)) {
+      // In d6 a plural or singular was used in order to apply the correct CSS selector to the list
+      // retain that functionality.
+      if(count($owner_sites)>1) {
+        $css_selector = array('class'=>'plural');
+      }else{
+        $css_selector = array('class'=>'single');
+      }
+      $vsites_list .= theme_item_list(array('items'=>$owner_sites, 'title'=>'My Websites','type'=>'ul','attributes'=>$css_selector));
+    }
+    if(!empty($member_sites)) {
+      if(count($member_sites)>1) {
+        $css_selector = array('class'=>'plural');
+      }else{
+        $css_selector = array('class'=>'single');
+      }// end if
+      $vsites_list .= theme_item_list(array('items'=>$member_sites, 'title'=>'Websites I am a member of:','type'=>'ul','attributes'=>$css_selector));
+    }
+    // Set a new field.
+    $build['web_sites'] = array(
+      '#title' => 'Website Membership Summary:',
+      '#type' => 'user_profile_item',
+      '#markup' => $vsites_list,
+      '#weight' => '10',
+    );
+  }
+}
+
+/**
+ * Implement hook_mail_alter().
+ * Function to alter some of the emails that are sent out
+ * to users based on certain actions.
+ */
+function vsite_mail_alter(&$message) {
+  global $base_url;
+
+  switch($message['id']) {
+    // Account created during "Create this OS Site on behalf of another user".
+    case 'user_register_no_approval_required':
+      // Get the user id we just created.
+    $n_new_user = $message['params']['account']->uid;
+    // Load the user.
+    $o_user = user_load($n_new_user);
+    // Grab their first name, if it doesnt exist, use their user name.
+    if(!empty($o_user->field_first_name['und'][0]['value'])) {
+      $first_name = $o_user->field_first_name['und'][0]['value'];
+    }else{
+      $first_name = $o_user->name;
+    }
+    // Alter the subject.
+    $message['subject'] = t('An OpenScholar account has been created for you at !site_name', array('!site_name' => variable_get('site_name', 'OpenScholar')));
+        $a_msg_variables = array(
+          '!site' => variable_get('site_name', 'OpenScholar'),
+          '!login_url' => user_pass_reset_url($o_user),
+          '!mailto' => $o_user->mail,
+          '!firstname' => $first_name,
+          '!username' => $o_user->name,
+          '!futurelogin' => $base_url.'/user/',
+        );
+
+        // Alter the body message.
+        $message['body'][0] = t("Dear !firstname,\n\nYour account at the !site website has been created for you. You may now log in by either clicking through on the following link or pasting it into your browser:\n\n !login_url\n\n(Note: This login can be used only once.)\n\nYour username is: !username \n\nAfter setting your password with the included link, you will be able to log in at !futurelogin in the future.\n\nSincerely,\nThe !site Team", $a_msg_variables);
+      break;
+    // Account created by admin in the admin/people panel.
+    case 'user_register_admin_created':
+      // Get the user id we just created.
+    $n_new_user = $message['params']['account']->uid;
+    // Load the user data.
+    $o_user = user_load($n_new_user);
+    // Grab their first name, if it doesnt exist, use their user name.
+    if(!empty($o_user->field_first_name['und'][0]['value'])) {
+      $first_name = $o_user->field_first_name['und'][0]['value'];
+    }else{
+      $first_name = $o_user->name;
+    }
+    // Alter the email subject.
+    $message['subject'] = t('An OpenScholar account has been created for you at !site_name', array('!site_name' => variable_get('site_name', 'OpenScholar')));
+        $a_msg_variables = array(
+          '!site' => variable_get('site_name', 'OpenScholar'),
+          '!login_url' => user_pass_reset_url($o_user),
+          '!mailto' => $o_user->mail,
+          '!firstname' => $first_name,
+          '!username' => $o_user->name,
+          '!futurelogin' => $base_url.'/user/',
+        );
+    // Alter the message body.
+        $message['body'][0] = t("Dear !firstname,\n\nA site owner at the !site website has created an account for you. You may now log in by either clicking through on the following link or pasting it into your browser:\n\n !login_url\n\n(Note: This login can be used only once.)\n\nYour username is: !username \n\nAfter setting your password with the included link, you will be able to log in at !futurelogin in the future.\n\nSincerely,\nThe !site Team", $a_msg_variables);
+      break;
+  }
+}
+
+/**
+ * Implements hook_node_presave().
+ */
+function vsite_node_presave($node) {
+  include_once(drupal_get_path('module', 'vsite') . '/includes/path.inc');
+  _vsite_alter_node_path_settings($node);
 }

@@ -1,5 +1,5 @@
 @import "quinn.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 
 html, body {
@@ -31,7 +31,7 @@ a:hover {
   text-decoration: none;
   }
 
-#logo a:hover {
+#boxes-box-site_logo a:hover {
   background: transparent;
   }
 
@@ -51,6 +51,8 @@ h2, h3, h4 {
 h2, h1#page-title {
   margin-bottom: 0;
   }
+
+
 
 h1#page-title {
   margin-bottom: .4em;
@@ -99,6 +101,8 @@ h2.block-title {
   }
 
 
+.region-header-first .region-inner {padding-top:0;}
+
 #content-column .content-inner {
   background: #fff;
   -moz-box-shadow: 0 3px 1em #ccc;
@@ -118,6 +122,11 @@ h2.block-title {
     height: 0;
     clear: both;
     visibility: hidden;
+}
+
+
+#columns .hg-container {
+    padding-top: 15px;
 }
 
 /* HEADER ELEMENTS */
@@ -145,13 +154,14 @@ h2.block-title {
 
 #header-container h2 {
     font-size: 1.2em;
+    margin-top:0;
     }
 
 #header-container a, #header-container a:visited {
     text-decoration: none;
     }
 
-#menu-bar .block ul.menu {
+#menu-bar #block-os-primary-menu {
   text-align: center;
   }
 
@@ -293,8 +303,7 @@ ul.nice-menu-right li.menuparent a:hover {
 #content-column .node,
 body.section-node-edit #content,
 body.section-node-add #content,
-#comments,
-.biblio-entry {
+#comments {
   padding: 1.5em;
   padding-top:0;
   }

@@ -53,21 +53,24 @@
 
 #toolbar-drawer-anchor {
   position: absolute;
+  top: 0;
   bottom: 0;
   left: 0;
   right: 0;
+  height: 100%;
 }
 
 #toolbar-drawer-slider {
-  margin-bottom: 0;
+  position: relative;
+  top: -25%;
   width: 100%;
   padding: 0 20px;
   background-color: #282828;
-  -webkit-transition: margin-bottom 0.25s;
-  -moz-transition: margin-bottom 0.25s;
-  -o-transition: margin-bottom 0.25s;
-  -ms-transition: margin-bottom 0.25;
-  transition: margin-bottom 0.25s;
+  -webkit-transition: top 0.25s;
+  -moz-transition: top 0.25s;
+  -o-transition: top 0.25s;
+  -ms-transition: top 0.25;
+  transition: top 0.25s;
 }
 
 #toolbar div.toolbar-drawer {
@@ -75,7 +78,7 @@
 }
 
 #toolbar-drawer-slider.active-path {
-  margin-bottom: -100%;
+  top: 100%;
 }
 
 #toolbar div.toolbar-drawer.active-path {
@@ -96,6 +99,7 @@
 }
 
 #toolbar div.toolbar-menu ul li a {
+  font-style: normal;  
   border-radius: 0;
   padding: 5px 15px;
 }
@@ -251,6 +255,10 @@
 #toolbar .toolbar-drawer.active-path + .toolbar-tooltips {
   display: block;
   padding-top: 0;
+}
+
+#toolbar .toolbar-drawer.collapsed + .toolbar-tooltips {
+  display: none;
 }
 
 #toolbar #toolbar-user li {

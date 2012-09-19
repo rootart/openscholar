@@ -23,11 +23,12 @@ function os_spaces_presets() {
         'os' => '1',
         'os_pages' => '1',
         'os_announcements' => '1',
-        'os_image_gallery' => '1',
+        'os_profiles' => '1',
         'os_links' => '1',
-        'os_publications' => '1',
+        'os_events' => '1',
       ),
       'site_frontpage' => 'home',
+      'theme_default' => 'ballard',
     ),
   );
 

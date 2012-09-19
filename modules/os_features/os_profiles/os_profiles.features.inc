@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_profiles.features.inc
@@ -26,6 +29,59 @@ function os_profiles_views_api() {
 }
 
 /**
+ * Implements hook_image_default_styles().
+ */
+function os_profiles_image_default_styles() {
+  $styles = array();
+
+  // Exported image style: profile_full
+  $styles['profile_full'] = array(
+    'name' => 'profile_full',
+    'effects' => array(
+      1 => array(
+        'label' => 'Scale and crop',
+        'help' => 'Scale and crop will maintain the aspect-ratio of the original image, then crop the larger dimension. This is most useful for creating perfectly square thumbnails without stretching the image.',
+        'effect callback' => 'image_scale_and_crop_effect',
+        'dimensions callback' => 'image_resize_dimensions',
+        'form callback' => 'image_resize_form',
+        'summary theme' => 'image_resize_summary',
+        'module' => 'image',
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => '180',
+          'height' => '220',
+        ),
+        'weight' => '1',
+      ),
+    ),
+  );
+
+  // Exported image style: profile_thumbnail
+  $styles['profile_thumbnail'] = array(
+    'name' => 'profile_thumbnail',
+    'effects' => array(
+      2 => array(
+        'label' => 'Scale and crop',
+        'help' => 'Scale and crop will maintain the aspect-ratio of the original image, then crop the larger dimension. This is most useful for creating perfectly square thumbnails without stretching the image.',
+        'effect callback' => 'image_scale_and_crop_effect',
+        'dimensions callback' => 'image_resize_dimensions',
+        'form callback' => 'image_resize_form',
+        'summary theme' => 'image_resize_summary',
+        'module' => 'image',
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => '75',
+          'height' => '75',
+        ),
+        'weight' => '1',
+      ),
+    ),
+  );
+
+  return $styles;
+}
+
+/**
  * Implements hook_node_info().
  */
 function os_profiles_node_info() {
@@ -34,10 +90,11 @@ function os_profiles_node_info() {
       'name' => t('Person'),
       'base' => 'node_content',
       'description' => '',
-      'has_title' => '1',
-      'title_label' => t('Title'),
+      'has_title' => '0',
+      'title_label' => '',
       'help' => '',
     ),
   );
   return $items;
 }
+

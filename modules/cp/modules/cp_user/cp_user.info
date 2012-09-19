@@ -1,10 +1,8 @@
 name = Control Panel: Users
-description = OpenScholar User Management UI
+description = OpenScholar User Management UI.
 core = 7.x
 package = Control Panel
 php = 5.2.4
 dependencies[] = cp
 dependencies[] = ctools
 dependencies[] = os
-features[features_api][] = api:1
-files[] = cp_user.form.inc

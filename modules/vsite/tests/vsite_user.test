@@ -78,7 +78,7 @@ class VsiteUser extends OpenscholarWebTestCase {
     ctools_include('user', 'os');
     
     //Add an account without group membership
-    $account = os_user_create($new_user, false);
+    $account = os_user_create($new_user);
     
     $this->assertNotNull($account->uid, "The new account was created via 'os_create_user'");
     
@@ -90,7 +90,7 @@ class VsiteUser extends OpenscholarWebTestCase {
     );
     
     //Add an account with group membership
-    $account = os_user_create($new_user2, TRUE);
+    $account = os_user_create($new_user2);
     $user = user_load($account->uid);
     
     $this->assertNotNull($user->uid, "The second account was created correctly and loaded via user_load");
@@ -108,13 +108,14 @@ class VsiteUser extends OpenscholarWebTestCase {
     $this->assertFalse(og_is_member($this->group_1->group_type, $this->group_1->id, 'user', $this->user1->uid), "User1 was not initially part of the Group");
     
     //Add to the active Group
-    os_user_add($this->user1->uid);
+    module_load_include('inc', 'vsite', 'includes/user');
+    vsite_user_add($$this->user1);
     $this->assertTrue(og_is_member($this->group_1->group_type, $this->group_1->id, 'user', $this->user1->uid), "User1 was added in the active Group");
     
     $this->assertFalse((og_is_member($this->group_1->group_type, $this->group_1->id, 'user', $this->user2->uid) || og_is_member($this->group_2->group_type, $this->group_2->id, 'user', $this->user2->uid)), "User2 was not initially part of the Group 1 or 2");
     
     //Add user2 to an inactive Group
-    os_user_add($this->user2->uid, $this->group_2->id);
+    vsite_user_add($this->user2, $this->group_2->id);
     $this->assertTrue(og_is_member($this->group_2->group_type, $this->group_2->id, 'user', $this->user2->uid), "User2 was added to the inactive Group");
   
     $this->assertFalse(og_is_member($this->group_1->group_type, $this->group_1->id, 'user', $this->user2->uid), "User2 was NOT added to the active Group");

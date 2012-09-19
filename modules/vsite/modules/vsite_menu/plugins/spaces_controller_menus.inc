@@ -13,7 +13,11 @@ class spaces_controller_menus extends spaces_controller {
    * Set override values for a given controller object in this space.
    */
   function set($id, $value){
-    uasort($value, '_vsite_menu_sort_weight');
+    // Change the order of the menu links to match core
+    // Collect all the parent links, and then add all of
+    // their children to the list as well.
+    $value = self::sort_tree($value);
+    
     return parent::set($id, $value);
   }
 
@@ -174,6 +178,52 @@ class spaces_controller_menus extends spaces_controller {
     $query->condition('m.path', $path);
     
     return $query->execute()->fetchAssoc();
+  }
+  
+  /**
+   * Given a full tree of menu links return a properly sorted
+   * list of links.
+   * 
+   * With the optional parent set this can be used to retrieve a ordered subtree
+   * 
+   * The links to sort
+   * @param array $links
+   * 
+   * The active tree, defaults to whole tree
+   * @param array $parents
+   */
+  public static function sort_tree($links, $parents = array(0)){
+    
+    $result = array();
+    foreach ($links as $mlid => $link) {
+      if(in_array($link['plid'], $parents) && !in_array($mlid, $parents)){
+        $result[$mlid] = $link;
+      }
+    }
+    
+    //Sort the parents by weight
+    uasort($result, '_vsite_menu_sort_weight');
+    
+    //Check to see if there is any processing left to do
+    if(!count($result) || count($result) == count($links)){
+      return $result;
+    }
+    
+    //Retrieve the children for this parent
+    foreach ($result as $mlid => $link) {
+      $children[] = self::sort_tree(array_diff_key($links, $result), array_merge($parents,array($mlid)));
+    }
+    
+    $offset = 1;
+    $children = array_filter($children);
+    foreach ($children as $index => $tree) {
+      //Add the child tree after the parent for efficient tree display
+      $result = array_slice($result,0, ($offset + $index), true) + $tree + array_slice($result, ($offset + $index), null, true);
+      $offset += count($tree);
+    }
+    
+    //Return sorted list ready for save
+    return $result;
   }
 
 }

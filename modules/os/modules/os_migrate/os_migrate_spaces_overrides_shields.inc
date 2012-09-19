@@ -13,6 +13,7 @@ class SpacesOverridesShieldsMigration extends SpacesOverridesTableMigration {
     $query = parent::query();
     $query->condition('object_id', 'vsite_shields_shield');
     $query->fields('s', array('id', 'value', 'type'));
+    $query->distinct(FALSE);
     return $query;
   }
   

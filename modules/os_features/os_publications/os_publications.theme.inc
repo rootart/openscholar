@@ -1,8 +1,12 @@
 <?php
+// $Id$
+
+
 /**
  * Full Node View
  * Displays the citation in a field that can be clicked to select all of it
  * Also displays abstract, full text and notes if enabled.
+ *
  * @param unknown_type $vars
  */
 function theme_os_publications_tabular(&$vars) {
@@ -14,12 +18,13 @@ function theme_os_publications_tabular(&$vars) {
 
   /* This field hasn't been added yet
   if ($node->biblio_url) {
-    $attrib = (variable_get('biblio_links_target_new_window', null)) ? array('target' => '_blank') : array();
-    $url_title = db_result(db_query('SELECT biblio_url_title FROM {biblio} WHERE nid = %d', $node->nid));
-    $url_title = (isset($url_title) && $url_title) ? $url_title : 'Website';
+    $attrib           = (variable_get('biblio_links_target_new_window', null)) ? array('target' => '_blank') : array();
+    $url_title        = db_result(db_query('SELECT biblio_url_title FROM {biblio} WHERE nid = %d', $node->nid));
+    $url_title        = (isset($url_title) && $url_title) ? $url_title : 'Website';
     $node->biblio_url = l($url_title, $node->biblio_url, $attrib);
   }
   */
+
 
   $citation = _os_publications_plain_citation($node);
 
@@ -41,23 +46,31 @@ function theme_os_publications_tabular(&$vars) {
   $rows = array();
 
   foreach ($fields as $f) {
-    if (in_array($f['name'], $hidden)) continue;  // field has already been processed. do nothing
-    if (!isset($node->$f['name'])) continue;  // field doesn't exist. do nothing
+    // field has already been processed. do nothing
+    if (in_array($f['name'], $hidden)) {
+      continue;
+    }
+    // field doesn't exist. do nothing
+    if (!isset($node->$f['name'])) {
+      continue;
+    }
 
     $value = $node->$f['name'];
-    $display_title = true;
+    $display_title = TRUE;
 
     switch ($f['name']) {
       case 'biblio_url':
         // no need to check plain. l does it for us
-        $data = '<p>'.l($node->biblio_url_title, $value).'</p>';
-        $display_title = false;
+        $data = '<p>' . l($node->biblio_url_title, $value) . '</p>';
+        $display_title = FALSE;
         break;
+
       case 'biblio_url_title':
         break;
+
       default:
         if ($f['type'] == 'text_format') {
-          $data = check_markup($value, $node->biblio_formats[$f['name']]);
+          $data = check_markup($value, isset($node->biblio_formats[$f['name']]) ? $node->biblio_formats[$f['name']] : filter_default_format());
         }
         else {
           $data = check_plain($value);
@@ -68,31 +81,32 @@ function theme_os_publications_tabular(&$vars) {
         $rows[] = array(
           array(
             'data' => t($f['title']),
-            'class' => 'biblio-row-title biblio-field-title-'.str_replace('_', '-', str_replace('biblio_', '', $f['name']))
+            'class' => 'biblio-row-title biblio-field-title-' . str_replace('_', '-', str_replace('biblio_', '', $f['name'])),
           ),
           array(
             'data' => $data,
-            'class' => 'biblio-field-contents-'.str_replace('_', '-', str_replace('biblio_', '', $f['name']))
-          )
+            'class' => 'biblio-field-contents-' . str_replace('_', '-', str_replace('biblio_', '', $f['name'])),
+          ),
         );
       }
       else {
         $rows[] = array(
           1 => array(
             'data' => $data,
-            'class' => 'biblio-field-contents-'.str_replace('_', '-', str_replace('biblio_', '', $f['name']))
-          )
+            'class' => 'biblio-field-contents-' . str_replace('_', '-', str_replace('biblio_', '', $f['name'])),
+          ),
         );
       }
     }
   }
   $output = '<div id="biblio-node">';
   $output .= filter_xss($node->biblio_coins, array('span'));
-  $output .= '<h3>Citation:</h3><div id="citation-wrapper">'.$citation.''.theme('biblio_export_links', array('node' => $node)).'</div>';
+  $output .= '<h3>Citation:</h3><div id="citation-wrapper">' . $citation . '' . theme('biblio_export_links', array('node' => $node)) . '</div>';
 
-  foreach ($rows as $row){
-    if (isset($row[0]['data']) && $row[0]['data'])
-      $output .= "<h3>".$row[0]['data'].":</h3>";
+  foreach ($rows as $row) {
+    if (isset($row[0]['data']) && $row[0]['data']) {
+      $output .= "<h3>" . $row[0]['data'] . ":</h3>";
+    }
     $output .= $row[1]['data'];
   }
 
@@ -111,10 +125,10 @@ function theme_os_publications_tabular(&$vars) {
  */
 function _os_publications_plain_citation($node) {
   $style = biblio_get_style();
-  $base  = variable_get('biblio_base', 'biblio');
+  $base = variable_get('biblio_base', 'biblio');
 
   // Note that this is a working paper after the title and before the year
-  if ($style == 'chicago' && in_array($node->biblio_type, array(1000)) && empty($node->biblio_publisher)){
+  if ($style == 'chicago' && in_array($node->biblio_type, array(1000)) && empty($node->biblio_publisher)) {
     $node->biblio_publisher = "Working Paper";
   }
 
@@ -126,14 +140,15 @@ function _os_publications_plain_citation($node) {
     /* replace punctuation at end of citation with period.
      * biblio_coins follow end of citation and block an easy RE match, so we're appending them.
      */
-    $coins = filter_xss($node->biblio_coins, array('span'));
-    $re = '/' .  '[!-~] (<\/\w*>)?' . preg_quote($coins, '/') . '/';
 
-    if (preg_match( $re, $citation)) {
+    $coins = filter_xss($node->biblio_coins, array('span'));
+    $re = '/' . '[!-~] (<\/\w*>)?' . preg_quote($coins, '/') . '/';
+
+    if (preg_match($re, $citation)) {
       $citation = preg_replace($re, ", </span>$coins", $citation);
     }
 
-    $citation .= ' copy at ' . shorten_url(url('node/'.$node->nid, array('absolute'=>TRUE)));
+    $citation .= ' copy at ' . shorten_url(url('node/' . $node->nid, array('absolute' => TRUE)));
   }
 
   $citation = strip_tags($citation);
@@ -150,8 +165,8 @@ function _os_publications_plain_citation($node) {
   	div.moveToElementText(ele);
   	div.select();
   }
-}','inline');
-  $citation = "<div class=\"biblio-citation\" onclick=\"if (event.target) selectText(event.target); else selectText(this);\">{$citation}</div>";
+}', 'inline');
+  $citation = "<div class=\"biblio-citation\" onclick=\"if (event.target) {  selectText(event.target); else selectText(this);\">{$citation}</div>";
 
   return $citation;
 }
@@ -159,9 +174,9 @@ function _os_publications_plain_citation($node) {
 function theme_os_publications_export_links($variables) {
 
   global $pager_total_items;
-  $node = $variables['node'];
+  $node   = $variables['node'];
   $filter = ($variables['node'] == NULL && isset($variables['filter'])) ? $variables['filter'] : array();
-  $links = array();
+  $links  = array();
   $output = '';
 
   if (biblio_access('export')) {
@@ -170,9 +185,9 @@ function theme_os_publications_export_links($variables) {
     if ($show_link['google'] && !empty($node)) {
       $lookup_links['biblio_google_scholar'] = theme('google_scholar_link', array('node' => $node));
     }
-    $nid = (isset($node->nid)) ? $node->nid : NULL;
+    $nid          = (isset($node->nid)) ? $node->nid : NULL;
     $export_links = module_invoke_all('biblio_export_link', $nid, $filter);
-    $links = array_merge($lookup_links, $export_links);
+    $links        = array_merge($lookup_links, $export_links);
   }
   $title = 'Export';
   if (empty($node) && !empty($links)) {
@@ -182,30 +197,33 @@ function theme_os_publications_export_links($variables) {
   return theme('ctools_dropdown', array('links' => $links, 'title' => $title, 'attributes' => array('class' => array('biblio-export-buttons'))));
 }
 
-
 /**
+ *
  * @param $form
+ *
  * @return unknown_type
  */
 function theme_os_publications_contributors($variables) {
-  $form = $variables['form'];
-  $rows = array();
-  $display_role = true;
-  $headers = array('', t('Name'), t('Role'), t('Weight'));
+  $form         = $variables['form'];
+  $rows         = array();
+  $display_role = TRUE;
+  $headers      = array('', t('Name'), t('Role'), t('Weight'));
   drupal_add_tabledrag($form['#id'], 'order', 'sibling', 'rank');
 
   foreach (element_children($form) as $key) {
     // No need to print the field title every time.
-//    unset($form[$key]['name']['#title'], $form[$key]['auth_type']['#title'], $form[$key]['auth_category']['#title']);
+    //    unset($form[$key]['name']['#title'], $form[$key]['auth_type']['#title'], $form[$key]['auth_category']['#title']);
     // Add class to group weight fields for drag and drop.
     $form[$key]['rank']['#attributes']['class'] = array('rank');
 
     // Build the table row.
     $row = array('');
-    $row[] = array('data' => drupal_render($form[$key]['name']).drupal_render($form[$key]['auth_category']),
-                   'class' => array('biblio-contributor', 'biblio-contributor-category'));
+    $row[] = array('data' => drupal_render($form[$key]['name']) . drupal_render($form[$key]['auth_category']),
+      'class' => array('biblio-contributor', 'biblio-contributor-category'),
+    );
     $row[] = array('data' => drupal_render($form[$key]['auth_type']),
-                     'class' => array('biblio-contributor-type'));
+      'class' => array('biblio-contributor-type'),
+    );
     $row[] = drupal_render($form[$key]['rank']);
     $rows[] = array('data' => $row, 'class' => array('draggable'));
   }
@@ -228,30 +246,29 @@ function theme_os_publications_download_links($variables) {
   $fields = field_attach_view('node', $node, 'full', $langcode);
   foreach (element_children($fields) as $field) {
 
-    if($fields[$field]['#access']  && $fields[$field]['#field_type'] == 'file' && $field != 'field_biblio_image') {
+    if ($fields[$field]['#access'] && $fields[$field]['#field_type'] == 'file' && $field != 'field_biblio_image') {
       foreach ($fields[$field]['#items'] as $delta => $item) {
-        if (module_exists('filefield_paths')) {
-          $alias =  drupal_get_path_alias('filefield_paths/alias/' . $item['fid']);
-          $item->uri = $alias;
-        }
+        /*if (module_exists('filefield_paths')) {
+          $alias = drupal_get_path_alias('filefield_paths/alias/' . $item['fid']);
+          $item['uri'] = $alias;
+        }*/
         $file_links[] = array(
           theme('file_link', array('file' => (object) $item)),
         );
       }
-
     }
   }
   $files = '';
   if (count($file_links) > 0 && (user_access('show download links') || user_access('show own download links'))) {
     $files .= '<span class="biblio_file_links">';
-   // $files .= '&nbsp;' . t('Download') . ':&nbsp;';
+    // $files .= '&nbsp;' . t('Download') . ':&nbsp;';
     $file_count = 0;
     foreach ($file_links as $file) {
-        $files .= $file[0];
-
+      $files .= $file[0];
     }
     $files .= '</span>';
   }
 
   return $files;
 }
+

@@ -79,7 +79,7 @@
 					
 					if (DOM.isHidden(id)) {
 						Toggle_PDW = 0;
-						DOM.show(id);
+						DOM.setStyle(id, 'display', 'table');
 						t._resizeIframe(ed, tbIds[j], -26);
 						
 					} else {

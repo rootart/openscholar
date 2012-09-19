@@ -5,10 +5,9 @@ Drupal.behaviors.osPublications = {
   attach: function (ctx) {
     // change the author category to the role when the form is submitted
     var $ = jQuery;
-    $('.form-submit').click(function (i) {
-      var hidden = $('#edit-biblio-contributors .biblio-contributor-category input[type="hidden"]').not('.autocomplete'),
-          val = hidden.parents('tr').find('select').val();
-      hidden.val(val);
-    });
+    $('.biblio-contributor-type .form-select', ctx).change(function (i) {
+      var tar = $(this).parents('tr').find('.biblio-contributor-category input[type="hidden"]').not('.autocomplete');
+      tar.val($(this).val());
+    }).change();
   }
 };

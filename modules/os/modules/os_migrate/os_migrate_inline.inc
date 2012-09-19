@@ -78,7 +78,11 @@ class ImageInlineOSMigration extends OSMigration {
     $add_fields = array('uri' => 'Unique Resource Identifier.');
     $this->source = new MigrateSourceSQL($this->query(), $add_fields , NULL,  array('map_joinable' => FALSE));
     $this->map = new MigrateSQLMap($this->machineName,
-      array('fid' => array('type'=>'int', 'unsigned'=>TRUE, 'not null'=>TRUE,)),
+      array(
+        'fid' => array('type'=>'int', 'unsigned'=>TRUE, 'not null'=>TRUE,),
+        'vid' => array('type'=>'int', 'unsigned'=>TRUE, 'not null'=>TRUE),
+        ), 
+    
       //array('os_inline_image_migrate_id' => array('type'=>'varchar'), 'length'=>255, 'not null'=>TRUE, 'description' => 'Unique ids for migrate'),
       MigrateDestinationFile::getKeySchema());
     //$this->destination = new MigrateDestinationFile(array('copy_file'=>TRUE));
@@ -98,7 +102,7 @@ class ImageInlineOSMigration extends OSMigration {
   public function query() {     
 
     $query = parent::d6_db_select('content_field_os_inline_image', 'cf')
-      ->fields('cf', array('field_os_inline_image_fid', 'nid'))
+      ->fields('cf', array('field_os_inline_image_fid', 'nid', 'vid'  ))
       ->isNotNull('field_os_inline_image_fid')
       ->distinct();
     $query->join('files', 'f', 'f.fid = cf.field_os_inline_image_fid');
@@ -131,7 +135,9 @@ class EmbedInlineOSMigration extends OSMigration {
     $add_fields = array('uri' => 'Unique Resource Identifier.', 'filename' => 'File name');
     $this->source = new MigrateSourceSQL($this->query(), $add_fields , NULL,  array('map_joinable' => FALSE));
     $this->map = new MigrateSQLMap($this->machineName,
-      array('vid' => array('type'=>'int', 'unsigned'=>TRUE, 'not null'=>TRUE,)),
+      array('vid' => array('type'=>'int', 'unsigned'=>TRUE, 'not null'=>TRUE,),
+             'delta' => array('type'=>'int', 'unsigned'=>TRUE, 'not null'=>TRUE,),
+        ),
       MigrateDestinationMedia::getKeySchema());
       //file dest is no good heree.  oembed:// is unsupported
     
@@ -151,7 +157,7 @@ class EmbedInlineOSMigration extends OSMigration {
   
   public function query() {
     $query = parent::d6_db_select('content_field_os_inline_oembed', 'cf')
-      ->fields('cf', array('field_os_inline_oembed_url', 'vid'))
+      ->fields('cf', array('field_os_inline_oembed_url', 'vid', 'delta'))
       ->isNotNull('field_os_inline_oembed_url')
       ->groupBy('field_os_inline_oembed_url');
     $query->leftJoin('node', 'n', 'cf.nid = n.nid');
@@ -162,7 +168,6 @@ class EmbedInlineOSMigration extends OSMigration {
   public function prepareRow($row) {
     $row->uri = preg_replace('/https?:\/\//', 'oembed://', $row->field_os_inline_oembed_url);//$row->field_os_inline_oembed_url;
     $row->filename = basename($row->uri); //or fetch this from media's name getting funcs.  slow as hell?
-    
   }
   
   //destination forces public:// URI.  switch it back.  uri is also truncated to basename.  lets not make all youtube links the same, kthxbai

@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * rbuild.features.field.inc
@@ -9,7 +12,7 @@
  */
 function rbuild_field_default_fields() {
   $fields = array();
-  
+
   // Exported field: 'node-software_project-field_rbuild_short_name'
   $fields['node-software_project-field_rbuild_short_name'] = array(
     'field_config' => array(
@@ -77,7 +80,7 @@ function rbuild_field_default_fields() {
       ),
     ),
   );
-  
+
   // Exported field: 'node-software_project-field_software_repo'
   $fields['node-software_project-field_software_repo'] = array(
     'field_config' => array(
@@ -108,9 +111,9 @@ function rbuild_field_default_fields() {
     ),
     'field_instance' => array(
       'bundle' => 'software_project',
-      'default_value' => NULL,
+      'default_value' => 'http://r.iq.harvard.edu/src/contrib',
       'deleted' => '0',
-      'description' => 'Example: http://r.iq.harvard.edu/src/PACKAGE.CookingRecipes',
+      'description' => 'Example: http://r.iq.harvard.edu/src/contrib',
       'display' => array(
         'default' => array(
           'label' => 'above',
@@ -144,10 +147,11 @@ function rbuild_field_default_fields() {
       ),
     ),
   );
-  
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Description');
+  t('Documentation');
   t('Example: http://r.iq.harvard.edu/src/PACKAGE.CookingRecipes');
   t('Note: Verify this unique rBuild short name corresponds to the Repository URL value above');
   t('Notes');
@@ -162,3 +166,4 @@ function rbuild_field_default_fields() {
 
   return $fields;
 }
+

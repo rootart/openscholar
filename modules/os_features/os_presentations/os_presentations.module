@@ -5,3 +5,12 @@
  */
 
 include_once 'os_presentations.features.inc';
+
+/**
+ * Implements hook_vsite_og_node_type_info().
+ */
+function os_presentations_vsite_og_node_type_info() {
+  return array(
+    'presentation' => 'group content',
+  );
+}

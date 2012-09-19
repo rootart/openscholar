@@ -1,28 +1,47 @@
 <?php
 
 /**
- * Alter information returned from module/theme info files
+ * @file
+ * Integration with OG Vocabulary.
  */
-function vsite_vocab_system_info_alter(&$info, $file, $type){
-  static $working;
 
-  // Only alter the vsite_vocab info file
-  if ($type != 'module' || $file->name != 'vsite_vocab' || $working) {
+/**
+ * Implements hook_field_create_instance().
+ *
+ * Add OG vocanulary field to a group-content bundle.
+ */
+function vsite_vocab_field_create_instance($instance) {
+  if (!og_is_group_audience_field($instance['field_name'])) {
     return;
   }
+  $field_instance = og_fields_info(OG_VOCAB_FIELD);
+  $field_instance['instance']['settings'] = array(
+    'behaviors' => array('prepopulate' => array('action' => 'hide', 'fallback' => 'none', 'skip_perm' => 'administer nodes', 'status' => 0)),
+    'user_register_form' => FALSE,
+  );
 
-  $working = true;
+  og_create_field(OG_VOCAB_FIELD, $instance['entity_type'], $instance['bundle'], $field_instance);
+}
 
-  // Add the feature settings for the dynamically managed og vocab reference fields
-  if (! is_array($info['features']['field']))
-    $info['features']['field'] = array();
+/**
+ * Implements hook_form_FORM-ID_alter().
+ *
+ * 1) Limit avalible bundles to just Publc/Private bundles in OS.
+ *
+ * @see og_vocab_form_taxonomy_form_vocabulary_alter().
+ */
+function vsite_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
+  if(isset($form['og_vocab'])){
 
-  include_once ('vsite_vocab.features.field.inc');
-  foreach ( vsite_vocab_get_vocab_fields() as $field => $definition ) {
-    if (! in_array($field, $info['features']['field'])) {
-      $info['features']['field'][] = $field;
+    //Get enabled bundles
+    $bundles = array_keys(os_get_bundles(array(1,2)));
+
+    //Remove bundle configuration for bundles not enabled in this site
+    foreach (element_children($form['og_vocab']) as $child){
+      list($bundle_type, $bundle) = explode(":", $child, 2);
+      if(!in_array($bundle, $bundles)){
+        unset($form['og_vocab'][$child]);
+      }
     }
   }
-
-  $working = false;
 }

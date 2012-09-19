@@ -1,5 +1,5 @@
 @import "weft.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 
 html,body, #page {
@@ -32,7 +32,6 @@ body {
 
 #header-container,  #block-os-primary-menu, #columns, #footer {
     padding: 0 0 0 30px;
-    width: 943px;
     margin: 0 auto;
     }
 
@@ -102,7 +101,7 @@ h2.block-title {
 /* LAYOUT ELEMENTS */
 
 .region-header-first,
-#logo {
+#boxes-box-site_logo {
   width: 120px;
   }
 
@@ -145,6 +144,7 @@ p.copy a.poweredby {
 
 #header-container h2 {
   font-size: 14px;
+  margin-top:0;
   }
 
 #menu-bar {
@@ -189,26 +189,22 @@ p.copy a.poweredby {
 
 /* NICE MENUS */
 ul.nice-menu ul {
-    top: 1em;
+    top: 2em;
     border-top:none;
 }
+
+#menu-bar ul.nice-menu ul li {
+    line-height: auto;
+    margin-top:auto;
+    }
+
 
 ul.nice-menu li a {
     color:#FFF;
 }
 
-ul.nice-menu ul ul {
-    top: 1em;
+.sidebar ul.nice-menu li a {
+    color:#333;
 }
-
-ul.nice-menu-down li ul li ul {
- 
-    top: -15px;
-}
-
-ul.nice-menu li li.menuparent {
-     background: #b8690c;
-}
-
 
 

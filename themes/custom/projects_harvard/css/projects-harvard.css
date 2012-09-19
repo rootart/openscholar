@@ -1,5 +1,5 @@
 @import "projects.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../../os_basetheme/css/d6buffer.css";
 
 
 
@@ -34,6 +34,11 @@ body.no-sidebars #columns .hg-container .column {
   border-top: 1px solid #ccc;
   width: 980px;
   }
+
+
+.block-inner {
+    margin-right: 0;
+}
 
 body.sidebar-right #columns .hg-container{
   padding-left: 30px;
@@ -108,16 +113,20 @@ h2 {
   }
   
   
-.region-header-second #block-os-primary-menu {
+.region-header-second #boxes-box-iqss_projects_fp_navblock {
 	float:right;
-	margin-top:20px;
+	margin-top:30px;
 	}
 	
-.region-header-second #block-os-primary-menu ul li {
+.region-header-second #boxes-box-iqss_projects_fp_navblock ul li {
 	margin-left:15px;
+	display:inline;
+	font-size:14px;
 	}	
 
 /* SEARCH FORM */
+
+.block-os-search-db {margin-top:25px;}
 
 #block-search-0 h3, .block-search h3 {
   display:none;
@@ -527,10 +536,6 @@ float: left;
   float: left;
   }
 
-#footer {
-  padding-top: 10px;
-  }
-
 p.copy a.poweredby {
   background-position: 0 -52px;
   }
@@ -769,29 +774,50 @@ body.section-websites .views-field-field-vsite-logo-fid {
   color: #1b86a9;
   }
   
+  #block-os-login {
+    margin-top: 22px;
+ }
+ 
+ #block-os-powered-by {
+ 	margin-right:55px;
+ }
+  
+#block-os-powered-by {
+    bottom: -5px;
+}
+  
  /* STATS STYLING ON THE FRONT PAGE */ 
   
-#block-iqss_openscholar_front-stats {
-    -moz-border-radius-bottomright:7px;
--webkit-border-bottom-right-radius:7px;
-border-bottom-right-radius: 7px;
--moz-border-radius-bottomleft:7px;
--webkit-border-bottom-left-radius:7px;
-border-bottom-left-radius: 7px;
+.block-os-stats {
+    -moz-border-radius-bottomright:3px;
+-webkit-border-bottom-right-radius:3px;
+border-bottom-right-radius: 3px;
+-moz-border-radius-bottomleft:3px;
+-webkit-border-bottom-left-radius:3px;
+border-bottom-left-radius: 3px;
      background-color: #000000;
      font-size: 1.2em;
      height: 35px;
-     margin-top: -14px;
+     margin-top: -16px;
      width: 981px;
 }
 
-#block-iqss_openscholar_front-stats dl {
+.block-os-stats h2.block-title {
+	display:none;
+}
+
+.block-os-stats dl {
      float: left;
-     margin: 10px 0pt 12px 18px;
+     margin: -50px 0 12px;
      width: 100%;
 }
 
-#block-iqss_openscholar_front-stats dt, #block-iqss_openscholar_front-stats dd {
+.logged-in .block-os-stats dl {
+    margin: 8px 0 12px;
+    
+}
+
+.block-os-stats dt, .block-os-stats dd {
      color: #FFFFFF;
      float: left;
      font-weight: normal;
@@ -800,12 +826,12 @@ border-bottom-left-radius: 7px;
      width: auto;
 }
 
-#block-iqss_openscholar_front-stats dd {
+.block-os-stats dd {
      color: #FF8207;
      font-weight: bold;
      margin-right: 12px;
 }
 
-#block-iqss_openscholar_front-stats dt {
+.block-os-stats dt {
      padding-left: 17px;
 }

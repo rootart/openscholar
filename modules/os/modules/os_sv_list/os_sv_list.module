@@ -1,0 +1,116 @@
+<?php
+
+/**
+ * Implements hook_menu()
+ */
+function os_sv_list_menu() {
+  $items = array();
+
+  $items['os_sv_list_more_link_ajax'] = array(
+    'type' => MENU_CALLBACK,
+    'page callback' => 'os_sv_list_more_link_ajax',
+    'page arguments' => array(1),
+    'access callback' => TRUE
+  );
+
+  $items['os_sv_list/page/%os_boxes'] = array(
+    'title' => 'Pager',
+    'page callback' => 'os_sv_list_pager_callback',
+    'page arguments' => array(2),
+    'delivery callback'  => 'ajax_deliver',
+    'type' => MENU_CALLBACK,
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+/**
+ * @function os_sv_list_more_link_ajax
+ *
+ * Ajax callback for the more link.  Triggers when content type is changed.
+ * Returns a new link for that content type, provided the existing link is
+ * a default.  ie when content type is "publications", that can change.  If
+ * the user wrote in "writing" and changes the content type from biblio to
+ * page, "writing" won't get swapped out.
+ */
+function os_sv_list_more_link_ajax($form, $state) {
+  $content_type = $state['values']['content_type'];
+  $content_map = array(
+    'all' => '',
+    'announcement' => 'announcements',
+    'biblio' => 'publications',
+    'event' => 'calendar',
+    'page' => 'pages',
+    'data' => 'data',
+    'blog' => 'blog',
+    'book' => 'documents',
+    'feed' => 'reader',
+    'media_gallery' => 'galleries',
+    'link' => 'links',
+    'presentation' => 'presentations',
+    'software_project' => 'software',
+    'software_release' => 'software',
+    'person' => 'people',
+  );
+
+  $current = $state['values']['more_link'];
+
+  //only change a value that the user didn't set.
+  if (in_array($current, $content_map)) {
+    $link = (isset($content_map[$content_type])) ? $content_map[$content_type] : '';
+  } else {
+    $link = $current;
+  }
+
+  $form['options']['more_link']['#value'] = $link;
+
+  //just return the input element.  states has modified this element's parent to show/hide.
+  //ajax call won't retrigger states check, so just replace the input itself to preserve visiblity
+  $built = drupal_render($form['options']['more_link']);
+  $built = explode("\n", $built);
+  $built = preg_grep('/input/', $built);
+  $input = current($built);
+
+  return $input;
+}
+
+function os_sv_list_pager_callback($box) {
+  $output = $box->render();
+  $commands[] = ajax_command_replace('box-'.$box->delta.'-page', $output['content']);
+  return $output['content'];
+}
+
+/**
+ * Implements hook_ctools_plugin_api
+ */
+function os_sv_list_ctools_plugin_api($module, $api) {
+  if ($module == 'boxes' && $api == 'plugins') {
+    return array(
+      'version' => 1
+    );
+  }
+}
+
+/**
+ * Implements hook_boxes_plugins
+ */
+function os_sv_list_boxes_plugins() {
+  $plugins = array();
+
+  $plugins['os_sv_list_box'] = array(
+    'title' => 'List of Posts',
+    'tags' => array(
+      'Content'
+    ),
+    'handler' => array(
+      'class' => 'os_sv_list_box',
+      'file' => 'os_sv_list.box.inc',
+      'path' => drupal_get_path('module', 'os_sv_list') . '/plugins/',
+      'parent' => 'os_boxes_default'
+    ),
+    'factory' => TRUE
+  );
+
+  return $plugins;
+}

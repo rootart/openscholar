@@ -120,11 +120,19 @@ div.messages {
 .os-powered-link,
 #block-os-powered-by {
     float: right;
+    bottom:-26px;
+    position:relative;
+}
+
+.page-cp #block-os-powered-by {
+  
+    bottom:0;
+   
 }
 
 #block-os-powered-by a,
 .os-powered-link a.os-poweredby {
-    background: url("/profiles/openscholar/themes/os_basetheme/images/poweredby.png") no-repeat scroll 0 0 transparent;
+    background: url("../images/poweredby.png") no-repeat scroll 0 0 transparent;
     border: medium none !important;
     display: block;
     height: 26px;
@@ -141,8 +149,10 @@ div.messages {
 }
 
 
-#logo img {
-  vertical-align: bottom;
+#scholar-shield {
+    margin: 0 auto;
+    text-align: center;
+    width: 75px;
 }
 
 
@@ -181,7 +191,7 @@ div.messages {
 }
 
 
-h1#page-title, /* The title of the page. */ {
+h1#page-title /* The title of the page. */ {
 }
 
 div.messages /* Important messages (status, warning, and error) for the user. See also the declarations in messages.css. */ {
@@ -196,6 +206,13 @@ div.messages ul {
 
 
 div.status /* Normal priority messages */ {
+	
+}
+
+div#success-message.status {
+  padding:3px 0  0 25px;
+  border-color: #be7;
+  background-repeat:no-repeat;
 }
 
 
@@ -284,6 +301,30 @@ ul.links li {
   padding: 0 10px 0 0; /* LTR */
 }
 
+/* BOOKLET ICONS */
+.node-book .links li.book_add_child a {
+    background: url("/sites/all/themes/openscholar/scholar_base/images/addChildpage_plus.png") no-repeat scroll left center transparent;
+    color: #3A6A8C;
+    margin-right: 12px;
+    padding-left: 15px;
+}
+
+.node-book .links li.book_printer a {
+    background: url("/sites/all/themes/openscholar/scholar_base/images/printPage.png") no-repeat scroll left center transparent;
+    color: #3A6A8C;
+    margin-right: 12px;
+    padding-left: 15px;
+}
+
+.node-book .links li.permalink a {
+    background: url("/sites/all/themes/openscholar/scholar_base/images/perma_link.png") no-repeat scroll left center transparent;
+    color: #3A6A8C;
+    margin-right: 12px;
+    padding-left: 15px;
+}
+
+
+bookiconsprite.png
 
 .feed-icon /* The link to the RSS or Atom feed for the current list of content */ {
 }
@@ -375,8 +416,9 @@ ul.links li {
 
 #modalContent {
   top: 0 !important;
-   color: #666;
-  }
+  color: #666;
+  position: fixed !important;
+}
 
 div.ctools-modal-content {
   color: #555;
@@ -527,13 +569,25 @@ div.ctools-modal-content .modal-content .modal-throbber-wrapper img {
 }	
 	
 /** OS LOGIN CONTAINER STYLES **/	
-.page-site-register #columns,
-.page-user #columns {
+.not-logged-in.page-user #columns {
 	width:540px;
 	border-radius:5px;
 	-moz-border-radius:5px;
 	border-radius:5px;
 	margin:100px auto;
+	border:1px solid #8996A0;
+	background:#F7F7F7;
+}
+
+.not-logged-in.page-user #columns h1 {
+	width:530px;
+	background:#555;
+	color:#FFF;
+	height:35px;
+	margin:-20px 0 0 -15px;
+	padding:5px 0 0 10px;
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
 }
 
 
@@ -559,6 +613,12 @@ border-top:1px solid #ccc;
 .ui-tabs .ui-tabs-nav li a {
     padding: 0.15em 1em;
   }
+
+.page-cp #tabs,
+.page-cp #tabs .links {
+	border:none;
+	border-bottom:none;
+}	
 	
 	
 	

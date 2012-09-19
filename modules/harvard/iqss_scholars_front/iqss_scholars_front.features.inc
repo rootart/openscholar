@@ -12,4 +12,7 @@ function iqss_scholars_front_ctools_plugin_api() {
   if ($module == "boxes" && $api == "box") {
     return array("version" => "1");
   }
+  if ($module == "strongarm" && $api == "strongarm") {
+    return array("version" => "1");
+  }
 }

@@ -46,10 +46,10 @@ function os_software_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
-          'module' => 'text',
+          'module' => 'os_files',
           'settings' => array(),
-          'type' => 'text_default',
-          'weight' => '0',
+          'type' => 'os_files_image_list',
+          'weight' => '2',
         ),
         'teaser' => array(
           'label' => 'hidden',
@@ -107,7 +107,11 @@ function os_software_field_default_fields() {
     ),
     'field_instance' => array(
       'bundle' => 'software_project',
-      'default_value' => 'Manual upload',
+      'default_value' => array(
+        0 => array(
+          'value' => 'Manual upload',
+        ),
+      ),
       'deleted' => '0',
       'description' => '',
       'display' => array(
@@ -115,7 +119,7 @@ function os_software_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '5',
+          'weight' => '6',
         ),
         'teaser' => array(
           'label' => 'above',
@@ -137,6 +141,115 @@ function os_software_field_default_fields() {
         'settings' => array(),
         'type' => 'options_select',
         'weight' => '2',
+      ),
+    ),
+  );
+
+  // Exported field: 'node-software_project-field_upload'
+  $fields['node-software_project-field_upload'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '-1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_upload',
+      'foreign keys' => array(
+        'fid' => array(
+          'columns' => array(
+            'fid' => 'fid',
+          ),
+          'table' => 'file_managed',
+        ),
+      ),
+      'indexes' => array(
+        'fid' => array(
+          0 => 'fid',
+        ),
+      ),
+      'module' => 'file',
+      'settings' => array(
+        'display_default' => 0,
+        'display_field' => 0,
+        'uri_scheme' => 'public',
+      ),
+      'translatable' => '0',
+      'type' => 'file',
+    ),
+    'field_instance' => array(
+      'bundle' => 'software_project',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'module' => 'file',
+          'settings' => array(),
+          'type' => 'file_default',
+          'weight' => '7',
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_upload',
+      'label' => 'Attach Files',
+      'required' => 0,
+      'settings' => array(
+        'description_field' => 0,
+        'file_directory' => '',
+        'file_extensions' => 'jpg jpeg gif png txt doc docx gz xls xlsx pdf ppt pptx pps odt ods odp tex tgz xml zip',
+        'filefield_paths' => array(
+          'active_updating' => 0,
+          'file_name' => array(
+            'options' => array(
+              'pathauto' => 0,
+              'transliterate' => 0,
+            ),
+            'value' => '[file:ffp-name-only-original].[file:ffp-extension-original]',
+          ),
+          'file_path' => array(
+            'options' => array(
+              'pathauto' => 0,
+              'transliterate' => 0,
+            ),
+            'value' => '',
+          ),
+          'retroactive_update' => 0,
+        ),
+        'max_filesize' => '128 MB',
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'media',
+        'settings' => array(
+          'allowed_schemes' => array(
+            'embed' => 0,
+            'oembed' => 0,
+            'public' => 'public',
+          ),
+          'allowed_types' => array(
+            'audio' => 0,
+            'default' => 0,
+            'html' => 0,
+            'image' => 'image',
+            'video' => 0,
+          ),
+          'browser_plugins' => array(
+            'library' => 0,
+            'media_default--media_browser_1' => 0,
+            'media_embed' => 0,
+            'media_internet' => 0,
+            'upload' => 'upload',
+          ),
+          'progress_indicator' => 'throbber',
+        ),
+        'type' => 'media_generic',
+        'weight' => '32',
       ),
     ),
   );
@@ -532,17 +645,14 @@ function os_software_field_default_fields() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Description');
-  t('Example: http://r.iq.harvard.edu/src/PACKAGE.CookingRecipes');
-  t('Note: Verify this unique rBuild short name corresponds to the Repository URL value above');
   t('Notes');
   t('Package');
   t('Packaging Method');
   t('Recommended');
-  t('Repository URL');
   t('Software Project');
   t('The recommended releases will be displayed on the project page. The latest recommended release per major version will be offered for update status.');
   t('Version');
-  t('rBuild Short Name');
+  t('upload');
 
   return $fields;
 }

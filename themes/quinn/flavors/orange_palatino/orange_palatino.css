@@ -35,16 +35,6 @@ a:visited {
 
 
 
-#content-column  {
-	font-size:1.1em;
-    -moz-border-radius: 1px 1px 1px 1px;
-    -moz-box-shadow: 0 1px 1em #333;
-      -webkit-box-shadow: 0 3px 2em #333;
-    background: none repeat scroll 0 0 #FFFFFF;
-    border: 1px solid #E5E5E4;
-    padding: 20px;
-}
-
 
  .region-sidebar-first #block-os-primary-menu .content ul.menu li  a {font-size:1.2em;}
   .region-sidebar-second #block-os-primary-menu .content ul.menu li  a {font-size:1.2em;}

@@ -70,6 +70,16 @@ function cp_menu(){
       'file path' => drupal_get_path('module', 'taxonomy'),
   );
 
+  $items["cp/build/taxonomy/add"] = array(
+      'title' => 'Add vocabulary',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('taxonomy_form_vocabulary'),
+      'access arguments' => array('administer taxonomy'),
+      'type' => MENU_LOCAL_ACTION,
+      'file' => 'taxonomy.admin.inc',
+      'file path' => drupal_get_path('module', 'taxonomy'),
+  );
+
   // feature customize forms
   $features = spaces_features('site');
   foreach ($features as $name => $feature) {
@@ -189,174 +199,6 @@ function cp_taxonomy(){
 }
 
 /**
- * Block functions
- * Implementations of block hooks to define the navigation block
- */
-function cp_block_info(){
-  return array(
-      'cp_minimenu' => array(
-          'info' => t('CP Mini-Menu'),
-          'region' => false,
-          'cache' => DRUPAL_CACHE_PER_ROLE
-      )
-  );
-}
-
-function cp_block_view($delta){
-  switch ($delta) {
-    case 'cp_minimenu' :
-      if (!module_exists('cp_toolbar') && _cp_get_toolbar_setting() == CP_MENU_MINI) {
-        return _cp_mini_menu();
-      }
-      else {
-        return array();
-      }
-//     case 'cp_fullmenu' :
-//       if (_cp_get_toolbar_setting() == CP_MENU_FULL && spaces_access_admin()) {
-//         return array(
-//             'subject' => NULL,
-//             'content' => _cp_full_menu()
-//         );
-//       }
-//       else {
-//         return array();
-//       }
-  }
-}
-
-/**
- * Adds the CP menus to a page
- *
- * @todo Add seperate mini toolbar
- */
-function cp_page_build(&$page){
-  $menu = array();
-  switch (_cp_get_toolbar_setting()) {
-    case CP_MENU_FULL :
-      // MINI Toolbar needed
-      $menu = array(
-          '#pre_render' => array(
-              'cp_toolbar_pre_render'
-          ),
-          '#access' => spaces_access_admin_perms(array(
-              'access control panel'
-          ))
-      );
-      break;
-    case CP_MENU_MINI :
-  }
-  //$page['page_top']['cp_toolbar'] = $menu;
-
-  cp_invoke('page_build', $page);
-}
-
-/**
- * Returns a constant reflecting the state of the CP menu
- */
-function _cp_get_toolbar_setting(){
-
-  // If the user is logged out or we are not in a space, turn the menu off
-  if ((module_exists('vsite') && ! spaces_get_space())) {
-    return CP_MENU_OFF;
-  }
-
-  if (spaces_access_admin() && (context_isset('context', 'os_cp') || variable_get('cp_admin_menu', 0))) {
-    return CP_MENU_FULL;
-  }
-
-  return CP_MENU_MINI;
-}
-
-// // TODO: Rewrite to use Nice Menus
-// // TODO: Add all CP links (including children) to mini menu
-// // TODO: Add links for Add Content and Add Users below Content and Users
-// // TODO: Make sure everything is in right place when not admin 1
-// function _cp_full_menu(){
-//   $links = array();
-
-//   // Retrieve the admin menu from the database.
-//   // These are the 'Features/Appearance/Users/etc. buttons.
-//   $tree = menu_tree_all_data('cp');
-//   $links = menu_tree_output($tree);
-
-//   // Add user-specific links
-//   global $user;
-//   $user_links = array();
-//   $user_links[] = array(
-//       'title' => t('Hello <strong>!username</strong>', array(
-//           '!username' => $user->name
-//       )),
-//       'href' => 'user',
-//       'html' => TRUE
-//   );
-
-//   /*
-//    * $new_count = vsite_news_get_new_activity_count(); $user_links[] = array(
-//    * 'title' => $new_count, 'href' => 'cp/news', //@TODO: replace this with new
-//    * path 'attributes' => $new_count?array('class' => 'unread', 'title' =>
-//    * t('Unread Activity on your Site')):array('title' => t('All Activity on your
-//    * Site')), );
-//    */
-
-//   $user_links[] = array(
-//       'title' => t('Logout'),
-//       'href' => "logout",
-//       'query' => ! context_isset('context', 'os_cp') ? array(
-//           'destination' => $_GET['q']
-//       ) : array(
-//           'destination' => '<front>'
-//       )
-//   );
-//   if (context_isset('context', 'os_cp')) {
-//     $user_links[] = array(
-//         'title' => t('Back to your site!'),
-//         'href' => "",
-//         'html' => TRUE
-//     );
-//   }
-
-//   return array(
-//       '#type' => 'container',
-//       'toolbar' => $links,
-//       'user' => array(
-//           '#theme' => 'links',
-//           '#links' => $user_links
-//       ),
-//       '#attributes' => array(
-//           'id' => array(
-//               'cp-menu-full'
-//           )
-//       )
-//   );
-// }
-
-function _cp_mini_menu(){
-  global $user;
-  $user_links = array();
-  /*
-   * if (spaces_access_admin()) { $links = menu_build_tree('cp'); foreach
-   * ($links as $l) { $link = array( 'data' => theme('menu_link',
-   * array('element' => $l['link'])), 'children' => array(), ); if
-   * (count($l['below'])) { foreach ($l['below'] as $child) {
-   * $link['children'][] = theme('menu_link', array('element' => $child)); } }
-   * $user_links[] = $link; } //$new_count =
-   * vsite_news_get_new_activity_count(); //$user_links[] = l($new_count,
-   * 'cp/news', $new_count?array('attributes' => array('class' => 'unread',
-   * 'title' => t('New Activity on this Site'))):array('attributes' =>
-   * array('title' => t('All Activity on this Site')))); } $user_links[] =
-   * array( 'data' => t('Hello <strong>!username</strong>', array( '!username'
-   * => $user->name )), 'children' => array( l('My Account', 'user'),
-   * l('Logout', 'logout'), ) );
-   */
-  return theme('nice_menus', array(
-      'id' => 'cp-minimenu',
-      'menu_name' => 'cp',
-      'direction' => 'down'
-  ));
-}
-
-
-/**
  * Make a decision about the active theme
  */
 function cp_custom_theme(){
@@ -368,28 +210,15 @@ function cp_custom_theme(){
 }
 
 /**
- * Gets only the top level items below the 'admin' path.
- *
- * @return An array containing a menu tree of top level items below the 'admin'
- *         path.
- */
-function cp_get_menu_tree(){
-  $tree = array();
-  $tree = menu_build_tree('cp', array(
-      'min_depth' => 1,
-      'max_depth' => 1
-  ));
-
-  return $tree;
-}
-
-/**
  * @function cp_use_cp_theme
  *
  * @return Bool indicating whether or not to use cp theme.
  */
 function cp_use_cp_theme(){
-  if ((arg(0) == 'cp') || (arg(0) == 'node' && arg(1) == 'add') || (arg(0) == 'node' && arg(2) == 'edit')) {
+  if ((arg(0) == 'cp') ||
+      (arg(0) == 'os') ||
+      (arg(0) == 'media') ||
+      (arg(0) == 'node' && (arg(1) == 'add' || arg(2) == 'edit' || arg(2) == 'delete'))) {
     return TRUE;
   }
   return FALSE;

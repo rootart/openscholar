@@ -74,8 +74,8 @@ function os_stats_block_save($delta='',$edit = array()) {
   		foreach(_os_stats() as $stat => $def) {
   			//variable_set('os_stats_stat_'.$stat, (bool)$edit['os_stats_stat_'.$stat]);
   			$enabled[$stat] = (bool)$edit['os_stat_' . $stat]; 
-  		}
-  			
+  		}// end foreach
+  		
   		variable_set('os_stats_enabled', serialize($enabled));
   		cache_clear_all('os_stats_data', 'cache');
 	}// end if
@@ -101,10 +101,10 @@ function os_stats_content() {
   		}// end if
   		uasort($stats, '_stats_weight');
   		$enabled = unserialize(variable_get('os_stats_enabled', FALSE));
-  	
+  
   		foreach($stats as $stat => $def) {
   	  		//$args = (isset($def['query_args']) && is_array($def['query_args'])) ? $def['query_args'] : array();
-  	 		if ($enabled[$stat] || !isset($enabled[$stat])) {
+  			if (!empty($enabled[$stat]) || !isset($enabled[$stat])) {
   	 		 	// if the query has an array, assign it
  				if((!empty($def['query_args'])) && (!empty($def['query_args_type']))) {
  					$type = $def['query_args_type'];

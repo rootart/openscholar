@@ -1,5 +1,5 @@
 @import "aberdeen.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 body {
 background: url('../images/bodyBg.gif') no-repeat fixed center -110px #e3e3e3;
@@ -25,7 +25,7 @@ font-family: helvetica,arial,sans-serif;
 
 .sidebar {background:#eef2f2;}
 
-#header-container {padding:12px 0;}
+#header-container {padding:0 0 12px 0;}
 
 .content-left.content-right #content-left {
     border-right: 1px dotted #CCCCCC;
@@ -96,6 +96,12 @@ border-radius:5px;
 
 .submitted {font-weight:bold;}
 
+
+/**** BLOCK/BOX STYLES ****/
+#boxes-box-os_addthis {margin-top:10px;}
+
+
+
 /**** MAIN NAV BAR ****/
 
 #menu-bar #block-os-site_search {
@@ -132,6 +138,10 @@ top:3.1em;
   background: none;
   }
 
+#menu-bar ul.nice-menu ul li {
+  margin-top:0;
+}
+
 #menu-bar ul.nice-menu li a {
   color: #FFF;
   font-weight:bold;
@@ -166,17 +176,26 @@ top:3.1em;
 -webkit-border-radius: 0;
 }
 
+#menu-bar ul.nice-menu ul li a,
+#menu-bar ul.nice-menu ul li a:hover,
+#menu-bar ul.nice-menu ul li a.active,
+#menu-barul.nice-menu ul li.active-trail a {
+	background: #60615C;
+}
+
+#menu-bar ul.nice-menu ul ul {
+    top: -1px;
+    left: 12.4em;
+}
 
 /**** MAIN NAV IN SIDEBAR ****/
 
 .sidebar ul.nice-menu li {
  list-style-type:none;
  list-style-image:none;
+ margin-bottom: 0;
   }
 
-.sidebar ul.nice-menu li {
- list-style-type:none;
-  }
 
 .sidebar ul.nice-menu li a,
 .sidebar ul.nice-menu li a:hover,

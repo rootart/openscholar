@@ -2,7 +2,7 @@
 /**
  * @file
  * Custom teaser and full node display overrides for Presentation nodes.
- * 
+ *
  * @see /themes/adaptivetheme/at_core/templates/node.tpl.php
  * @see /modules/os_features/os_presentations
  */
@@ -11,15 +11,15 @@ hide($content['comments']);
 hide($content['links']);
 
 // Accesses field values safely using $content[FIELD], not $node->FIELD
-if ($content['field_presentation_location']['#items'][0]['value'] !== NULL) {
+if (isset($content['field_presentation_location']) && $content['field_presentation_location']['#items'][0]['value'] !== NULL) {
   $location_value = $content['field_presentation_location']['#items'][0]['value'];
 }
 
-if ($content['field_presentation_date'][0]['#markup'] !== NULL) {
+if (isset($content['field_presentation_date']) && $content['field_presentation_date'][0]['#markup'] !== NULL) {
   $date_value = $content['field_presentation_date'][0]['#markup'];
 }
 
-if ($node->field_presentation_file['und'][0]['fid'] !== NULL) {
+if (isset($content['field_presentation_file'])) {
   // Renders all files in a list
   $file_value = render($content['field_presentation_file']);
 }
@@ -28,23 +28,24 @@ if ($node->field_presentation_file['und'][0]['fid'] !== NULL) {
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
   <div class="node-inner">
   <?php print render($title_prefix); ?>
-  
+
   <?php if (!$page): // begin teaser ?>
     <span class="title">
     	<strong>
     		<a href="<?php print $node_url; ?>" title="<?php print $title ?>">
-    		  <?php print $title; ?></a><?php if ($location_value): ?>, <?php endif; ?>
+    		  <?php print $title; ?></a><?php if (isset($location_value) && !empty($location_value)): ?>, <?php endif; ?>
     	</strong>
     </span>
-    <?php if ($location_value): ?>
-      at 
+    <?php if (isset($location_value) && !empty($location_value)): ?>
+      at
       <span class="location">
-        <strong><?php print $location_value; ?></strong><?php if ($date_value) ?>, <?php endif; ?>
+        <strong><?php print $location_value; ?></strong><?php if (isset($date_value) && !empty($date_value)): ?>, <?php endif; ?>
       </span>
     <?php endif; ?>
-    <?php if ($date_value): ?>
-      <?php print $date_value; ?><?php if ($file_value): ?>: <?php endif; ?>
-    <?php if ($file_value): ?>
+    <?php if (isset($date_value) && !empty($date_value)): ?>
+      <?php print $date_value; ?><?php if (isset($file_value) && !empty($file_value)): ?>: <?php endif; ?>
+    <?php endif; ?>
+    <?php if (isset($file_value) && !empty($file_value)): ?>
       <?php print $file_value; ?>
     <?php endif; ?>
   <?php endif; // end teaser ?>
@@ -57,19 +58,19 @@ if ($node->field_presentation_file['und'][0]['fid'] !== NULL) {
         </p>
       </footer>
     <?php endif; ?>
-      
+
     <div<?php print $content_attributes; ?>>
       <?php print render($content); ?>
     </div>
-      
+
     <?php if ($links = render($content['links'])): ?>
       <nav<?php print $links_attributes; ?>>
         <?php print $links; ?>
       </nav>
     <?php endif; ?>
-    
+
     <?php print render($content['comments']); ?>
-    
+
     <?php print render($title_suffix); ?>
   <?php endif; ?>
   </div> <!-- /div.node-inner -->

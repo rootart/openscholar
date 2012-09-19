@@ -82,73 +82,47 @@ function os_booklets_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-book-og_group_ref'
-  $fields['node-book-og_group_ref'] = array(
+  // Exported field: 'node-book-field_upload'
+  $fields['node-book-field_upload'] = array(
     'field_config' => array(
       'active' => '1',
-      'cardinality' => '1',
+      'cardinality' => '-1',
       'deleted' => '0',
       'entity_types' => array(),
-      'field_name' => 'og_group_ref',
+      'field_name' => 'field_upload',
       'foreign keys' => array(
-        'node' => array(
+        'fid' => array(
           'columns' => array(
-            'target_id' => 'nid',
+            'fid' => 'fid',
           ),
-          'table' => 'node',
+          'table' => 'file_managed',
         ),
       ),
       'indexes' => array(
-        'target_id' => array(
-          0 => 'target_id',
+        'fid' => array(
+          0 => 'fid',
         ),
       ),
-      'module' => 'entityreference',
+      'module' => 'file',
       'settings' => array(
-        'handler' => 'og',
-        'handler_settings' => array(
-          'behaviors' => array(
-            'og_behavior' => array(
-              'status' => TRUE,
-            ),
-            'views-select-list' => array(
-              'status' => 0,
-            ),
-          ),
-          'hide_secondary_field' => 1,
-          'membership_type' => 'og_membership_type_default',
-          'primary_field' => '0',
-          'reference_type' => 'all_groups',
-          'sort' => array(
-            'direction' => 'ASC',
-            'field' => 'body:value',
-            'property' => 'nid',
-            'type' => 'none',
-          ),
-          'target_bundles' => array(
-            'vsite' => 'vsite',
-          ),
-        ),
-        'handler_submit' => 'Change handler',
-        'target_type' => 'node',
+        'display_default' => 0,
+        'display_field' => 0,
+        'uri_scheme' => 'public',
       ),
       'translatable' => '0',
-      'type' => 'entityreference',
+      'type' => 'file',
     ),
     'field_instance' => array(
       'bundle' => 'book',
-      'default_value' => NULL,
       'deleted' => '0',
       'description' => '',
       'display' => array(
         'default' => array(
-          'label' => 'above',
-          'module' => 'entityreference',
-          'settings' => array(
-            'link' => FALSE,
-          ),
-          'type' => 'entityreference_label',
-          'weight' => 1,
+          'label' => 'hidden',
+          'module' => 'file',
+          'settings' => array(),
+          'type' => 'file_default',
+          'weight' => '1',
         ),
         'teaser' => array(
           'label' => 'above',
@@ -158,34 +132,61 @@ function os_booklets_field_default_fields() {
         ),
       ),
       'entity_type' => 'node',
-      'field_name' => 'og_group_ref',
-      'label' => 'Groups audience',
+      'field_name' => 'field_upload',
+      'label' => 'Attach Files',
       'required' => 0,
       'settings' => array(
+        'description_field' => 0,
+        'file_directory' => '',
+        'file_extensions' => 'jpg jpeg gif png txt doc docx gz xls xlsx pdf ppt pptx pps odt ods odp tex tgz xml zip',
+        'filefield_paths' => array(
+          'active_updating' => 0,
+          'file_name' => array(
+            'options' => array(
+              'pathauto' => 0,
+              'transliterate' => 0,
+            ),
+            'value' => '[file:ffp-name-only-original].[file:ffp-extension-original]',
+          ),
+          'file_path' => array(
+            'options' => array(
+              'pathauto' => 0,
+              'transliterate' => 0,
+            ),
+            'value' => '',
+          ),
+          'retroactive_update' => 0,
+        ),
+        'max_filesize' => '128 MB',
         'user_register_form' => FALSE,
-      ),
-      'view modes' => array(
-        'full' => array(
-          'custom settings' => FALSE,
-          'label' => 'Full',
-          'type' => 'og_list_default',
-        ),
-        'teaser' => array(
-          'custom settings' => FALSE,
-          'label' => 'Teaser',
-          'type' => 'og_list_default',
-        ),
       ),
       'widget' => array(
         'active' => 1,
-        'module' => 'entityreference',
+        'module' => 'media',
         'settings' => array(
-          'match_operator' => 'CONTAINS',
-          'path' => '',
-          'size' => '60',
+          'allowed_schemes' => array(
+            'embed' => 0,
+            'oembed' => 0,
+            'public' => 'public',
+          ),
+          'allowed_types' => array(
+            'audio' => 0,
+            'default' => 0,
+            'html' => 0,
+            'image' => 'image',
+            'video' => 0,
+          ),
+          'browser_plugins' => array(
+            'library' => 0,
+            'media_default--media_browser_1' => 0,
+            'media_embed' => 0,
+            'media_internet' => 0,
+            'upload' => 'upload',
+          ),
+          'progress_indicator' => 'throbber',
         ),
-        'type' => 'entityreference_autocomplete',
-        'weight' => '-3',
+        'type' => 'media_generic',
+        'weight' => '32',
       ),
     ),
   );
@@ -193,6 +194,7 @@ function os_booklets_field_default_fields() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Body');
+  t('upload');
 
   return $fields;
 }

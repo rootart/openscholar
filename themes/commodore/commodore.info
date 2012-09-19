@@ -11,7 +11,7 @@
 
 ;----------// OpenScholar
 
-os[widgets][vsite-site_search] = navbar
+os[widgets][vsite-os-search-db] = menu_bar
 os[cp_layout_css] = cp-layout-map.css
 
 os[theme_type]   = 'vsite'

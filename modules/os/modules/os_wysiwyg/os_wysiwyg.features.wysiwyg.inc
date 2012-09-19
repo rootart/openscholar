@@ -36,7 +36,6 @@ function os_wysiwyg_wysiwyg_default_profiles() {
           'link' => 1,
           'unlink' => 1,
           'formatselect' => 1,
-          'styleselect' => 1,
           'fontselect' => 1,
           'fontsizeselect' => 1,
           'forecolor' => 1,

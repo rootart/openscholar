@@ -22,12 +22,15 @@ class os_boxes_booktoc extends os_boxes_default {
 
     // custom query
     $q = db_select('book', 'b');
-    $q->join('node', 'n');
-    // TODO: Spaces check. Unless spaces takes care of this for us
+    $q->join('node', 'n', 'b.bid = n.nid');
     $q->fields('b', array('bid'))
       ->fields('n', array('title'))
-      ->condition('bid', 'nid')
       ->distinct();
+
+    if (module_exists('vsite') && $vsite = spaces_get_space()) {
+      $q->join('og_membership', 'ogm', 'n.nid = ogm.etid');
+      $q->condition('gid', $vsite->group->nid);
+    }
 
     $results = $q->execute();
     $options = array(-1 => 'Current Book');

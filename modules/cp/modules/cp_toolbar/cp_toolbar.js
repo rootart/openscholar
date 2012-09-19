@@ -14,9 +14,9 @@ Drupal.behaviors.cp_toolbar = {
     Drupal.cp_toolbar.path = $('#toolbar .active');
     //Drupal.cp_toolbar.original = Drupal.settings.toolbar.tooltips.default;
 
-    $(window).bind('hashchange.drupal-overlay', Drupal.cp_toolbar.activeTrail);
-    $(document).bind('drupalOverlayLoad', Drupal.cp_toolbar.activeTrail);
-    $(document).bind('drupalOverlayClose', Drupal.cp_toolbar.drawer_close);
+    //$(window).bind('hashchange.drupal-overlay', Drupal.cp_toolbar.activeTrail);
+    //$(document).bind('drupalOverlayLoad', Drupal.cp_toolbar.activeTrail);
+    //$(document).bind('drupalOverlayClose', Drupal.cp_toolbar.drawer_close);
     
     $('#toolbar li').bind('mouseenter', Drupal.cp_toolbar.tooltipShow);
     $('#toolbar').bind('mouseleave', Drupal.cp_toolbar.tooltipHide);

@@ -12,44 +12,45 @@ include_once 'os_software.features.inc';
 
 /**
  * Implements hook_form_FORM_ID_form_alter() for software_project_node_form
- * 
+ *
  * Hides the packaging method field if only one option exists.
  */
 function os_software_form_software_project_node_form_alter(&$form, &$form_state, $form_id) {
   $method_field_options = _os_software_packaging_method_options();
   if (sizeof($method_field_options) > 1) return;
-  
+
   $form['#attached'] = array(
   	'css' => array(
   		'type' => 'file',
   		'data' => drupal_get_path('module', 'os_software') . '/os_software.css',
   	),
   );
+  $form['actions']['submit']['#submit'][] = '_os_software_form_redirect';
 }
 
 /**
  * Implements hook_node_insert()
- * 
- * Enforces single recommended release per project constraint for "Software Release" 
+ *
+ * Enforces single recommended release per project constraint for "Software Release"
  */
 function os_software_node_insert($node) {
   if ($node->type !== 'software_release') return;
-  
+
   $field_items = field_get_items('node', $node, 'field_software_recommended');
   $recommended_value = $field_items[0]['value'];
   if ($recommended_value === 0) return;
-  
+
   _os_software_new_recommended_release($node);
 }
 
 /**
  * Implements hook_node_update()
- * 
- * Enforces single recommended release per project constraint for "Software Release" 
+ *
+ * Enforces single recommended release per project constraint for "Software Release"
  */
 function os_software_node_update($node) {
   if ($node->type !== 'software_release') return;
-  
+
   // Compares original and updated "Recommended" field value
   $node_original = node_load($node->nid);
   if (isset($node_original->title)) { // Only compare values if an original node exists
@@ -58,22 +59,22 @@ function os_software_node_update($node) {
     $rec_field_item_updated = field_get_items('node', $node_updated, 'field_software_recommended');
     $rec_value_original = $rec_field_item_original[0]['value'];
     $rec_value_updated = $rec_field_item_updated[0]['value'];
-    if ($recommended_value_updated === $recommended_value_original) return;
-  }  
+    if ($rec_value_updated === $rec_value_original) return;
+  }
   // Only updates other Software Release nodes if this value has changed to "Recommended"
-  if ($recommended_value_updated === 0) return;
-  
+  if ($rec_value_updated === 0) return;
+
   _os_software_new_recommended_release($node);
 }
 
 /**
- * Implements hook_node_presave()
- * 
- * Generates the node title for Software Releases 
+ * Implements hook_node_presave().
+ *
+ * Generates the node title for Software Releases
  */
 function os_software_node_presave($node) {
   if ($node->type !== 'software_release') return;
-  
+
   // Sets the node title like "[project-node:title] [release-node:version]"
   $title = _os_software_prepare_release_title($node);
   $node->title = $title;
@@ -81,12 +82,12 @@ function os_software_node_presave($node) {
 
 /**
  * Implements hook_node_view()
- * 
- * Sets the custom release node title 
+ *
+ * Sets the custom release node title
  */
 function os_software_node_view($node, $view_mode, $langcode) {
   if ($node->type !== 'software_project') return;
-  
+
   $method_field_item = field_get_items('node', $node, 'field_software_method');
   if ($method_field_item[0]['value'] !== 'Manual upload') {
     return;
@@ -113,18 +114,18 @@ function os_software_node_view($node, $view_mode, $langcode) {
  */
 function os_software_node_delete($node) {
   if ($node->type !== 'software_project') return;
-  
+
   // Deletes all referencing software release nodes
   _os_software_delete_child_releases($node);
 }
 
 /**
  * Implements hook_cron()
- * 
+ *
  * Invokes hook to automatically create release content (i.e. Rbuild)
  */
 function os_software_cron() {
-  module_invoke_all('os_software_process_remote_release');  
+  module_invoke_all('os_software_process_remote_release');
 }
 
 /**
@@ -132,32 +133,46 @@ function os_software_cron() {
  */
 
 /**
+ * Implements hook_vsite_og_node_type_info().
+ */
+function os_software_vsite_og_node_type_info() {
+  return array(
+    'software_project' => 'group content',
+    'software_release' => 'group content',
+  );
+}
+
+/**
  * Implements hook_os_add_new_links_alter()
- * 
+ *
  * Removes "Add new > Software Release" link from "Add new" contextual links
  */
 function os_software_os_add_new_links_alter(&$links) {
   if (isset($links['software_release'])) {
     unset($links['software_release']);
   }
+  if (isset($links['software_project'])) {
+    $request_path = request_path();
+    $links['software_project']['query'] = array('destination' => $request_path);
+  }
 }
 
 /**
  * Implements hook_os_widget()
- * 
+ *
  * Exposes blocks as OpenScholar widgets.
  */
 function os_software_os_widget() {
   $items = array();
-  
-  $items['views-os_software_releases-block-1'] = array(
-    'module' => 'views', 
-    'delta' => 'os_software_releases-block_1', 
-    'region' => 'sidebar_second', 
+
+  $items['views-os_software_releases-block_1'] = array(
+    'module' => 'views',
+    'delta' => 'os_software_releases-block_1',
+    'region' => 'sidebar_second',
     'weight' => '-10',
-    'info' => 'Software Releases',
+    'info' => 'Recent Software Releases',
   );
-  
+
   return $items;
 }
 
@@ -185,13 +200,13 @@ function _os_software_new_recommended_release($node) {
   $project_field_item = field_get_items('node', $node, 'field_software_project');
   $view->set_arguments(array($project_field_item[0]['target_id']));
   $view->execute();
-  
+
   foreach ($view->result as $data) {
     if (!isset($node->nid) || $data->nid !== $node->nid) {
       $release_node = node_load($data->nid);
-      $wrapper = entity_metadata_wrapper('node', $release_node);
-      $wrapper->field_software_recommended[0]->set(0);
-      $wrapper->save();
+      $language = $release_node->language;
+      $release_node->field_software_recommended[$language][0]['value'] = 0;
+      node_save($release_node);
     }
   }
 }
@@ -200,17 +215,58 @@ function _os_software_new_recommended_release($node) {
  * Finds all child Software Release nodes and deletes them
  */
 function _os_software_delete_child_releases($node) {
-  // Uses [:os_software_relesases_eva:] view to filter only releases for this project
-  $view = views_get_view('os_software_releases');
-  $view->set_display('page_1');
-  $view->set_arguments(array($node->nid));
-  $view->execute();
-  
-  $nids = array();
-  foreach ($view->result as $data) {
-    if (is_numeric($data->nid)) $nids[] = $data->nid;
+  $nids = _os_software_get_software_release_nids($node->nid);
+  if (count($nids) === 0) {
+    return;
   }
-  node_delete_multiple($nids);
+
+  $operations = array();
+  foreach ($nids as $nid) {
+    $operations[] = array('node_delete', array($nid));
+  }
+
+  $batch = array(
+    'title' => t('Removing orphaned Software Releases for ') . '<em>' . $node->title . '</em>',
+    'init_message' => t('Initializing...'),
+    'operations' => $operations,
+    'finished' => '_os_software_batch_finished',
+  );
+
+  batch_set($batch);
+  batch_process();
+}
+
+/**
+ * Returns an array of node IDs of child Software Release nodes of a Project.
+ *
+ * @param int $nid
+ *   A Software Project node ID
+ */
+function _os_software_get_software_release_nids($nid) {
+  include_once drupal_get_path('module', 'os') . '/includes/node.inc';
+  $query = new OSNodeFieldQuery('software_release');
+  $query
+    ->fieldCondition('field_software_project', 'target_id', $nid);
+  $result = $query->execute();
+
+  if (!isset($result['node'])) {
+    return array();
+  }
+
+  $nids = array_keys($result['node']);
+  return $nids;
+}
+
+/**
+ * Displays success/failure message after deleting a Project node with children.
+ */
+function _os_software_batch_finished($success, $results, $operations) {
+  if ($success) {
+    drupal_set_message(format_plural(count($results), '1 orphaned Software Release removed.', '@count orphaned Software Releases removed.'));
+  }
+  else {
+    drupal_set_message(t('Oops! Some orphaned Software Releases may need to be manually removed.'));
+  }
 }
 
 /**
@@ -218,11 +274,11 @@ function _os_software_delete_child_releases($node) {
  */
 function _os_software_prepare_release_title($node) {
   $default_prefix = 'Project Release';
-  
+
   $project_field = field_get_items('node', $node, 'field_software_project');
   $project_node = node_load($project_field[0]['target_id']);
   $project_title = (!empty($project_node->title)) ? $project_node->title : $default_prefix;
-  
+
   $version_field = field_get_items('node', $node, 'field_software_version');
   $version = trim($version_field[0]['value']);
 
@@ -230,7 +286,7 @@ function _os_software_prepare_release_title($node) {
     $project_title,
     $version,
   );
-  
+
   return implode(' ', $title_parts);
 }
 
@@ -240,4 +296,11 @@ function _os_software_prepare_release_title($node) {
 function _os_software_packaging_method_options() {
   $options = module_invoke_all('os_packaging_method_option');
   return $options;
+}
+
+/**
+ * Redirects user to Links page, individual link nodes should not be viewed.
+ */
+function _os_software_form_redirect($form, &$form_state) {
+  $form_state['redirect'] = 'software';
 }

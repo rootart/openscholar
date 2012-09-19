@@ -1,7 +1,7 @@
 .mceToolbarEnd {
-	clear: left;
+  clear: left;
 }
 
-.defaultSkin .mceToolbar {
-	width: 100%;
+.defaultSkin table.mceToolbar {
+  width: 100%;
 }

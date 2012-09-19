@@ -1,14 +1,16 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  */
 
-include_once('os_image_gallery.features.inc');
-
+include_once ('os_image_gallery.features.inc');
 
 /**
  * Implements hook_contextual_links_view_alter
- * 
+ *
  * OS and media_gallery both add contextuals.  Clean that up.
  */
 function os_image_gallery_contextual_links_view_alter(&$element, $items) {
@@ -18,11 +20,18 @@ function os_image_gallery_contextual_links_view_alter(&$element, $items) {
   }
 }
 
-
+/**
+ * Implements hook_vsite_og_node_type_info().
+ */
+function os_image_gallery_vsite_og_node_type_info() {
+  return array(
+    'media_gallery' => 'group content',
+  );
+}
 
 /**
  * Implements hook_form_FORM_ID_alter().
- * 
+ *
  * Removes block option from media_gallery node edit.  OS blocks are managed by layout CP.  This shouldn't be exception.
  */
 function os_image_gallery_form_media_gallery_node_form_alter(&$form, &$form_state) {
@@ -31,15 +40,15 @@ function os_image_gallery_form_media_gallery_node_form_alter(&$form, &$form_stat
 
 /**
  * Implements hook_module_implements_alter().
- * 
+ *
  * Makes sure that os_image_gallery alters the media_gallery form after media_gallery, but before vsite
  */
 function os_image_gallery_module_implements_alter(&$implementations, $hook) {
-  if ($hook == 'form_alter' && isset($implementations['media_gallery'], $implementations['os_image_gallery'])) {    
+  if ($hook == 'form_alter' && isset($implementations['media_gallery'], $implementations['os_image_gallery'])) {
     $os_image_gallery = $implementations['os_image_gallery'];
     unset($implementations['os_image_gallery']);
     $implementations['os_image_gallery'] = $os_image_gallery;
-    
+
     if (isset($implementations['vsite'])) {
       $vsite = $implementations['vsite'];
       unset($implementations['vsite']);
@@ -50,7 +59,7 @@ function os_image_gallery_module_implements_alter(&$implementations, $hook) {
 
 /**
  * Implements hook_node_view().
- * 
+ *
  * This feature has claimed the media_gallery node type, making it so media_gallery_view
  * is no longer called on it.  Pass those along here instead.
  */
@@ -66,37 +75,37 @@ function os_image_gallery_node_view($node, $view_mode) {
  */
 function os_image_gallery_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, 'media_edit_') === 0) {
-    $form_id; //media_edit_1
+    // media_edit_1
+    $form_id;
     $form['fieldset'] = array(
       '#title' => t('Image Settings'),
       '#type' => 'fieldset',
       '#collapsed' => TRUE,
       '#collapsible' => TRUE,
     );
-    
+
     foreach (array('field_license', 'media_description', 'filename') as $elem) {
       $form['fieldset'][$elem] = $form[$elem];
       unset($form[$elem]);
       //$form[$elem]['#parents'] = array('fieldset');
     }
-    
+
     //make an image instead of a link
     $form['preview']['#theme'] = 'media_admin_thumbnail';
-    
   }
 }
 
 /**
  * Implements hook_file_delete
- * 
+ *
  * When an image is deleted, remove it from media_gallery nodes first.
  */
 function os_image_gallery_file_delete($file) {
   $query = new EntityFieldQuery();
   $result = $query->entityCondition('entity_type', 'node')
-              ->fieldCondition('media_gallery_media', 'fid', $file->fid, '=')
-              ->execute();
-  
+      ->fieldCondition('media_gallery_media', 'fid', $file->fid, '=')
+      ->execute();
+
   if (isset($result['node'])) {
     $nids = array_keys($result['node']);
     $nodes = entity_load('node', $nids);
@@ -105,3 +114,4 @@ function os_image_gallery_file_delete($file) {
     }
   }
 }
+

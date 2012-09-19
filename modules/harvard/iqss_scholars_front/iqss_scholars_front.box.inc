@@ -73,8 +73,7 @@ function iqss_scholars_front_default_box() {
   $box->description = 'Scholars Learn More Box';
   $box->options = array(
     'body' => array(
-      'value' => '<a href="/register"><img src="/profiles/openscholar/themes/custom/scholars_harvard/images/getsitenowButton.png"></a>
-      <div class="os-rightcol">
+      'value' => '<div class="os-rightcol">
 <p class="os-leadin">Scholars at Harvard is a free web site building tool available to faculty, graduate students and visiting scholars at Harvard.</p>
 <ul>
 <li><span>Create a beautiful academic web site in seconds.</span></li>

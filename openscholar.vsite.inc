@@ -13,4 +13,5 @@ dependencies[] = vsite_menu
 dependencies[] = vsite_layout
 dependencies[] = vsite_register
 dependencies[] = vsite_access
+dependencies[] = vsite_vocab
 dependencies[] = og
