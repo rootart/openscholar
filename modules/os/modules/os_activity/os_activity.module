@@ -65,7 +65,7 @@ function os_activity_message_node_create($node, $op) {
   $wrapper = entity_metadata_wrapper('message', $message);
   $wrapper->field_node_reference->set($node);
 
-  $is_private = $node_wrapper->og_group_ref->get(0)->{OG_ACCESS_FIELD}->value() ? 1 : 0;
+  $is_private = $node_wrapper->{OG_AUDIENCE_FIELD}->get(0)->{OG_ACCESS_FIELD}->value() ? 1 : 0;
   $wrapper->field_private_message->set($is_private);
   $wrapper->save();
 }
