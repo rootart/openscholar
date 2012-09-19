@@ -10,6 +10,16 @@
 function os_books_user_default_permissions() {
   $permissions = array();
 
+  // Exported permission: access printer-friendly version.
+  $permissions['access printer-friendly version'] = array(
+    'name' => 'access printer-friendly version',
+    'roles' => array(
+      0 => 'anonymous user',
+      1 => 'authenticated user',
+    ),
+    'module' => 'book',
+  );
+
   // Exported permission: add content to books.
   $permissions['add content to books'] = array(
     'name' => 'add content to books',

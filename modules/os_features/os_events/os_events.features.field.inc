@@ -205,11 +205,9 @@ function os_events_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
-          'module' => 'file_entity',
-          'settings' => array(
-            'file_view_mode' => 'default',
-          ),
-          'type' => 'file_rendered',
+          'module' => 'os_files',
+          'settings' => array(),
+          'type' => 'os_files_image_list',
           'weight' => '2',
         ),
         'teaser' => array(

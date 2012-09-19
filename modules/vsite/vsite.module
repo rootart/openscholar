@@ -250,33 +250,41 @@ function vsite_get_type_from_bundle($bundle = NULL) {
  * @see hook_vsite_og_node_type_info().
  */
 function vsite_field_attach_create_bundle($entity_type, $bundle) {
-  if ($entity_type != 'node') {
-    return;
-  }
+  switch ($entity_type) {
+    case 'file':
+      // every file is group content
+      drupal_set_message('Adding og_group_ref field to file type '.$bundle.' in create_bundle');
+      vsite_attach_fields_to_group_content('file', $bundle);
+    break;
+    case 'node':
+      if (!$type = vsite_get_type_from_bundle($bundle)) {
+        return;
+      }
 
-  if (!$type = vsite_get_type_from_bundle($bundle)) {
-    return;
-  }
-
-  if ($type == 'group') {
-    vsite_attach_fields_to_group($bundle);
-  }
-  else {
-    // Group content.
-    vsite_attach_fields_to_group_content($bundle);
+      if ($type == 'group') {
+        vsite_attach_fields_to_group($bundle);
+      }
+      else {
+        // Group content.
+        vsite_attach_fields_to_group_content('node', $bundle);
+      }
+    break;
   }
 }
 
 /**
  * Add group content fields to bundle.
  *
+ * @param $entity_type
+ *   The entity type of the bundle we want to attach the field to
+ *
  * @param $bundle
- *   The node-type to attach the fields to.
+ *   The bundle to attach the fields to.
  */
-function vsite_attach_fields_to_group_content($bundle) {
+function vsite_attach_fields_to_group_content($entity_type, $bundle) {
   $og_field = og_fields_info(OG_AUDIENCE_FIELD);
   $og_field['instance']['default_value_function'] = 'vsite_group_audience_field_default_value';
-  og_create_field(OG_AUDIENCE_FIELD, 'node', $bundle, $og_field);
+  og_create_field(OG_AUDIENCE_FIELD, $entity_type, $bundle, $og_field);
 }
 
 /**
@@ -323,7 +331,6 @@ function vsite_attach_fields_to_group($bundle) {
   if (!field_info_instance('node', 'field_site_address', $bundle)) {
     $instance = array(
       'bundle' => $bundle,
-      'default_value' => 'Your Town<br>Your City, State, ZIP',
       'deleted' => '0',
       'description' => '',
       'display' => array(
@@ -396,7 +403,6 @@ function vsite_attach_fields_to_group($bundle) {
   if (!field_info_instance('node', 'field_site_description', $bundle)) {
     $instance = array(
       'bundle' => $bundle,
-      'default_value' => 'Your website',
       'deleted' => '0',
       'description' => '',
       'display' => array(
@@ -689,15 +695,16 @@ function vsite_menu_alter(&$items) {
 }
 
 /**
- * Function to return all sites a user belongs to.
+ * Function to return all sites a user owns.
  */
 function vsite_load_user_sites($user_id) {
   $sites = array();
   $sites_array = array();
   // Grab their sites.
-  $vsites = vsite_get_vsite_by_owner($user_id);
+
+  $vsites_owner = vsite_get_vsite_by_owner($user_id);
   // Create each site as a link.
-  foreach($vsites as $site) {
+  foreach($vsites_owner as $site) {
     $sites = array('#title'=>$site->group->title, '#type'=>'link','#href'=>$site->get_absolute_url());
     // Prepare them for theme_list_item.
     $sites_array[] = array('data'=>drupal_render($sites));
@@ -707,50 +714,87 @@ function vsite_load_user_sites($user_id) {
 }
 
 /**
+ * Function to return all sites the user is a member of of.
+ */
+function vsite_load_user_membership($user_id) {
+  $member_sites = array();
+  $member_array = array();
+
+  $vsites_member = vsite_get_user_vsites($user_id);
+  // This function is returning 'all' sites, both member and admin sites.
+  // Loop through and create links for the sites, but also check if they're the owner
+  // or not, ignore them if they are.
+  foreach($vsites_member as $m_site) {
+  	// Check against the uid of the site
+  	if($user_id != $m_site->group->uid) {
+      $member_sites = array('#title'=>$m_site->group->title, '#type'=>'link','#href'=>$m_site->get_absolute_url());
+      // Prepare them for theme_list_item.
+      $member_array[] = array('data'=>drupal_render($member_sites));
+    }
+  }
+
+  return $member_array;
+}
+
+/**
  * Implements hook_user_view_alter().
  * Altering the user view to remove history, groups and other groups
  * also altering to add in "My Websites" for all sites the user belongs to.
  */
 function vsite_user_view_alter(&$build) {
   global $user;
-
   // Removal section.
-    // Remove the "history" and "member for" info if it's there.
-    if(isset($build['summary'])) {
-      unset($build['summary']);
-    }
-    // Remove the og_user_group_ref.
-    if(isset($build['og_user_group_ref'])) {
-      $build['og_user_group_ref']['#access'] = FALSE;
-    }
-    // Remove the og_other_user_group_ref.
-    if(isset($build['og_other_user_group_ref'])) {
-      $build['og_other_user_group_ref']['#access'] = FALSE;
-    }
+  // Remove the "history" and "member for" info if it's there.
+  if(isset($build['summary'])) {
+    unset($build['summary']);
+  }
+  // Remove the og_user_group_ref.
+  if(isset($build['og_user_group_ref'])) {
+    $build['og_user_group_ref']['#access'] = FALSE;
+  }
+  // Remove the og_other_user_group_ref.
+  if(isset($build['og_other_user_group_ref'])) {
+    $build['og_other_user_group_ref']['#access'] = FALSE;
+  }
+  // Remove the og_user_node.
+  if(isset($build['og_user_node'])) {
+    $build['og_user_node']['#access'] = FALSE;
+  }
 
-    // Make sure they're logged in.
-    if($user->uid) {
-    // Additions section.
-      // Load their link created vsites.
-      $vsites = vsite_load_user_sites($build['#account']->uid);
+  // Additions section.
+  // Load data of their sites.
+  $owner_sites = vsite_load_user_sites($build['#account']->uid);
+  $member_sites = vsite_load_user_membership($build['#account']->uid);
 
+  $vsites_list = '';
+  // Websites item build.
+  if(!empty($owner_sites) || !empty($member_sites)) {
+    // Pass the items to theme_item_list.
+    if(!empty($owner_sites)) {
       // In d6 a plural or singular was used in order to apply the correct CSS selector to the list
       // retain that functionality.
-      if(count($vsites)>1) {
-        $cssSelector = array('class'=>'plural');
+      if(count($owner_sites)>1) {
+        $css_selector = array('class'=>'plural');
       }else{
-        $cssSelector = array('class'=>'single');
+        $css_selector = array('class'=>'single');
+      }
+      $vsites_list .= theme_item_list(array('items'=>$owner_sites, 'title'=>'My Websites','type'=>'ul','attributes'=>$css_selector));
+    }
+    if(!empty($member_sites)) {
+      if(count($member_sites)>1) {
+        $css_selector = array('class'=>'plural');
+      }else{
+        $css_selector = array('class'=>'single');
       }// end if
-
-      // Pass the items to theme_item_list.
-      $vsitesList = theme_item_list(array('items'=>$vsites, 'title'=>'','type'=>'ul','attributes'=>$cssSelector));
-
-      // Set a new field.
-      $build['web_sites'] = array(
-        '#title' => 'My Websites',
-        '#type' => 'user_profile_item',
-        '#markup' => $vsitesList,
-          );
+      $vsites_list .= theme_item_list(array('items'=>$member_sites, 'title'=>'Websites I am a member of:','type'=>'ul','attributes'=>$css_selector));
+    }
+    // Set a new field.
+    $build['web_sites'] = array(
+      '#title' => 'Website Membership Summary:',
+      '#type' => 'user_profile_item',
+      '#markup' => $vsites_list,
+      '#weight' => '10',
+    );
   }
 }
 
@@ -761,6 +805,7 @@ function vsite_user_view_alter(&$build) {
  */
 function vsite_mail_alter(&$message) {
   global $base_url;
+
   switch($message['id']) {
     // Account created during "Create this OS Site on behalf of another user".
     case 'user_register_no_approval_required':
@@ -786,7 +831,7 @@ function vsite_mail_alter(&$message) {
         );
 
         // Alter the body message.
-        $message['body'][0] = t("Dear !firstname,\n\nA site owner at the !site website has created an account for you. You may now log in by either clicking through on the following link or pasting it into your browser:\n\n !login_url\n\n(Note: This login can be used only once.)\n\nYour username is: !username \n\nAfter setting your password with the included link, you will be able to log in at !futurelogin in the future.\n\nSincerely,\nThe !site Team", $a_msg_variables);
+        $message['body'][0] = t("Dear !firstname,\n\nYour account at the !site website has been created for you. You may now log in by either clicking through on the following link or pasting it into your browser:\n\n !login_url\n\n(Note: This login can be used only once.)\n\nYour username is: !username \n\nAfter setting your password with the included link, you will be able to log in at !futurelogin in the future.\n\nSincerely,\nThe !site Team", $a_msg_variables);
       break;
     // Account created by admin in the admin/people panel.
     case 'user_register_admin_created':
@@ -814,4 +859,12 @@ function vsite_mail_alter(&$message) {
         $message['body'][0] = t("Dear !firstname,\n\nA site owner at the !site website has created an account for you. You may now log in by either clicking through on the following link or pasting it into your browser:\n\n !login_url\n\n(Note: This login can be used only once.)\n\nYour username is: !username \n\nAfter setting your password with the included link, you will be able to log in at !futurelogin in the future.\n\nSincerely,\nThe !site Team", $a_msg_variables);
       break;
   }
+}
+
+/**
+ * Implements hook_node_presave().
+ */
+function vsite_node_presave($node) {
+  include_once(drupal_get_path('module', 'vsite') . '/includes/path.inc');
+  _vsite_alter_node_path_settings($node);
 }

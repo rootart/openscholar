@@ -1,13 +1,9 @@
 @import "nortony.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
+
+@import url(http://fonts.googleapis.com/css?family=Headland+One);
 
 
-
-@font-face {
-	font-family: 'GoudyTrajanRegular';
-	src: url('fonts/GoudyTrajan-Regular.eot');
-	src: local('fonts/Goudy Trajan Regular'), local('fonts/GoudyTrajan-Regular'), url('fonts/GoudyTrajan-Regular.woff') format('woff'), url('fonts/GoudyTrajan-Regular.otf') format('opentype'), url('fonts/GoudyTrajan-Regular.svg#GoudyTrajan-Regular') format('svg');
-  }
 
 body,
 #header-container, 
@@ -167,8 +163,13 @@ body.header-main-right .region-header-second {
     line-height: 28px;
     font-weight:normal;
     color:#fff;
-    font-family:'GoudyTrajanRegular', serif;
+    font-family:'Headland One', serif;
     margin: 0;
+    }
+    
+    #header-container h1 {
+
+    text-transform:uppercase;
     }
 
 #header-container h2 {
@@ -269,7 +270,7 @@ body.header-main-right .region-header-second {
 #menu-bar ul.nice-menu ul li a {
 	color:#FFF;
 	background:#353535;
-	padding:5px 8px;
+	padding:5px 15px;
 }
 
 
@@ -327,9 +328,6 @@ ul.nice-menu-right a, ul.nice-menu-right ul a {
 }	
 
 
-#scholar-shield {
-  margin-right:0;
-  }
 
 /* MAIN CONTENT AREA */
 

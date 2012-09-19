@@ -39,9 +39,16 @@ function rbuild_form_software_project_node_form_alter(&$form, &$form_state, $for
   // Checks that the provided Repository URL and Short Name are valid
   $form['#validate'][] = '_rbuild_project_node_validate';
 
-  // Hides the Documentation text field unless user 1.
+  // Prevents users from changing packaging method info after creating node.
   global $user;
-  $form['field_rbuild_docs']['#access'] = ((int)$user->uid === 1);
+  $is_user_1 = ((int)$user->uid === 1);
+  $is_new = (!isset($form['#node']->nid));
+  if ($is_new || $is_user_1) {
+    return;
+  }
+  $form['field_software_method']['#disabled'] = TRUE;
+  $form['field_software_repo']['#disabled'] = TRUE;
+  $form['field_rbuild_short_name']['#disabled'] = TRUE;
 }
 
 /**
@@ -54,7 +61,7 @@ function rbuild_menu() {
     'title' => 'Documentation',
     'page callback' => '_rbuild_docs_page_contents',
     'page arguments' => array(1),
-    'access callback' => '_rbuild_docs_exist',
+    'access callback' => '_rbuild_docs_page_access',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
@@ -69,7 +76,7 @@ function rbuild_menu() {
 function rbuild_theme() {
   return array(
     'rbuild_docs_iframe' => array(
-      'variables' => array('path' => NULL),
+      'variables' => array('docs_url' => NULL),
       'template' => 'rbuild-docs-iframe',
     ),
   );
@@ -137,7 +144,6 @@ function rbuild_node_update($node) {
     return;
   }
 
-  _os_software_delete_child_releases($node);
   _rbuild_init_releases($node);
 }
 
@@ -606,6 +612,37 @@ function _rbuild_docs_page_access($node) {
 }
 
 /**
+ * Returns whether rBuild docs exist for project node.
+ *
+ * @param object $node
+ *   The Software Project node accessed at /node/%/rbuild_documentation/[...]
+ *
+ * @return string $docs_url
+ *   The full URL of the remote documentation
+ *
+ * @see rbuild_menu()
+ */
+function _rbuild_docs_url($node) {
+
+  $version = _rbuild_get_recommended_release_version($node->nid);
+
+  $field_name = 'field_rbuild_short_name';
+  $items      = field_get_items('node', $node, $field_name);
+  $short_name = $items[0]['value'];
+
+  // Prepares external path and version information to request remote page.
+  $drupal_path = arg();
+  $path = '';
+  if (in_array('rbuild_documentation', $drupal_path)) {
+    // Removes the first parts of the path, leaves just the docs path.
+    while ((array_shift($drupal_path)) != 'rbuild_documentation');
+    $path = implode("/", $drupal_path);
+  }
+  $docs_url = _rbuild_format_docs_url($short_name, $version, $path);
+  return $docs_url;
+}
+
+/**
  * Finds the recommended release version value of a Software Project node.
  *
  * @param int $nid
@@ -619,17 +656,14 @@ function _rbuild_docs_page_access($node) {
 function _rbuild_get_recommended_release_version($nid, $type = 'software_release') {
   $version = '';
 
-  $query = new EntityFieldQuery();
+  // Includes class OSNodeFieldQuery (extends EntityFieldQuery)
+  include_once drupal_get_path('module', 'os') . '/includes/node.inc';
+
+  $query = new OSNodeFieldQuery('software_release');
   $query
-    ->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', $type)
-    ->propertyCondition('status', 1)
     ->propertyOrderBy('nid')
     ->fieldCondition('field_software_project', 'target_id', $nid)
     ->fieldCondition('field_software_recommended', 'value', '1');
-  if (module_exists('vsite') && $space = spaces_get_space()) {
-    $query->fieldCondition(OG_AUDIENCE_FIELD, 'target_id', $space->id);
-  }
   $result = $query->execute();
 
   // Returns '' (empty string) if no results.
@@ -656,15 +690,8 @@ function _rbuild_get_recommended_release_version($nid, $type = 'software_release
  * @see _rbuild_docs_page_access()
  */
 function _rbuild_docs_page_contents($node) {
-  $drupal_path = arg();
-  // Removes the first parts of the path, leaves just the docs path.
-  while ((array_shift($drupal_path)) != 'rbuild_documentation');
-  $path = implode("/", $drupal_path);
+  $docs_url = _rbuild_docs_url($node);
 
-  if (!$path && substr($_SERVER['REQUEST_URI'], -1) != "/") {
-    drupal_goto($_GET['q'] . "/");
-  }
-
-  return theme('rbuild_docs_iframe', $path);
+  return theme('rbuild_docs_iframe', array('docs_url' => $docs_url));
 }
 

@@ -119,9 +119,9 @@ function os_pages_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
-          'module' => 'file',
+          'module' => 'os_files',
           'settings' => array(),
-          'type' => 'file_default',
+          'type' => 'os_files_image_list',
           'weight' => '3',
         ),
         'teaser' => array(

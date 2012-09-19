@@ -104,11 +104,12 @@ color: #6D1102;
 	padding-bottom: 0;
 }
 
+
+
 .front #menu-bar .os-menu {background: #6E1205; height: 60px;
     padding-top: 35px;
-    width: 1002px;}
+    padding-left:170px;}
 
-.front #menu-bar ul.os-menu  {text-align:center;}
 
 .front #page {width:1020px;margin: 30px auto;}
 

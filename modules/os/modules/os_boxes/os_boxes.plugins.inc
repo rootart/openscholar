@@ -49,7 +49,7 @@ function _os_boxes_boxes_plugins() {
     ),
   );
 
- /* $info['os_boxes_media'] = array(
+  $info['os_boxes_media'] = array(
     'title' => 'Embed Media',
     'description' => 'Embed a video, audio or other internet resource',
     'tags' => array('Media'),
@@ -59,7 +59,7 @@ function _os_boxes_boxes_plugins() {
       'path' => $path.'/os_boxes_media',
       'parent' => 'os_boxes_default',
     ),
-  );*/
+  );
 
   $info['os_boxes_slideshow'] = array(
     'title' => 'Slideshow',

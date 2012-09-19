@@ -221,10 +221,6 @@ abstract class AbstractNodeOSMigration extends OSMigration {
     $results = $query->execute()->fetchAssoc();
     $current_row->path = $results['dst'];
 
-    //get file uploads
-    //$current_row->file_upload = parent::os_migrate_get_file_uploads($current_row->vid);
-    // file upload fields aren't in current page type.
-
     //lanuage should be explicitly undefined instead of blank
     if (!strlen($current_row->language)) {
       $current_row->language = 'und';
@@ -257,19 +253,21 @@ abstract class AbstractNodeOSMigration extends OSMigration {
   function _prepare_file_field(&$row) {
     if ($this->_has_file_field()) {
       $files_query = parent::os_migrate_node_get_files_query($row->vid);
-      $fields = array('description', 'list', 'filepath');
+      $fields = array('description' => 'description', 'list' => 'display', 'filepath' => 'field_upload');
       parent::os_migrate_prepare_files($files_query->execute(), $row, 'field_upload', $fields);
     }
   }
 
   function _map_file_field() {
     if ($this->_has_file_field()) {
-      $this->addSimpleMappings(array('field_upload') + parent::subfields('field_upload', array('language', 'description', 'display',)));
+      $this->addFieldMapping('field_upload', 'field_upload')
+      ->defaultValue(NULL);
+      $this->addSimpleMappings(parent::subfields('field_upload', array('language', 'description', 'display',)));
       $this->addFieldMapping('field_upload:destination_file', 'filepath');
       $this->addFieldMapping('field_upload:source_dir')
         ->defaultValue(variable_get('os_migrate_files', FALSE));
       //good defaults
-      $this->addUnmigratedDestinations(parent::subfields('field_upload', array('file_class', 'language', 'destination_dir', 'file_replace', 'preserve_files',)));
+      $this->addUnmigratedDestinations(parent::subfields('field_upload', array('file_class', 'destination_dir', 'file_replace', 'preserve_files',)));
     }
   }
 
@@ -279,6 +277,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
         'field_upload' => t('Uploaded file'),
         'field_upload:description' => t('Uploaded file\'s desctription'),
         'field_upload:display' => t('Include uploaded file in listing'),
+        'field_upload:language' => t('Uploaded file\'s langauge'),
         'filepath' => t('Full path to file'),
       );
     } else {

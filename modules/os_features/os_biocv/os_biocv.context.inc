@@ -27,7 +27,7 @@ function os_biocv_context_default_contexts() {
         'cv' => 'cv',
       ),
       'options' => array(
-        'node_form' => '1',
+        'node_form' => '0',
       ),
     ),
     'path' => array(
@@ -46,12 +46,6 @@ function os_biocv_context_default_contexts() {
           'module' => 'boxes',
           'delta' => 'os_taxonomy_fltr_cat',
           'region' => 'sidebar_second',
-          'weight' => '-10',
-        ),
-        'boxes-os_biocv_bio' => array(
-          'module' => 'os_biocv',
-          'delta' => 'bio',
-          'region' => 'content_top',
           'weight' => '-10',
         ),
       ),

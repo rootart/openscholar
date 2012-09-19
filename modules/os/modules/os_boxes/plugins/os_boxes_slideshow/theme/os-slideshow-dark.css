@@ -1,3 +1,14 @@
 .gallery-slideshow {
 	/* border: 1px black solid; stupid style for making sure css files are included */
 }
+
+.view-os-image-gallery-slideshow .views-field-filename {width:100%;padding:3px 0 2px 5px;background:#444;color:#FFF;}
+.view-os-image-gallery-slideshow .views-field-filename a {color:#FFF;}
+
+.view-os-image-gallery-slideshow .views-slideshow-controls-bottom {width:100%;padding:3px 0 2px 5px;background:#444;color:#FFF;}
+.view-os-image-gallery-slideshow .views-slideshow-controls-bottom a {color:#FFF;}
+
+
+.views-slideshow-slide-counter {float:right;display:inline;clear:none;}
+.views-slideshow-controls-text {float:left;display:inline;clear:none;}
+

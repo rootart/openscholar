@@ -86,13 +86,6 @@ function iqss_projects_front_default_box() {
     ),
     'additional_classes' => '',
   );
-  // Add in the jcarousel call.
-  // Make sure we're on the front page only and the jcarousel module exists.
-  if(module_exists('jcarousel')) {
-    if(drupal_is_front_page() == TRUE) {
-      jcarousel_add('os-jcarousel-skin-os_front ul',array('skin'=>'os_front'),TRUE);
-    }
-  }
   $export['iqss_projects_fp_features'] = $box;
 
   $box = new stdClass();
@@ -104,9 +97,7 @@ function iqss_projects_front_default_box() {
   $box->description = 'Projects Info text';
   $box->options = array(
     'body' => array(
-      'value' => '<div class="os-fp-imageholder"><img src="/profiles/openscholar/themes/custom/projects_harvard/images/top_image.png"></div>
-<div class="os-more-info"><strong>Projects at Harvard</strong> is a free web site building tool available to groups at Harvard wishing to create a site for their project. It is one of two main Harvard installations of <strong>OpenScholar</strong> and a creation of Harvard’s <em>Institute for Quantitative Social Science.</em><br><br><strong>Projects at Harvard</strong> (and the personal site-oriented <strong>Scholars at Harvard</strong>) provide simple web site creation and management with a suite of features tailored to the particular needs of academics.
-<div class="os-big-button"><a href="/site/register">Get your web site!</a></div></div>',
+      'value' => iqss_projects_front_infoblock_content(),
       'format' => 'filtered_html',
     ),
     'additional_classes' => '',
@@ -146,6 +137,38 @@ function iqss_projects_front_default_box() {
   $export['iqss_projects_fp_navblock'] = $box;
 
   return $export;
+}
+
+/**
+ * Function to return the contents for iqss_projects_fp_infoblock
+ */
+function iqss_projects_front_infoblock_content() {
+  global $user;
+  $vsites = vsite_get_vsite_by_owner($user->uid);
+  if (!vsite_vsite_exists_access($vsites)) {
+    if($vsites){
+	    $items[] = array(
+		  '#title' => ((count($vsites) > 1) ? 'Go to your sites' : "Go to your site"),
+		  '#href' => ((count($vsites) > 1) ? 'user' : $vsites[0]->get_absolute_url()),
+	      '#type' => 'link',
+		);
+    } //No sites or ablility to create one
+  }else{
+  	//Create a site
+  	$items[] = array(
+	  '#title' => ((count($vsites) > 1)?"Create a web site.":'Get your web site!'),
+	  '#href' => 'site/register',
+  	  '#type' => 'link',
+	);
+  }
+  // Create the link.
+  $block_button = drupal_render($items);
+  // Setup the content.
+  $block_content = '<div class="os-fp-imageholder"><img src="/profiles/openscholar/themes/custom/projects_harvard/images/top_image.png"></div>
+<div class="os-more-info"><strong>Projects at Harvard</strong> is a free web site building tool available to groups at Harvard wishing to create a site for their project. It is one of two main Harvard installations of <strong>OpenScholar</strong> and a creation of Harvard’s <em>Institute for Quantitative Social Science.</em><br><br><strong>Projects at Harvard</strong> (and the personal site-oriented <strong>Scholars at Harvard</strong>) provide simple web site creation and management with a suite of features tailored to the particular needs of academics.
+<div class="os-big-button">'.$block_button.'</div></div>';
+
+  return $block_content;
 }
 
 /**
@@ -201,18 +224,3 @@ function iqss_projects_front_navblock_content() {
 
   return $vsitesList = theme_item_list(array('items'=>$link_array, 'title'=>'','type'=>'ul','attributes'=>array('id'=>'top-front')));
 }
-
-/**
- * Implements hook_jcarousel_skin_info().
- * Allows us to use our own custom CSS file for the carousel skin.
- */
-function iqss_projects_front_jcarousel_skin_info() {
-  $skins = array();
-  $skins['os_front'] = array(
-    'title' => t('OpenScholar Projects Front Page'),
-    'file' => 'carousel.css',
-  );
-
-  return $skins;
-}
-

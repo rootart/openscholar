@@ -1,5 +1,5 @@
 @import "spinker.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../../os_basetheme/css/d6buffer.css";
 
 @font-face {
 	font-family: 'GoudyTrajanRegular';
@@ -43,6 +43,7 @@ h1#page-title {
   margin-bottom: 1em;
 	font-weight: bold;
   color: #F26C4F;	
+  font-size: 1.2em;
   }
 
 .links li {
@@ -57,7 +58,7 @@ h1#page-title {
 .region-sidebar-first h2.block-title,
 .region-sidebar-first #block-os-primary-menu li a {
   color: #087af8;
-  font: 13px/normal "Lucida Grande","Lucida Sans Unicode",Arial,Verdana,sans-serif;
+  font: .9em/normal "Lucida Grande","Lucida Sans Unicode",Arial,Verdana,sans-serif;
   font-weight: normal;
   text-transform:uppercase;
   letter-spacing: .5px;
@@ -167,7 +168,6 @@ p.copy a.poweredby {
   }
 
 #header-container {
-  padding-left: 149px;
   padding-bottom:5px;
   }
 
@@ -196,12 +196,13 @@ body.header-main-right .region-header-second {
     
 #header-container h1 {
 	text-transform: uppercase;
-  font-size: 25px;
+  font-size: 2em;
   margin-bottom: 5px;
+  font-style:normal;
 }
 
 #header-container h2 {
-  font-size: 13px;
+  font-size: 1em;
   line-height: 18px;
   font-style:normal;
   }
@@ -226,6 +227,10 @@ body.header-main-right .region-header-second {
   background: #F26C4F;
   padding: 0;
   }
+
+.sidebar ul.menu {
+text-align: right;
+}
 
 #menu-bar li {
     display: inline-block;

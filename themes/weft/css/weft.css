@@ -1,5 +1,5 @@
 @import "weft.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 
 html,body, #page {
@@ -32,7 +32,6 @@ body {
 
 #header-container,  #block-os-primary-menu, #columns, #footer {
     padding: 0 0 0 30px;
-    width: 943px;
     margin: 0 auto;
     }
 
@@ -145,6 +144,7 @@ p.copy a.poweredby {
 
 #header-container h2 {
   font-size: 14px;
+  margin-top:0;
   }
 
 #menu-bar {
@@ -203,6 +203,8 @@ ul.nice-menu li a {
     color:#FFF;
 }
 
-
+.sidebar ul.nice-menu li a {
+    color:#333;
+}
 
 

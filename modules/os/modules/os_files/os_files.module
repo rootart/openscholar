@@ -132,8 +132,7 @@ function os_files_views_default_views_alter(&$views) {
     $view = $views['media_default'];
 
     //Link in Files related via file_usage
-    $view->add_item('default', 'relationship', 'file_usage', 'file_to_node');
-    $view->add_item('default', 'filter', 'spaces', 'current', array('relationship' => 'file_to_node'));
+    $view->add_item('default', 'filter', 'spaces', 'current');
   }
 }
 
@@ -149,4 +148,122 @@ function os_files_module_installed($modules) {
 
 function _os_files_clean_up_fields() {
   field_delete_field('field_license');
+}
+
+/**
+ * Implements hook_field_formatter_info.
+ *
+ * Formatter that splits images into its own list
+ * Used in conjunction with jCarousel
+ */
+function os_files_field_formatter_info() {
+  $formatters = array();
+
+  $formatters['os_files_image_list'] = array(
+    'label' => t('Images as Separate List'),
+    'field types' => array('file'),
+    'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+  );
+
+  return $formatters;
+}
+
+/**
+ * Implements hook_field_formatter_view.
+ *
+ * This formatter renders a list of files as two elements:
+ * 1. A list of images
+ * 2. A table of everything else
+ */
+function os_files_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $elements = array(
+    '#type' => 'markup',
+    '#theme' => '',
+    '#attributes' => array(
+      'class' => array('field-items'),
+    ),
+  );
+  switch ($display['type']) {
+    case 'os_files_image_list':
+      $images = array();
+      $other = array();
+      foreach ($items as $i) {
+        if ($i['type'] == 'image') {
+          $title = field_get_items('file', (object)$i, 'media_title');
+          $title = isset($title[0])?$title[0]['value']:'';
+          $alt = field_get_items('file', (object)$i, 'media_description');
+          $alt = isset($alt[0])?$alt[0]['value']:'';
+          $image_info = image_get_info($i['uri']);
+          $images[] = array(
+            'href' => file_create_url($i['uri']),
+            'title' => theme('image_style', array('path' => $i['uri'], 'style_name' => 'thumbnail', 'title' => $title, 'alt' => $alt, 'width' => $image_info['width'], 'height' => $image_info['height'])),
+            'html' => TRUE
+          );
+        }
+        else {
+          $extension = strtolower(substr(strrchr($i['filename'], '.'), 1));
+          $href = file_create_url($i['uri']);
+          $text = $i['description'] ? $i['description'] : $i['filename'];
+          $other[] = array(
+            array(
+              'data' => theme('file_icon', array('file' => (object)$i)),
+              'class' => array('mime', 'mime-'.$extension)
+            ),
+            array(
+              'data' => l($text, $href),
+              'class' => array('file'),
+            ),
+            array(
+              'data' => format_size($i['filesize']),
+              'class' => array('size'),
+            ),
+          );
+        }
+      }
+
+      $elements['images'] = array(
+        '#theme' => 'links',
+        '#links' => $images,
+        '#attributes' => array(
+          'class' => array(
+            'os-files-image-list',
+            'jcarousel-skin-default'
+          ),
+        ),
+      );
+      if (module_exists('jcarousel')) {
+        $elements['images']['#pre_render'][] = 'os_files_jcarousel_add';
+      }
+      $elements['other'] = array(
+        '#theme' => 'table',
+        '#rows' => $other,
+        '#header' => array(),
+        '#attributes' => array(
+          'class' => array(
+            'os-files-other-list',
+          ),
+        ),
+      );
+    break;
+  }
+
+  return $elements;
+}
+
+function os_files_jcarousel_add($elements) {
+  jcarousel_add('os-files-image-list');
+  return $elements;
+}
+
+/**
+ * Implements hook_views_data_alter.
+ *
+ * Adds file_managed as a table the pseudo-table spaces can be joined to.
+ * This enables files to use the spaces_current_space filter
+ */
+function os_files_views_data_alter(&$data) {
+  $data['spaces']['table']['join']['file_managed'] = array(
+    'left_field' => 'fid',
+    'field' => 'id',
+  );
 }

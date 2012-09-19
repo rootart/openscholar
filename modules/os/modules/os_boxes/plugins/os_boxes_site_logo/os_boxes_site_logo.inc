@@ -32,7 +32,8 @@ class os_boxes_site_logo extends os_boxes_default {
       $height = $this->options['height'];
       $width = $this->options['width'];
       if (module_exists('vsite') && $vsite = spaces_get_space()) {
-        $file = $vsite->group->field_site_logo[LANGUAGE_NONE][0];
+        $file = field_get_items('node', $vsite->group, 'field_site_logo');
+        $file = $file[0];
         $fid = $file['fid'];
         $x = $file['cropbox_x'];
         $y = $file['cropbox_y'];
@@ -109,7 +110,8 @@ class os_boxes_site_logo extends os_boxes_default {
           $block['content'] = l(render($output), '<front>', array('html' => true));
         }
         else {
-          return $block;
+          $output = theme('image', array('path' => drupal_get_path('module', 'os_boxes').'/plugins/os_boxes_site_logo/default_logo.jpg'));
+          $block['content'] = l($output, '<front>', array('html' => true));
         }
       }
       catch (Exception $e) {

@@ -435,7 +435,7 @@ function os_layout_block_delete($bid, $contexts = FALSE) {
  * @todo Add weight to context table.
  */
 function _os_context_get_rank($context) {
-  $context_rank = drupal_static(__FUNCTION__, array());
+  $context_rank = &drupal_static(__FUNCTION__, array());
 
   if (!isset($context_rank[$context])) {
     $o_context = context_load($context);
@@ -448,7 +448,7 @@ function _os_context_get_rank($context) {
         'os_public',
         'os_cp',
       );
-      if (in_array($context, array($array))) {
+      if (in_array($context, $array)) {
         $context_rank[$context] = 1;
         return $context_rank[$context];
       }
@@ -464,7 +464,6 @@ function _os_context_get_rank($context) {
       }
     }
   }
-
   return $context_rank[$context];
 }
 

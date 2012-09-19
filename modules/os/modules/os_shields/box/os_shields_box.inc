@@ -75,11 +75,19 @@ class os_shields_box extends os_boxes_default {
   public function render() {
     //@todo
     $block = parent::render();
+    $block['subject'] = $block['title'] = '';
 
     $filename = isset($this->options['shield'])?$this->options['shield']:variable_get('os_shields_shield', '');
     if ($filename && file_exists('public://os_shields/'.$filename)) {
-      $block['subject'] = $block['title'] = '';
       $block['content'] = '<div id="scholar-shield"><img src="'.file_create_url('public://os_shields/'.$filename).'" /> </div>';
+    }
+    else {
+      if (spaces_access_admin()) {
+        $block['content'] = t('No shields have been added to your install. Contact your site administrator or remove this widget to hide this message.');
+      }
+      else {
+        $block ['content'] = ' ';
+      }
     }
     return $block;
   }

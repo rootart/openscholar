@@ -248,10 +248,10 @@ function theme_os_publications_download_links($variables) {
 
     if ($fields[$field]['#access'] && $fields[$field]['#field_type'] == 'file' && $field != 'field_biblio_image') {
       foreach ($fields[$field]['#items'] as $delta => $item) {
-        if (module_exists('filefield_paths')) {
+        /*if (module_exists('filefield_paths')) {
           $alias = drupal_get_path_alias('filefield_paths/alias/' . $item['fid']);
-          $item->uri = $alias;
-        }
+          $item['uri'] = $alias;
+        }*/
         $file_links[] = array(
           theme('file_link', array('file' => (object) $item)),
         );

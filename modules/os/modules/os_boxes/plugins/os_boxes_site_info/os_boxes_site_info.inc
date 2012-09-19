@@ -20,10 +20,17 @@ class os_boxes_site_info extends os_boxes_default {
 
     if (module_exists('vsite') && $vsite = spaces_get_space()) {
       $group = $vsite->group;
-      $addr = explode('<br>', $group->field_site_address[LANGUAGE_NONE][0]['value']);
+      $addr = field_get_items('node', $group, 'field_site_address');
+      if (isset($addr[0])) {
+        $addr = explode('<br>', $addr[0]['value']);
+      }
+      else {
+        $addr = array('', '');
+      }
+      $descrip = field_get_items('node', $group, 'field_site_description');
       $this->options = array_merge($this->options, array(
         'site_title' => $group->title,
-        'descrip' => $group->field_site_description[LANGUAGE_NONE][0]['value'],
+        'descrip' => isset($descrip[0])?$descrip[0]['value']:'',
         'address1' => $addr[0],
         'address2' => $addr[1],
       ));

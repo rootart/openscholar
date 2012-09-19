@@ -8,8 +8,9 @@ class AnnouncementNodeOSMigration extends AbstractNodeOSMigration {
 
 
     //field_photo
+    $this->addFieldMapping('field_photo', 'field_photo');
     $this->addSimpleMappings(parent::subfields('field_photo', array('language', 'alt', 'title', 'destination_file')));
-    $this->addSimpleMappings(array('field_photo'));
+      //->defaultValue(FALSE);
     $this->addFieldMapping('field_photo:source_dir', 'field_photo:source_dir')
       ->defaultValue(variable_get('os_migrate_files', FALSE));
     $this->addUnmigratedDestinations(array('field_photo:file_class', 'field_photo:destination_dir', 'field_photo:file_replace',
@@ -22,6 +23,8 @@ class AnnouncementNodeOSMigration extends AbstractNodeOSMigration {
 //       ->defaultValue(variable_get('os_migrate_files', FALSE));
 //     //good defaults
 //     $this->addUnmigratedDestinations(parent::subfields('field_upload', array('file_class', 'language', 'destination_dir', 'file_replace', 'preserve_files',)));
+
+    $this->addUnmigratedSources(parent::subfields('field_announcement_photo', array('fid', 'list', 'data'), '_'), t('DNM'));
   }
 
   public function query($content_type) {
@@ -35,7 +38,7 @@ class AnnouncementNodeOSMigration extends AbstractNodeOSMigration {
     return $query;
   }
 
-  public function prepareRow($row) {
+  public function prepareRow(&$row) {
     if ($row->field_announcement_photo_data && $data = unserialize($row->field_announcement_photo_data)) {
       $row->{'field_photo:alt'} = isset($data['alt']) ? $data['alt'] : '';
       $row->{'field_photo:title'} = isset($data['title']) ? $data['title'] : '';
@@ -52,11 +55,8 @@ class AnnouncementNodeOSMigration extends AbstractNodeOSMigration {
 
     $photo = $result->fetchAssoc();
     if (is_array($photo) && count($photo)) {
-      $row->field_photo = $photo['filename'];
-      $row->{'field_photo:destination_file'} = $photo['filename'];
-      $row->{'field_photo:source_dir'} = $photo['filepath'];
-    } else {
-      $row->field_photo = $row->{'field_photo:source_dir'} = NULL;
+      $row->field_photo = $photo['filepath'];
+      $row->{'field_photo:destination_file'} = $photo['filepath'];
     }
 
 //     //file attachments

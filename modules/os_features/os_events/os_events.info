@@ -19,6 +19,7 @@ dependencies[] = features
 dependencies[] = filefield_paths
 dependencies[] = media
 dependencies[] = os
+dependencies[] = os_files
 dependencies[] = strongarm
 dependencies[] = views
 features[context][] = events_events

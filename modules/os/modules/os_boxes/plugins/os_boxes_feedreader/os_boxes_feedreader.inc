@@ -83,6 +83,7 @@ class os_boxes_feedreader extends os_boxes_default {
    * Implementation of boxes_content::render().
    */
   public function render(){
+    $block = parent::render();
     if (! $this->options['feed'] || ! ($node = node_load($this->options['feed']))) {
       return "";
     }
@@ -104,9 +105,9 @@ class os_boxes_feedreader extends os_boxes_default {
     $field = field_info_field_by_id($instance['field_id']);
     $result = google_feedapi_field_formatter_view('node', $node, $field, $instance, 'und', $node->field_url['und'], $display);
 
-    return array(
-      'content' => render($result)
-    );
+    $block['content'] = render($result);
+
+    return $block;
   }
 
   /**
