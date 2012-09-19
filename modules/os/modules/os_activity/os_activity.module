@@ -5,6 +5,7 @@
  * OS Activity module file.
  */
 include_once 'os_activity.features.inc';
+
 /**
  * Implements hook_node_insert().
  */
@@ -12,7 +13,7 @@ function os_activity_node_insert($node) {
   if (!og_is_group_content_type('node', $node->type)) {
     return;
   }
-  _os_activity_message_node_create($node, 'insert');
+  os_activity_message_node_create($node, 'insert');
 }
 
 /**
@@ -22,7 +23,7 @@ function os_activity_node_update($node) {
   if (!og_is_group_content_type('node', $node->type)) {
     return;
   }
-  _os_activity_message_node_create($node, 'update');
+  os_activity_message_node_create($node, 'update');
 }
 
 /**
@@ -49,7 +50,7 @@ function os_activity_message_owner_name(Message $message) {
 /**
  * Helper function; Create a message when a node is created or updated.
  */
-function _os_activity_message_node_create($node, $op) {
+function os_activity_message_node_create($node, $op) {
   $node_wrapper = entity_metadata_wrapper('node', $node);
 
   $action = $op == 'insert' ? t('posted') : t('edited');
