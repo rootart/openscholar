@@ -213,7 +213,6 @@ function theme_volcabulary_term_list($variables) {
  *
  *  @param $terms
  *    Array of taxonomy term obejcts.
- *
  *  @param $options
  *    Settings variable of the theme function.
  */
@@ -249,7 +248,6 @@ function os_taxonomy_build_terms_items($terms, $options) {
  *
  *  @param $items
  *    The taxonomy term childrens
- *
  *  @param $parent
  *    The parent term object.
  *
@@ -431,7 +429,6 @@ function os_taxonomy_count_term_tagged_items($terms, $node_bundles = array()) {
  *  @param $tid
  *    Using the taxonomy_get_tree function, or taxonomy_term_load_multiple ,
  *    this argument can be an array of taxonomy terms or a single term id.
- *
  *  @param $node_bundles
  *    Node bundles to include in the query.
  *
@@ -458,7 +455,6 @@ function os_taxonomy_count_attached_nodes_query_object($tid, $node_bundles = arr
  *  @param $tid
  *    Using the taxonomy_get_tree function, or taxonomy_term_load_multiple ,
  *    this argument can be an array of taxonomy terms or a single term id.
- *
  *  @param $node_bundles
  *    Node bundles to include in the query.
  *
@@ -480,13 +476,10 @@ function os_taxonomy_count_attached_nodes($tid, $node_bundles = array()) {
  *  @param $tid
  *    Using the taxonomy_get_tree function, or taxonomy_term_load_multiple ,
  *    this argument can be an array of taxonomy terms or a single term id.
- *
  *  @param $node_bundles
  *    Node bundles to include in the query.
- *
  *  @param $range
  *    Number of elements to process.
- *
  *  @param $offset
  *    Location of an element to start from.
  *
