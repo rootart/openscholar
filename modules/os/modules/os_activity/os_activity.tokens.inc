@@ -9,7 +9,7 @@
  * Implements hook_token_info().
  */
 function os_activity_token_info() {
-  $info['tokens']['node']['message_owner_name'] = array(
+  $info['tokens']['node']['message-owner'] = array(
     'name' => t('Message owner name'),
     'description' => t('Display the message owner name acording the the virtual site settings.'),
   );
@@ -21,20 +21,23 @@ function os_activity_token_info() {
  * Implements hook_tokens().
  */
 function os_activity_tokens($type, $tokens, array $data = array(), array $options = array()) {
-
   $replacements = array();
 
   // Only handeling messages.
-  if ($type != 'message') {
+  if ($type != 'node') {
     return;
   }
 
   foreach ($tokens as $name => $original) {
-    if ($original != '[message:field-node-reference:message_owner_name]') {
+    if ($name != 'message-owner') {
       continue;
     }
 
-    $replacements[$original] = os_activity_message_owner_name($data['message']);
+    $wrapper = entity_metadata_wrapper('node', $data['node']);
+
+    // The virtual site owner can decide of he want to present the username or the
+    // virtual site name as the message owner.
+    $replacements[$original] = $wrapper->value() == 'username' ? $wrapper->author->label() : $wrapper->label();
   }
 
   return $replacements;

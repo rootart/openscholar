@@ -27,27 +27,6 @@ function os_activity_node_update($node) {
 }
 
 /**
- * Return the message owner name acording to the virtual site configuration.
- *
- *  @param $message
- *    The message object.
- */
-function os_activity_message_owner_name(Message $message) {
-  $wrapper = entity_metadata_wrapper('message', $message);
-
-  // The virtual site owner can decide of he want to present the username or the
-  // virtual site name as the message owner.
-  if ($wrapper->field_node_reference->author->og_user_node->get(0)->field_message_display_name->value() == 'username') {
-    $display_name = $wrapper->field_node_reference->author->label();
-  }
-  else {
-    $display_name = $wrapper->field_node_reference->author->og_user_node->get(0)->label();
-  }
-
-  return $display_name;
-}
-
-/**
  * Helper function; Create a message when a node is created or updated.
  */
 function os_activity_message_node_create($node, $op) {
@@ -69,7 +48,7 @@ function os_activity_message_node_create($node, $op) {
   $group_wrapper = og_is_group('node', $node) ? $node : $node_wrapper->{OG_AUDIENCE_FIELD}->get(0);
   $wrapper->field_group->set($group_wrapper->value());
 
-  $is_private = (bool) $group_wrapper->{OG_ACCESS_FIELD}->value();
+  $is_private = (int) $group_wrapper->{OG_ACCESS_FIELD}->value();
   $wrapper->field_private_message->set($is_private);
   $wrapper->save();
 }
