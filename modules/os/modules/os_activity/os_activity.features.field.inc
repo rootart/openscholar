@@ -10,8 +10,8 @@
 function os_activity_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'message-os_activity_message-field_node_reference'
-  $fields['message-os_activity_message-field_node_reference'] = array(
+  // Exported field: 'message-os_node-field_node_reference'
+  $fields['message-os_node-field_node_reference'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
@@ -55,7 +55,7 @@ function os_activity_field_default_fields() {
       'type' => 'entityreference',
     ),
     'field_instance' => array(
-      'bundle' => 'os_activity_message',
+      'bundle' => 'os_node',
       'default_value' => NULL,
       'default_value_function' => '',
       'deleted' => '0',
@@ -100,8 +100,8 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_activity_message-field_private_message'
-  $fields['message-os_activity_message-field_private_message'] = array(
+  // Exported field: 'message-os_node-field_private_message'
+  $fields['message-os_node-field_private_message'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
@@ -126,7 +126,7 @@ function os_activity_field_default_fields() {
       'type' => 'list_boolean',
     ),
     'field_instance' => array(
-      'bundle' => 'os_activity_message',
+      'bundle' => 'os_node',
       'default_value' => array(
         0 => array(
           'value' => 0,
