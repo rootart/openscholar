@@ -20,4 +20,4 @@ features[field][] = message-os_node-field_private_message
 features[field][] = node-vsite-field_message_display_name
 features[field][] = node-vsite-field_private_messages
 features[message_type][] = os_node
-features[views_view][] = os_activity_stream
+features[views_view][] = os_activity
