@@ -567,7 +567,8 @@ ul.nice-menu-left ul a {
     border-top: none;
 }
 
-.sidebar ul.nice-menu ul li {
+.sidebar ul.nice-menu ul li,
+#menu-bar ul.nice-menu li ul li ul li ul li {
     display:none;
 }
 
@@ -616,7 +617,7 @@ ul.nice-menu-down ul li {
 
 ul.nice-menu-down li ul li ul {
   left: 12.5em; /* LTR */
-  top: -1px;
+  top: 0;
 }
 
 ul.nice-menu-down .menuparent a {

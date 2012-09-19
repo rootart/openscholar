@@ -1,5 +1,5 @@
 @import url("commodore.layout.css");
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 @import url("http://fonts.googleapis.com/css?family=Ovo");
 
@@ -81,7 +81,6 @@ a:hover {
 #header-container h1 {
      color: #545454;
      font-family: georgia,arial;
-     margin-top: 15px;
 }
 
 #header-container h1 a {
@@ -195,13 +194,13 @@ h4 {
 }
 
 
-#menu-bar ul li a:hover, #menu-bar ul li a.active {
+#menu-bar ul ul li a:hover, #menu-bar ul ul li a.active {
      background: none repeat scroll 0% 0% #DADADA;
      color: #5D7485;
 }
 
 #menu-bar ul.nice-menu ul li a {
-     padding: .5em 0 .5em 1.6em;
+     padding: 10px 0px 5px 3px
   
 }
 
@@ -250,22 +249,22 @@ ul.nice-menu ul {
 }
 
 
-#boxes-box-scholar_book_current_toc ul.menu ul, .box-os_boxes_booktoc ul.menu ul {
+#boxes-box-scholar_book_current_toc ul.menu ul, .block-boxes-os_boxes_booktoc ul.menu ul {
      color: #ED7918;
      margin: 0px 0 0 18px;
 }
 
-#boxes-box-scholar_book_current_toc ul.menu ul li, .box-os_boxes_booktoc ul.menu ul li {
+#boxes-box-scholar_book_current_toc ul.menu ul li, .block-boxes-os_boxes_booktoc ul.menu ul li {
      list-style-type: square;
 }
 
-#boxes-box-scholar_book_current_toc ul.menu ul li a, .box-os_boxes_booktoc ul.menu ul li a {
+#boxes-box-scholar_book_current_toc ul.menu ul li a, .block-boxes-os_boxes_booktoc ul.menu ul li a {
      color: #5D7485;
      display: block;
 }
 
 
-#boxes-box-scholar_book_current_toc ul.menu ul ul li, .box-os_boxes_booktoc ul.menu ul ul li {
+#boxes-box-scholar_book_current_toc ul.menu ul ul li, .block-boxes-os_boxes_booktoc ul.menu ul ul li {
      list-style-type: disc;
 }
 
@@ -419,7 +418,7 @@ margin:-54px -2px 0;
      width: 50%;
 }
 
-#boxes-box-scholar_book_current_toc a:first-of-type, .box-os_boxes_booktoc a:first-of-type {
+#boxes-box-scholar_book_current_toc a:first-of-type, .block-boxes-os_boxes_booktoc a:first-of-type {
      display: none;
 }
 

@@ -234,9 +234,9 @@ function os_announcements_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
-          'module' => 'file',
+          'module' => 'os_files',
           'settings' => array(),
-          'type' => 'file_default',
+          'type' => 'os_files_image_list',
           'weight' => '3',
         ),
         'teaser' => array(
@@ -308,9 +308,9 @@ function os_announcements_field_default_fields() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Attach Files');
   t('Body');
   t('Photo');
-  t('upload');
 
   return $fields;
 }

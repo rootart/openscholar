@@ -169,12 +169,12 @@ function _os_booklets_option_filter_form_alter(&$form) {
   $space = spaces_get_space();
   if (!module_exists('vsite') || !$space) return;
 
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node')
-    ->propertyCondition('type', 'book')
-    ->propertyCondition('status', 1)
-    ->fieldCondition(OG_AUDIENCE_FIELD, 'target_id', $space->id);
+  // Includes class OSNodeFieldQuery (extends EntityFieldQuery)
+  include_once drupal_get_path('module', 'os') . '/includes/node.inc';
+
+  $query = new OSNodeFieldQuery('book');
   $result = $query->execute();
+
   if (!isset($result['node'])) return;
 
   $nids_in_current_space = array_keys($result['node']);

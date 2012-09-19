@@ -1,4 +1,4 @@
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 @import "cleanblue.responsive.layout.css"; 
 
 
@@ -9,12 +9,8 @@ body  {
  
 
 
-  body.admin-menu {
- 	background: url("../images/bodyBg.png") repeat-x scroll 0 180px #F7F7F9;
- 	}
-  
-    body.cp-toolbar-full {
- 	background: url("../images/bodyBg.png") repeat-x scroll 0 200px #F7F7F9;
+  body.logged-in {
+ 	background: url("../images/bodyBg.png") repeat-x scroll 0 205px #F7F7F9;
  	}
   
 
@@ -158,7 +154,7 @@ background: #fff;
 
 #header-container {
   background: #f7f7f9;
-  height: 160px;
+  min-height: 160px;
   }
 
 body.no-sidebars #columns .hg-container,
@@ -318,6 +314,7 @@ ul.nice-menu ul {
 	color:#333;
 	background:#CCC;
 	border-bottom:none;
+	margin-right:0;
 }
 
 

@@ -129,9 +129,9 @@ function os_publications_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'above',
-          'module' => 'file',
+          'module' => 'os_files',
           'settings' => array(),
-          'type' => 'file_default',
+          'type' => 'os_files_image_list',
           'weight' => '3',
         ),
         'teaser' => array(

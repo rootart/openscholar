@@ -1,5 +1,5 @@
 @import "projects.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../../os_basetheme/css/d6buffer.css";
 
 
 
@@ -810,6 +810,11 @@ border-bottom-left-radius: 3px;
      float: left;
      margin: -50px 0 12px;
      width: 100%;
+}
+
+.logged-in .block-os-stats dl {
+    margin: 8px 0 12px;
+    
 }
 
 .block-os-stats dt, .block-os-stats dd {

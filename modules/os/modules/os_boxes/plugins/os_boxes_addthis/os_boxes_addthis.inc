@@ -97,8 +97,8 @@ class os_boxes_addthis extends os_boxes_default {
     drupal_add_js('http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4e9eeefa6983da55', 'external');
 
     //after removing and readding this widget, page needs a reload.  trigger it with js
-    if (preg_match('/os\/boxes\/os_addthis\/remove\/\w/', $_GET['q'])) {
-      $block['content'] = '<script type="text/javascript">window.location.reload();</script>';
+    if (preg_match('/os\/widget\/boxes\/os_addthis\/remove\/\w/', $_GET['q'])) {
+      $block['content'] = '<script type="text/javascript">window.parent.location.reload();</script>';
     }
     return $block;
   }

@@ -10,6 +10,9 @@ class SpacesOverridesVariableMigration extends SpacesOverridesTableMigration {
   public function query() {
     $query = parent::query();
     //$query->condition('object_id', 'spaces_features');
+
+    $blacklist = array('vsite_design_disable_shield', 'vsite_shields_disable_shield');
+    $query->condition('object_id', $blacklist, 'NOT IN');
     return $query;
   }
 

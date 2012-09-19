@@ -8,6 +8,8 @@
   release     = 7.x-3.x
   engine      = phptemplate
   screenshot  = screenshot.png
+  flavor_name = "Dark"
+  plugins[os][flavor] = flavors
 
 ;----------// OpenScholar
 

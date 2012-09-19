@@ -1,5 +1,5 @@
 @import "openscholar.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../../os_basetheme/css/d6buffer.css";
 
 @font-face {
 	font-family: 'DeliciousSmallCapsRegular';

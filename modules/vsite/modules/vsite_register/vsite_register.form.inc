@@ -19,7 +19,7 @@ function vsite_register_form($form, &$state) {
     '#required' => TRUE,
     '#field_prefix' => $base_url . '/',
     '#size' => 35,
-    '#description' => t('Minimum of 3 characters. Punctuation is not allowed except for hyphens and underscores. <br />Example: a choice of \'jdoe\' would result in the URL: %site.', array(
+    '#description' => t('Minimum of 3 characters, which must be lowercase. Punctuation is not allowed except for hyphens and underscores. <br />Example: a choice of \'jdoe\' would result in the URL: %site.', array(
       '%site' => $base_url . '/jdoe'
     )),
      '#ajax' => array(
@@ -203,6 +203,12 @@ function vsite_register_form_submit(&$form, &$state) {
     );
     $site_owner = os_user_create($user_options);
 
+    // Send out an email to notify the user of the newly created account.
+    // Email only sent if user requested to be notified of new account.
+    if ($values['notify']) {
+      _user_mail_notify('register_no_approval_required', $site_owner);
+    }
+
     //log in as new user, if we're not already logged in.
     global $user;
     if ($user->uid == 0) {
@@ -234,10 +240,9 @@ function vsite_register_form_submit(&$form, &$state) {
       node_save($node);
     }
 
-    // Send out an email to notify the user of the newly created site.
-    if ($values['notify']) {
-      vsite_register_notify_user($vsite);
-    }
+    // Email user to inform them of new created site, email is always sent.
+    vsite_register_notify_user($vsite);
+
     //it worked, clear the errors
     drupal_get_messages('error');
 
@@ -390,6 +395,7 @@ function _vsite_register_validate($element, &$values) {
       if (($purl = purl_load(array('value'=>$values['domain'], 'provider'=>'spaces_og'), TRUE)) || menu_get_item($values['domain'])) {
         $msg[] = t('URL %url is taken.  Please choose another.', array('%url'=>$values['domain']));
       }
+
     break;
 
     case 'mail':
@@ -482,7 +488,7 @@ function _vsite_register_valid_url($url) {
     }
   }
 
-  return TRUE;
+  return purl_validate(array('value' => $url, 'provider' => 'spaces_og'));
 }
 
 /*
@@ -504,6 +510,9 @@ function vsite_register_notify_user($vsite){
   $count = count(vsite_get_vsite_by_owner($user -> uid));
   $timestamp = time();
 
+  $subject = t("An OpenScholar web site has been created for you.", array(
+    '!site_name' => variable_get('site_name', 'OpenScholar')
+  ));
   $msg_variables = array(
     '!vsite-count' => $count,
     '!username' => $user->name,
@@ -529,18 +538,11 @@ function vsite_register_notify_user($vsite){
 
   //detemine if user is creating first site or additional site, send appropriate message
   if(count(vsite_get_vsite_by_owner($user -> uid)) > 1){
-    $body = t("Hi !username,\n\nYour new website at !site has been activated!\n\nYour website url is: !scholar_site_url \n\nYou will be able to log into your site at !site_login_uri with username: !username \n\nWe hope you will enjoy your new web site.\n\nSincerely,\nThe !site Team", $msg_variables);
-  	$subject = t("An additional OpenScholar website has been created for you.", array(
-      '!site_name' => variable_get('site_name', 'OpenScholar')
-  	));
+    $body = t("Hi !username,\n\nYour new web site at !site has been activated. Your web site url is !scholar_site_url\n\nYou will be able to log into your site at !site_login_uri with username:\n\n!username\n\nWe hope you will enjoy your new web site.\n\nSincerely,\nThe !site Team", $msg_variables);
   }else{
     $body = t(variable_get('openscholar_register_email_message', _vsite_register_get_default_mail_message()), $msg_variables);
-    $subject = t("An OpenScholar website has been created for you.", array(
-      '!site_name' => variable_get('site_name', 'OpenScholar')
-  	));
   }
 
-  //$body = t("Hi !username,\n\nYour new web site at !site has been activated. Your web site url is !scholar_site_url\n\nYou will be able to log into your site at !site_login_uri with username:\n\n!username\n\nWe hope you will enjoy your new web site.\n\nSincerely,\nThe !site Team", $msg_variables);
   $params['subject'] = $subject;
   $params['body'] = $body;
   $result = drupal_mail('vsite_register', 'vsite_register_notify', $user->mail, $language, $params, $from, $send=TRUE);
@@ -566,5 +568,5 @@ function vsite_register_mail($key, &$message, $params) {
  *
  */
 function _vsite_register_get_default_mail_message(){
-  return "Hi !username,\n\nYour new website at !site has been activated!\n\nYour website url is: !scholar_site_url \n\nYou may now log in by clicking on this link below or copying and pasting it in your browser:\n!login_url \n\nThis login can be used only once. After logging in, you will be redirected to !scholar_edit_url so you can change your password. \n\nOnce you have set your own password, you will be able to log in at !site_login_uri with your new username: !username\n\nWe hope you will enjoy your new web site.\n\nSincerely,\nThe !site Team";
+  return "Hi !username,\n\nYour new web site at !site has been activated.\n\nYour web site url is !scholar_site_url\nYou may now log in by clicking on this link or copying and pasting it in your browser: \n\n !login_url \n\nThis login can be used only once. After logging in, you will be redirected to !scholar_edit_url so you can change your password. Once you have set your own password, you will be able to log in at !site_login_uri as username:\n\n!username\n\nWe hope you will enjoy your new web site.\n\nSincerely,\nThe !site Team";
 }

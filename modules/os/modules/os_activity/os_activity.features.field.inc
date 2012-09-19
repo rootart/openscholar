@@ -10,8 +10,106 @@
 function os_activity_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'message-os_activity_message-field_node_reference'
-  $fields['message-os_activity_message-field_node_reference'] = array(
+  // Exported field: 'message-os_node-field_group'
+  $fields['message-os_node-field_group'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_group',
+      'foreign keys' => array(
+        'node' => array(
+          'columns' => array(
+            'target_id' => 'nid',
+          ),
+          'table' => 'node',
+        ),
+      ),
+      'indexes' => array(
+        'target_id' => array(
+          0 => 'target_id',
+        ),
+      ),
+      'module' => 'entityreference',
+      'settings' => array(
+        'handler' => 'base',
+        'handler_settings' => array(
+          'behaviors' => array(
+            'views-select-list' => array(
+              'status' => 0,
+            ),
+          ),
+          'sort' => array(
+            'direction' => 'ASC',
+            'field' => 'og_group_ref:target_id',
+            'property' => 'nid',
+            'type' => 'none',
+          ),
+          'target_bundles' => array(
+            'vsite' => 'vsite',
+          ),
+        ),
+        'handler_submit' => 'Change handler',
+        'target_type' => 'node',
+      ),
+      'translatable' => '0',
+      'type' => 'entityreference',
+    ),
+    'field_instance' => array(
+      'bundle' => 'os_node',
+      'default_value' => NULL,
+      'default_value_function' => '',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '2',
+        ),
+        'full' => array(
+          'label' => 'above',
+          'module' => 'entityreference',
+          'settings' => array(
+            'link' => FALSE,
+          ),
+          'type' => 'entityreference_label',
+          'weight' => '2',
+        ),
+      ),
+      'entity_type' => 'message',
+      'field_name' => 'field_group',
+      'label' => 'Group reference',
+      'required' => 1,
+      'settings' => array(
+        'behaviors' => array(
+          'prepopulate' => array(
+            'action' => 'hide',
+            'fallback' => 'none',
+            'skip_perm' => 'administer biblio',
+            'status' => 0,
+          ),
+        ),
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'entityreference',
+        'settings' => array(
+          'match_operator' => 'CONTAINS',
+          'path' => '',
+          'size' => '60',
+        ),
+        'type' => 'entityreference_autocomplete',
+        'weight' => '3',
+      ),
+    ),
+  );
+
+  // Exported field: 'message-os_node-field_node_reference'
+  $fields['message-os_node-field_node_reference'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
@@ -55,7 +153,7 @@ function os_activity_field_default_fields() {
       'type' => 'entityreference',
     ),
     'field_instance' => array(
-      'bundle' => 'os_activity_message',
+      'bundle' => 'os_node',
       'default_value' => NULL,
       'default_value_function' => '',
       'deleted' => '0',
@@ -63,12 +161,18 @@ function os_activity_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '3',
+        ),
+        'full' => array(
+          'label' => 'above',
           'module' => 'entityreference',
           'settings' => array(
             'link' => FALSE,
           ),
           'type' => 'entityreference_label',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'message',
@@ -100,8 +204,8 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_activity_message-field_private_message'
-  $fields['message-os_activity_message-field_private_message'] = array(
+  // Exported field: 'message-os_node-field_private_message'
+  $fields['message-os_node-field_private_message'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
@@ -126,7 +230,7 @@ function os_activity_field_default_fields() {
       'type' => 'list_boolean',
     ),
     'field_instance' => array(
-      'bundle' => 'os_activity_message',
+      'bundle' => 'os_node',
       'default_value' => array(
         0 => array(
           'value' => 0,
@@ -137,10 +241,16 @@ function os_activity_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '1',
+        ),
+        'full' => array(
+          'label' => 'above',
           'module' => 'list',
           'settings' => array(),
           'type' => 'list_default',
-          'weight' => 1,
+          'weight' => '1',
         ),
       ),
       'entity_type' => 'message',
@@ -296,9 +406,101 @@ function os_activity_field_default_fields() {
     ),
   );
 
+  // Exported field: 'og_membership-og_membership_type_default-field_message'
+  $fields['og_membership-og_membership_type_default-field_message'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_message',
+      'foreign keys' => array(
+        'node' => array(
+          'columns' => array(
+            'target_id' => 'nid',
+          ),
+          'table' => 'node',
+        ),
+      ),
+      'indexes' => array(
+        'target_id' => array(
+          0 => 'target_id',
+        ),
+      ),
+      'module' => 'entityreference',
+      'settings' => array(
+        'handler' => 'base',
+        'handler_settings' => array(
+          'behaviors' => array(
+            'views-select-list' => array(
+              'status' => 0,
+            ),
+          ),
+          'sort' => array(
+            'direction' => 'ASC',
+            'field' => 'field_node_reference:target_id',
+            'property' => 'mid',
+            'type' => 'none',
+          ),
+          'target_bundles' => array(),
+        ),
+        'handler_submit' => 'Change handler',
+        'target_type' => 'message',
+      ),
+      'translatable' => '0',
+      'type' => 'entityreference',
+    ),
+    'field_instance' => array(
+      'bundle' => 'og_membership_type_default',
+      'default_value' => NULL,
+      'default_value_function' => '',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'entityreference',
+          'settings' => array(
+            'link' => FALSE,
+          ),
+          'type' => 'entityreference_label',
+          'weight' => 1,
+        ),
+      ),
+      'entity_type' => 'og_membership',
+      'field_name' => 'field_message',
+      'label' => 'Last message',
+      'required' => 0,
+      'settings' => array(
+        'behaviors' => array(
+          'prepopulate' => array(
+            'action' => 'hide',
+            'fallback' => 'none',
+            'skip_perm' => 'administer biblio',
+            'status' => 0,
+          ),
+        ),
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'entityreference',
+        'settings' => array(
+          'match_operator' => 'CONTAINS',
+          'path' => '',
+          'size' => '60',
+        ),
+        'type' => 'entityreference_autocomplete',
+        'weight' => '1',
+      ),
+    ),
+  );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Control if the messages generated by OS Activity are private to this group.');
+  t('Group reference');
+  t('Last message');
   t('Message owner diplay');
   t('Node reference');
   t('Private message');

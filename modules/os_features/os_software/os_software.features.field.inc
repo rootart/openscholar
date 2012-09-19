@@ -46,9 +46,9 @@ function os_software_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'hidden',
-          'module' => 'text',
+          'module' => 'os_files',
           'settings' => array(),
-          'type' => 'text_default',
+          'type' => 'os_files_image_list',
           'weight' => '2',
         ),
         'teaser' => array(

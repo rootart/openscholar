@@ -25,11 +25,6 @@ h1#page-title {
   text-shadow: 0 0 1px #000;
   }
 
-#content-main {
-  -moz-box-shadow: 0 3px 2em #333;
-  -webkit-box-shadow: 0 3px 2em #333;
-  box-shadow: 0 3px 2em #333;
-  }
 
 .region-sidebar-first a:hover,
 .region-sidebar-second a:hover,

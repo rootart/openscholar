@@ -16,7 +16,7 @@
 
 abstract class os_boxes_default extends boxes_box {
 
-  /*
+  /**
    * If this box has been overridden the changed timestamp will be held here
    */
   public $changed;

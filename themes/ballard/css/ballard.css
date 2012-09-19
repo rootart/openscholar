@@ -1,5 +1,5 @@
 @import "ballard.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 @import url(http://fonts.googleapis.com/css?family=Judson);
 
@@ -108,7 +108,7 @@ font-weight:normal;
 margin: 0 -7px;
 }
 
-.block ul {
+#columns .block ul {
 margin: 8px 0 0 20px;
 }
 
@@ -205,6 +205,11 @@ color: #F3F3F1;
     width: 180px;
 }
 
+#menu-bar ul.nice-menu ul ul {
+    top: -1px;
+    left: 12.4em;
+}
+
 /**** MAIN NAV IN SIDEBAR ****/
 #columns .sidebar .block ul.nice-menu ul.nice-menu-,
 #columns .sidebar .block ul.nice-menu {
@@ -261,42 +266,42 @@ margin: 8px 0 0 0;
 
 
 /* SECONDARY NAV WHEN IN HEADER RIGHT  */ 
-.region-header-third #block-vsite_menus-scholar_secondary_menu  {
+.region-header-third #block-os-secondary-menu  {
    width:260px;
    margin: -10px 0 40px;
 }
 
-.region-header-third #block-vsite_menus-scholar_secondary_menu ul {
+.region-header-third #block-os-secondary-menu ul {
 float:right;
  }
  
-.region-header-third #block-vsite_menus-scholar_secondary_menu li {
+.region-header-third #block-os-secondary-menu li {
     float: left;
     padding: 0 7px;
     border-right:1px solid #F3F3F1;
  }
  
-.region-header-third #block-vsite_menus-scholar_secondary_menu li a {
+.region-header-third #block-os-secondary-menu li a {
   text-decoration: underline;
   color: #F3F3F1;
   font-size:.9em;
  } 
 
-.region-header-third #block-vsite_menus-scholar_secondary_menu li.last {
+.region-header-third #block-os-secondary-menu li.last {
   border-right:none;
  }
 
 /* SECONDARY NAV WHEN IN A SIDEBAR  */ 
 
-.sidebar #block-vsite_menus-scholar_secondary_menu ul {
+.sidebar #block-os-secondary-menu ul {
 	margin: 8px 0 0 15px;
 	}
 
-.sidebar #block-vsite_menus-scholar_secondary_menu ul li {
+.sidebar #block-os-secondary-menu ul li {
 	list-style-type:square;
 	}
 
-.sidebar #block-vsite_menus-scholar_secondary_menu ul li a {
+.sidebar #block-os-secondary-menu ul li a {
   font-weight:bold;
   font-size:1em;
 }

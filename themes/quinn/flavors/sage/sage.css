@@ -14,11 +14,6 @@ html,body {
   color: #fff;
   }
 
-#content-column {
-  -moz-box-shadow: 0 3px 1em #666;
-  -webkit-box-shadow: 0 3px 1em #666;
-  box-shadow: 0 3px 1em #666;
-  }
 
 .region-sidebar-first a:hover,
 .region-sidebar-second a:hover,

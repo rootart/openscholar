@@ -33,6 +33,8 @@ class CVNodeOSMigration extends AbstractNodeOSMigration {
     $this->addFieldMapping('field_biocv_pdf_upload:description', 'field_cv_attach_data');
     $this->addFieldMapping('field_biocv_pdf_upload:display', 'field_cv_attach_list');
 
+    $this->addUnmigratedSources(array('field_cv_attach_fid', 'field_cv_attached_fid', 'field_cv_attached_list', 'field_cv_attached_data'), t('DNM'));
+
   }
 
   public function query($content_type) {
@@ -52,6 +54,8 @@ class CVNodeOSMigration extends AbstractNodeOSMigration {
     /**
      * Describe each of the source columns
      */
+
+    $fields['field_biocv_pdf_upload'] = t('Uploaded CV file');
 
     return $fields;
   }

@@ -6,6 +6,7 @@ php = 5.2.4
 dependencies[] = book
 dependencies[] = features
 features[features_api][] = api:1
+features[user_permission][] = access printer-friendly version
 features[user_permission][] = add content to books
 features[user_permission][] = administer book outlines
 features[user_permission][] = create book content

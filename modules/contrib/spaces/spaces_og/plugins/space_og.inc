@@ -34,13 +34,13 @@ class space_og extends space_type_purl {
       // TODO determine what replaces this in D7.
       // og_set_group_context($this->group);
       // og_set_language($this->group);
-      
+
       // Handle theme switching for OG
       if (! empty($this->group->og_theme)) {
         global $custom_theme;
         $custom_theme = $this->group->og_theme;
       }
-      
+
       return TRUE;
     }
     return FALSE;
@@ -67,9 +67,9 @@ class space_og extends space_type_purl {
   function access_space($account = NULL){
     global $user;
     $account = isset($account) ? $account : $user;
-    
+
     $public = (! module_exists('og_access') || $this->group->{OG_ACCESS_FIELD}[LANGUAGE_NONE][0]['value'] != 1);
-    
+
     return parent::access_space($account) && (user_access('administer group') || $public ||     // Group is public, allow access
     og_is_member($this->group_type, $this->id, 'user', $account) ||     // User is
                                                                     // group
@@ -85,7 +85,7 @@ class space_og extends space_type_purl {
   function access_admin($account = NULL){
     global $user;
     $account = isset($account) ? $account : $user;
-    
+
     if ($this->og && ($this->og_is_group_admin($this->og, $account) || $this->group->uid === $account->uid)) {
       return TRUE;
     }
@@ -102,18 +102,20 @@ class space_og extends space_type_purl {
    */
   function access_feature($op = 'view', $feature, $account = NULL){
     $access = parent::access_feature($op, $feature, $account);
-    
+
     global $user;
     $account = isset($account) ? $account : $user;
-    
+
     // Only allow access if: user can administer OG, group is public,
     // or user is a member.
     $membership = FALSE;
     if ($membership = og_get_membership($this->group_type, $this->id, 'user', $account->uid)) {
       $membership = $membership->state;
     }
-    $access = $access && (user_access('administer group') || (! module_exists('og_access') || $this->group->{OG_ACCESS_FIELD}[LANGUAGE_NONE][0]['value'] == OG_CONTENT_ACCESS_PUBLIC) || $membership);
-    
+
+    $wrapper = entity_metadata_wrapper('node', $this->group);
+    $access = $access && (user_access('administer group') || (!module_exists('og_access') || empty($wrapper->{OG_ACCESS_FIELD}) || !$wrapper->{OG_ACCESS_FIELD}->value()) || $membership);
+
     // Additional check for group membership if authoring content in this group.
     if ($op === 'create') {
       return $access && (user_access('administer group') || og_is_member($this->group_type, $this->id, 'user', $account));
@@ -147,7 +149,7 @@ class space_og extends space_type_purl {
       case 'node' :
         $node = $object;
         $form = ! isset($node->nid) || isset($node->date) ? TRUE : FALSE;
-        
+
         // Group node
         if (og_is_group_type('node', $node->type)) {
           // Don't make new groups from within a group space.
@@ -171,13 +173,13 @@ class space_og extends space_type_purl {
               $gids[] = $item['target_id'];
             }
           }
-          
+
           // If the node belongs to the current active group space, or we're in
           // an allowable other space type, pass thru
           if ($this->active && in_array($this->id, $gids)) {
             return;
           }
-          
+
           // Otherwise route
           $gid = reset($gids);
           if ($gid) {
@@ -188,10 +190,10 @@ class space_og extends space_type_purl {
         break;
     }
   }
-  
+
   // Spaces OG views filter
   function views_filter(&$query, $base_table = '', $relationship = ''){
-    
+
     switch ($base_table) {
       case 'og_membership' :
         if (!isset($query->space_og_proccessed)) {
@@ -204,11 +206,11 @@ class space_og extends space_type_purl {
           $query->set_group_operator('OR');
           $where_group = $query->set_where_group('AND');
         }
-        
+
         // Ensure that the og_membership relationship was added
         $table = $query->ensure_table('og_membership', $relationship);
         if ($table) {
-          
+
           // Add og_membership relationship parameters
           $query->add_where($where_group, $table . '.gid', $this->og->nid, '=');
           $query->add_where($where_group, $table . '.group_type', $this->group_type, '=');

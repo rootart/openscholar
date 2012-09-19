@@ -1,5 +1,5 @@
 @import "scholars-harvard.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../../os_basetheme/css/d6buffer.css";
 
 @import url('http://fonts.googleapis.com/css?family=PT+Sans');
 @import url('http://fonts.googleapis.com/css?family=Radley');

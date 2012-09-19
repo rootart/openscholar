@@ -46,6 +46,8 @@ class os_context_reaction_block extends context_reaction_block {
 
       $this->is_editable_check($context_blocks);
       foreach ($context_blocks as $r => $blocks) {
+        // do nothing for blocks that are in no region
+        if (!$r) continue;
         $context_blocks[$r] = _block_render_blocks($blocks);
 
         // Make blocks editable if allowed.

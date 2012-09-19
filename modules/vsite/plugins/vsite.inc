@@ -132,7 +132,7 @@ class vsite extends space_og {
       switch ($features[$feature]) {
         //Private
         case 2 :
-          if (! og_is_member_group_member($this->type, $this->id, TRUE, $account->uid)) {
+          if (! og_is_member($this->group_type, $this->id , 'user', $account)) {
             $access = false;
           } //Admin or group member?
           break;
