@@ -63,15 +63,17 @@ function os_taxonomy_theme() {
  *    - description: The taxonomy term description.
  */
 function theme_volcabulary_term_list_row($variables) {
-  $number = !$variables['number'] ? '' : ' (' . $variables['number'] . ')';
+  $number = !$variables['number'] ? '' : ' <span class="count">(' . $variables['number'] . ')</span>';
   $name = check_plain($variables['name']);
 
   $name = !$number && !$variables['link_to_empty_terms'] ? $name : l($name, $variables['url_path'], $variables['link_options']);
-  $output = $name . $number;
+  $output = '<div class="term-' . check_plain($variables['name']) . '">' . $name . $number;
 
   if ($variables['terms_description'] && !empty($variables['description'])) {
-    $output .= '<br />  - ' . check_plain($variables['description']);
+    $output .= '<div class="description">  - ' . check_plain($variables['description']) . '</div>';
   }
+
+  $output .= '</div>';
 
   return $output;
 }
