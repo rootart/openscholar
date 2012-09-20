@@ -27,9 +27,9 @@ function os_activity_default_message_type() {
     "arguments" : null,
     "message_text" : { "und" : [
         {
-          "value" : "[message:field-node-reference:group-site-logo]\\r\\n\\u003Ca href=\\u0022@{message:field-group:url}\\u0022\\u003E@{message:field-group:message-owner}\\u003C\\/a\\u003E has @action \\u003Ca href=\\u0027[message:field-node-reference:url]\\u0027\\u003E[message:field-node-reference:title]\\u003C\\/a\\u003E",
+          "value" : "\\u003Cdiv class=\\u0027wrapper-picture\\u0027\\u003E[message:field-node-reference:group-site-logo]\\u003C\\/div\\u003E\\r\\n\\u003Cdiv class=\\u0027wrapper-message-content\\u0027\\u003E\\r\\n  \\u003Ca href=\\u0022@{message:field-group:url}\\u0022\\u003E@{message:field-group:message-owner}\\u003C\\/a\\u003E has @action \\u003Ca href=\\u0027[message:field-node-reference:url]\\u0027\\u003E[message:field-node-reference:title]\\u003C\\/a\\u003E\\r\\n  [message:timestamp:since] ago\\r\\n\\u003C\\/div\\u003E",
           "format" : "full_html",
-          "safe_value" : "\\u003Cp\\u003E[message:field-node-reference:group-site-logo]\\u003Cbr \\/\\u003E\\u003Ca href=\\u0022@{message:field-group:url}\\u0022\\u003E@{message:field-group:message-owner}\\u003C\\/a\\u003E has @action \\u003Ca href=\\u0022[message:field-node-reference:url]\\u0022\\u003E[message:field-node-reference:title]\\u003C\\/a\\u003E\\u003C\\/p\\u003E\\n"
+          "safe_value" : "\\u003Cdiv class=\\u0022wrapper-picture\\u0022\\u003E[message:field-node-reference:group-site-logo]\\u003C\\/div\\u003E\\n\\u003Cdiv class=\\u0022wrapper-message-content\\u0022\\u003E\\n  \\u003Ca href=\\u0022@{message:field-group:url}\\u0022\\u003E@{message:field-group:message-owner}\\u003C\\/a\\u003E has @action \\u003Ca href=\\u0022[message:field-node-reference:url]\\u0022\\u003E[message:field-node-reference:title]\\u003C\\/a\\u003E\\u003Cbr \\/\\u003E\\n  [message:timestamp:since] ago\\n\\u003C\\/div\\u003E\\n"
         }
       ]
     },

@@ -47,6 +47,10 @@ function os_activity_views_pre_render(&$view) {
     return;
   }
 
+  if ($view->name == 'os_activity') {
+    drupal_add_css(drupal_get_path('module', 'os_activity') . '/css/os_activity.css');
+  }
+
   $mids = array();
   foreach ($view->result as $item) {
     $mids[$item->mid] = $item->mid;
