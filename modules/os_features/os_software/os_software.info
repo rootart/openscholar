@@ -17,6 +17,7 @@ dependencies[] = list
 dependencies[] = media
 dependencies[] = options
 dependencies[] = os
+dependencies[] = os_files
 dependencies[] = strongarm
 dependencies[] = views
 features[context][] = software_software

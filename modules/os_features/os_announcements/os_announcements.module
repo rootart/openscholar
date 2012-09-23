@@ -24,3 +24,12 @@ function os_announcements_process_node(&$vars) {
   $vars['submitted'] = '<time datetime="' . $vars['datetime'] . '" pubdate="pubdate">' . $pubdate . '</time>';
 }
 
+/**
+ * Implements hook_vsite_og_node_type_info().
+ */
+function os_announcements_vsite_og_node_type_info() {
+  return array(
+    'announcement' => 'group content',
+  );
+}
+

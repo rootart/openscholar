@@ -7,6 +7,15 @@
 include_once 'os_booklets.features.inc';
 
 /**
+ * Implements hook_vsite_og_node_type_info().
+ */
+function os_booklets_vsite_og_node_type_info() {
+  return array(
+    'book' => 'group content',
+  );
+}
+
+/**
  * Implements hook_form_FORM_ID_form_alter()
  *
  * Removes the book outline form from node types that aren't enabled to have it
@@ -48,26 +57,6 @@ function os_booklets_form_book_node_form_alter(&$form, &$form_state, $form_id) {
     // Filters book options by current space
     _os_booklets_option_filter_form_alter($form);
   }
-}
-
-/**
- * Implements hook_os_widget().
- *
- * Exposes blocks as OpenScholar widgets.
- */
-function os_booklets_os_widget() {
-  $items = array();
-
-  // Displays "Archive" list of blog entry nodes by month
-  $items['views-os_booklets-block'] = array(
-      'module' => 'views',
-      'delta' => 'os_booklets-block',
-      'region' => 'sidebar_second',
-      'weight' => '-10',
-      'info' => 'Recent Documents'
-  );
-
-  return $items;
 }
 
 /**
@@ -160,12 +149,12 @@ function _os_booklets_option_filter_form_alter(&$form) {
   $space = spaces_get_space();
   if (!module_exists('vsite') || !$space) return;
 
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node')
-    ->propertyCondition('type', 'book')
-    ->propertyCondition('status', 1)
-    ->fieldCondition(OG_AUDIENCE_FIELD, 'target_id', $space->id);
+  // Includes class OSNodeFieldQuery (extends EntityFieldQuery)
+  include_once drupal_get_path('module', 'os') . '/includes/node.inc';
+
+  $query = new OSNodeFieldQuery('book');
   $result = $query->execute();
+
   if (!isset($result['node'])) return;
 
   $nids_in_current_space = array_keys($result['node']);

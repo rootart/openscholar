@@ -64,6 +64,15 @@ if (!class_exists('purl_vsite_path')) {
 
       }//If we are asking for the absolute url then return the correct base url for a path provider
 
+      //Disable addition of URL prefix if prefix is part of the path alias
+      if (!empty($path) && $path != '<front>') {
+        $language = isset($options['language']) && isset($options['language']->language) ? $options['language']->language : '';
+        $alias = drupal_get_path_alias($path, $language);
+        if ($alias != $path && $alias != $this->remove($alias, $element)) {
+          return;
+        }
+      }
+
 	    return parent::rewrite($path, $options, $element);
 	  }
   }

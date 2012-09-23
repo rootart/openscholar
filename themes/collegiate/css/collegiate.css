@@ -1,10 +1,14 @@
 @import "collegiate.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 
 body {
 color:#37352B;
 background: url('../images/bodyBg.png') repeat-x scroll 0px -12px #EFEFEF;
+ }  
+ 
+body.logged-in {
+background: url('../images/bodyBg.png') repeat-x scroll 0px 30px #EFEFEF;
  }    
 
 /* TYPOGRAPHY*/
@@ -239,12 +243,12 @@ body.one-sidebar .region-sidebar-first {
 #header-container .column {
   padding-top: 15px;
 } 
-
+/*
 .header-main #header-container,
 .header-main-right #header-container {
   padding-right:250px;
   }
-
+*/
 #header-container h1,
 #header-container h2 {
     font-size: 3em;
@@ -332,7 +336,7 @@ padding:0px;
 	}
 	
 #menu-bar ul.nice-menu ul ul {
-	margin-top:0;
+	margin-top:-1px;
 }
 
 #menu-bar ul.nice-menu ul ul li {
@@ -347,6 +351,7 @@ padding:0px;
 #menu-bar ul.nice-menu ul li a {
 	color:#FFF;
 	background:#353535;
+	padding: 10px 15px 5px;
 }
 
 

@@ -1,3 +1,40 @@
-.gallery-slideshow {
-	/* border: 1px black solid; stupid style for making sure css files are included */
+/* DARK VERSION */
+
+.views-slideshow-cycle-main-frame {margin:0 auto;}
+
+.view-os-image-gallery-slideshow {border:1px solid #B8BFC0;background:#555;}
+
+.view-os-image-gallery-slideshow .views-field-filename {padding: 2px 0 1px 5px;color:#FFF;}
+.view-os-image-gallery-slideshow .views-field-filename a {color:#FFF;}
+
+.view-os-image-gallery-slideshow .views-slideshow-controls-bottom {padding:3px 0 2px 5px;color:#FFF;}
+.view-os-image-gallery-slideshow .views-slideshow-controls-bottom a {color:#FFF;}
+
+.views-slideshow-slide-counter {float:right;display:inline;clear:none;}
+.views-slideshow-controls-text {float:left;display:inline;clear:none;}
+
+
+.views-slideshow-controls-text-previous a {background: url('rev.png')no-repeat;}
+.views-slideshow-controls-text-next a {background: url('fwd.png')no-repeat;}
+.views-slideshow-controls-text-pause a {background: url('play.png')no-repeat;}
+.views-slideshow-controls-text-play a {background: url('play.png')no-repeat;}
+.views-slideshow-controls-text a {width:16px;height:14px;text-indent: 100%;white-space: nowrap;overflow:hidden;float:left;margin-right:5px;}
+
+.views_slideshow_slide img {
+    margin: 0 auto -20px auto;
 }
+
+.view-os-image-gallery-slideshow .views-slideshow-controls-bottom {
+    color: #FFFFFF;
+    padding: 1px 5px;
+}
+
+.view-os-image-gallery-slideshow .views-field-uri {
+	margin:0 auto;
+}
+
+
+
+
+
+

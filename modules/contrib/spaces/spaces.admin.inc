@@ -78,7 +78,7 @@ function spaces_features_form($form, &$form_state) {
 
   $form = system_settings_form($form);
   $form['#theme'] = 'spaces_features_form';
-  $form['buttons']['#weight'] = 100;
+  $form['actions']['#weight'] = 100;
   return $form;
 }
 

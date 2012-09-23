@@ -1,5 +1,5 @@
 @import "airstream.responsive.layout.css"; 
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 
 
@@ -43,10 +43,7 @@ h2.block-title {
 
 /* LAYOUT ELEMENTS */
 
-#columns, #header-container, #block-os-primary-menu, #footer {
-	margin:0 auto;
-	width:910px;
-}
+
 
 
 body.sidebar-first #columns .hg-container,

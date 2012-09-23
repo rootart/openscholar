@@ -44,24 +44,8 @@ class space_taxonomy extends space_type_purl {
         }
         break;
       case 'node':
-        $node = $object;
-        $vocab = variable_get('spaces_taxonomy_machine_name', 0);
-        $fields = field_info_fields();
-        foreach ($fields as $name => $field) {
-          if ($field['type'] == 'taxonomy_term_reference' && $vocab == $field['settings']['allowed_values'][0]['vocabulary']) {
-            $term = NULL;
-            if (isset($node->{$name}['und'][0]['taxonomy_term'])) {
-              $term = $node->{$name}['und'][0]['taxonomy_term'];
-            }
-            elseif (isset($node->{$name}['und'][0]['tid'])) {
-              $term = taxonomy_term_load($node->{$name}['und'][0]['tid']);
-            }
-
-            if ($term) {
-              $this->router_term($term);
-              return;
-            }
-          }
+        if ($term = spaces_taxonomy_get_term($object)) {
+          $this->router_term($term);
         }
         break;
     }
@@ -87,8 +71,8 @@ class space_taxonomy extends space_type_purl {
   function views_filter(&$query, $base_table = '', $relationship = '') {
     switch ($base_table) {
       case 'node':
-        $table = $query->ensure_table('taxonomy_term_node', $relationship);
-        $query->add_where(0, "$table.tid = %d", $this->id);
+        $table = $query->ensure_table('taxonomy_index', $relationship);
+        $query->add_where(0, "$table.tid", $this->id);
         break;
     }
   }

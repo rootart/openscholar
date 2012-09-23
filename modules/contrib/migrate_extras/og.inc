@@ -5,6 +5,11 @@
  * Import Organic group memberships.
  */
 
+//If OG has been updated to include this destinaion then use that
+if(class_exists('MigrateDestinationOGMembership')){
+  return;
+}
+
 /**
  * Destination class implementing migration into an OG Audience field.
  */
@@ -19,7 +24,7 @@ class MigrateDestinationOGMembership extends MigrateDestination {
   public function __toString() {
     return t('group');
   }
-  
+
   static public function getKeySchema() {
     return array(
       'gid' => array(

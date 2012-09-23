@@ -56,9 +56,12 @@ function os_profiles_field_default_fields() {
         ),
         'teaser' => array(
           'label' => 'hidden',
-          'settings' => array(),
-          'type' => 'hidden',
-          'weight' => '7',
+          'module' => 'text',
+          'settings' => array(
+            'trim_length' => 600,
+          ),
+          'type' => 'text_summary_or_trimmed',
+          'weight' => '6',
         ),
       ),
       'entity_type' => 'node',
@@ -263,7 +266,7 @@ function os_profiles_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '6',
+          'weight' => '8',
         ),
       ),
       'entity_type' => 'node',
@@ -739,10 +742,8 @@ function os_profiles_field_default_fields() {
   t('Address');
   t('Email');
   t('First Name');
-  t('General group reference');
   t('Last Name');
   t('Middle Name or Initial');
-  t('Other groups');
   t('Phone');
   t('Photo');
   t('Professional Title/Affiliation');

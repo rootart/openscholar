@@ -27,7 +27,7 @@ function os_biocv_context_default_contexts() {
         'cv' => 'cv',
       ),
       'options' => array(
-        'node_form' => '1',
+        'node_form' => '0',
       ),
     ),
     'path' => array(

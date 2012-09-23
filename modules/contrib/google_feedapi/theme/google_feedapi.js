@@ -41,13 +41,19 @@ Drupal.behaviors.googleFeedAPI = {
 		           		content = entry.contentSnippet;
 		           	  }
 		           	  
-		              var div = $("<div class='feed_item'>" +
-		            		date +
-                      		"<a class='title' href='" + entry.link + "'>" + entry.title + "</a>" +
-                      		"<span class='description'>" +
-                      		content + 
-                      		"<span/>" +
-                      		"</div>");
+		           	  var feed_markup = "<div class='feed_item'>" +
+	            		date +
+                  		"<a class='title' href='" + entry.link + "'>" + entry.title + "</a>";
+		           	  
+		           	  if(feed_setting.show_content){
+		           		feed_markup = feed_markup + "<span class='description'>" +
+                  		content + 
+                  		"<span/>";
+		           	  }
+		           	  
+		           	  feed_markup = feed_markup + "</div>";
+		           	  
+		              var div = $(feed_markup);
 		   	          container.append(div);
 		    	    }
 		      	  

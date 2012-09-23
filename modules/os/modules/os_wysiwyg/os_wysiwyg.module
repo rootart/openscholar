@@ -9,11 +9,11 @@
  * If we find any, update those files with the nid of this post
  * Enter description here .
  * ..
- * 
- * @param unknown_type $node          
+ *
+ * @param unknown_type $node
  */
 function os_wysiwyg_update_files($node){
-  
+
   // get the list of files already in this node
   $result = db_select('file_usage', 'f')
   ->fields('f', array('fid', 'module', 'type', 'id', 'count'))
@@ -26,21 +26,21 @@ function os_wysiwyg_update_files($node){
   foreach ($result as $usage) {
     $curr_files[$usage->fid] = $usage->count;
   }
-  
+
   if (isset($node->body['und'][0]['value'])) {
-    
+
     $matches = array();
     if (preg_match_all("/\[\[.*?\]\]/s", $node->body['und'][0]['value'], $matches)) {
-      
+
       $matches = $matches[0];
       $matches = str_replace("[[", "", $matches);
       $matches = str_replace("]]", "", $matches);
       foreach ( $matches as $tag ) {
-        
+
         if (!is_string($tag)) {
           continue;
         }
-        
+
         $tag_info = drupal_json_decode($tag);
         if($tag_info['type'] == 'media' && $tag_info['fid'] && ($file = file_load($tag_info['fid']))){
           if(isset($curr_files[$tag_info['fid']]) && $curr_files[$tag_info['fid']] > 0){
@@ -54,7 +54,7 @@ function os_wysiwyg_update_files($node){
       }
     }
   }
-  
+
   //Delete no longer used file references
   foreach ( $curr_files as $fid => $count ) {
     if($count > 0){
@@ -72,31 +72,57 @@ function os_wysiwyg_node_update($node){
   os_wysiwyg_update_files($node);
 }
 
+function os_wysiwyg_node_delete($node) {
+  $files = array();
+  $body = field_get_items('node', $node, 'body');
+  if (isset($body[0]['value'])) {
+
+    $matches = array();
+    if (preg_match_all("/\[\[.*?\]\]/s", $body[0]['value'], $matches)) {
+
+      $matches = $matches[0];
+      $matches = str_replace("[[", "", $matches);
+      $matches = str_replace("]]", "", $matches);
+      foreach ($matches as $tag) {
+        if (!is_string($tag)) {
+          continue;
+        }
+
+        $tag_info = drupal_json_decode($tag);
+        if ($tag_info['type'] == 'media' && $tag_info['fid'] && $file = file_load($tag_info['fid'])) {
+          file_usage_delete($file, 'os_wysiwyg', 'node', $node->nid, 1);
+          file_delete($file);
+        }
+      }
+    }
+  }
+}
+
 function os_wysiwyg_wysiwyg_editor_settings_alter(&$settings, $context){
-  
+
   // settings there are no UI options for
   $settings['gecko_spellcheck'] = true;
   drupal_add_css(drupal_get_path('module', 'os_wysiwyg') . '/os_wysiwyg.css');
-  
+
   // reorder buttons
   // TODO: remove when WYSIWYG module can do this for us
-  
+
   // format select buttons
   $btns = explode(',', $settings['theme_advanced_buttons1']);
   $format_start = array_search('formatselect', $btns);
   $selects = array_splice($btns, $format_start, 4);
   $format_start = array_search('pasteword', $btns);
   array_splice($btns, $format_start, 0, $selects);
-  
+
   // toggle toolbar button
   $toggle_start = array_search('pdw', $btns);
   $toggle = array_splice($btns, $toggle_start, 1);
   array_splice($btns, $format_start, 0, $toggle);
-  
+
   $toolbarStart = array_search('pdw', $btns) + 1;
   $settings['theme_advanced_buttons2'] = implode(',', array_splice($btns, $toolbarStart));
   $settings['theme_advanced_buttons1'] = implode(',', $btns);
-  
+
   // pdw settings
   $settings['pdw_toggle_toolbars'] = '2,3,4';
   $settings['pdw_toggle_on'] = 1;
@@ -117,4 +143,37 @@ function os_wysiwyg_wysiwyg_include_directory($type){
   if ($type == 'plugins') {
     return $type;
   }
+}
+
+function os_wysiwyg_media_wysiwyg_allowed_view_modes_alter(&$view_modes, $file) {
+  $scheme = file_uri_scheme($file->uri);
+  switch ($scheme) {
+    case 'oembed':
+      $temp['media_original'] = $view_modes['media_original'];
+      $view_modes = $temp;
+    break;
+    case 'public':
+      $mime = explode('/', $file->filemime);
+      $type = $mime[0];  // I do this to get the type in case bundles for files are ever expanded out of just mime type
+      if ($type == 'image') {
+        $temp['media_original'] = $view_modes['media_original'];
+        $temp['media_small'] = $view_modes['media_small'];
+        $temp['media_large'] = $view_modes['media_large'];
+        $temp['media_link'] = $view_modes['media_link'];
+      }
+      else {  // until there is support for the audio or video tags, this is the best we can do for that kind of file.
+        $temp['media_link'] = $view_modes['media_link'];
+      }
+      $view_modes = $temp;
+    break;
+  }
+}
+
+/**
+ * Implements hook_element_info_alter
+ *
+ * Adds a prerender to the text_format element
+ */
+function os_wysiwyg_element_info_alter(&$elements) {
+  $elements['text_format']['#attached']['js'][] = drupal_get_path('module', 'os_wysiwyg').'/os_wysiwyg.js';
 }

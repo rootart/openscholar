@@ -1,0 +1,15 @@
+.content-left.content-right .region-content-first {
+     border-right: none;
+}
+
+.content-left.content-right .region-content-first, .content-left.content-right .region-content-second, .content-left.content-right .region-content-bottom {
+     clear: none;
+     display: inline;
+     float: left;
+     margin: 15px 0;
+     width: 32%;
+}
+
+.content-left.content-right .region region-content-first, .content-left.content-right .region-content-second {
+     margin-right: 15px;
+}

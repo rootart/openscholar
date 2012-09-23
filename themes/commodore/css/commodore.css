@@ -1,5 +1,5 @@
 @import url("commodore.layout.css");
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 @import url("http://fonts.googleapis.com/css?family=Ovo");
 
@@ -9,10 +9,6 @@ html, body {
      font: 0.93em/22px Arial,Verdana,sans-serif;
 }
 
-#header-container,  #menu-bar {
-     margin: 0 auto;
-     width: 960px;
-}
 
 #block-os-primary-menu {
 	margin-left:0;
@@ -44,22 +40,6 @@ html, body {
      margin-left: 3px;
 }
 
-.content-left.content-right #content-left {
-     border-right: medium none;
-}
-
-.content-left.content-right #content-left, .content-left.content-right #content-right, .content-left.content-right #content-bottom {
-     clear: none;
-     display: inline;
-     float: left;
-     margin: 15px 0;
-     width: 32%;
-}
-
-.content-left.content-right #content-left, .content-left.content-right #content-right {
-     margin-right: 15px;
-}
-
 .node-inner {
      padding: 0;
 }
@@ -81,7 +61,6 @@ a:hover {
 #header-container h1 {
      color: #545454;
      font-family: georgia,arial;
-     margin-top: 15px;
 }
 
 #header-container h1 a {
@@ -195,13 +174,13 @@ h4 {
 }
 
 
-#menu-bar ul li a:hover, #menu-bar ul li a.active {
+#menu-bar ul ul li a:hover, #menu-bar ul ul li a.active {
      background: none repeat scroll 0% 0% #DADADA;
      color: #5D7485;
 }
 
 #menu-bar ul.nice-menu ul li a {
-     padding: .5em 0 .5em 1.6em;
+     padding: 10px 0px 5px 3px
   
 }
 
@@ -250,22 +229,22 @@ ul.nice-menu ul {
 }
 
 
-#boxes-box-scholar_book_current_toc ul.menu ul, .box-os_boxes_booktoc ul.menu ul {
+#boxes-box-scholar_book_current_toc ul.menu ul, .block-boxes-os_boxes_booktoc ul.menu ul {
      color: #ED7918;
      margin: 0px 0 0 18px;
 }
 
-#boxes-box-scholar_book_current_toc ul.menu ul li, .box-os_boxes_booktoc ul.menu ul li {
+#boxes-box-scholar_book_current_toc ul.menu ul li, .block-boxes-os_boxes_booktoc ul.menu ul li {
      list-style-type: square;
 }
 
-#boxes-box-scholar_book_current_toc ul.menu ul li a, .box-os_boxes_booktoc ul.menu ul li a {
+#boxes-box-scholar_book_current_toc ul.menu ul li a, .block-boxes-os_boxes_booktoc ul.menu ul li a {
      color: #5D7485;
      display: block;
 }
 
 
-#boxes-box-scholar_book_current_toc ul.menu ul ul li, .box-os_boxes_booktoc ul.menu ul ul li {
+#boxes-box-scholar_book_current_toc ul.menu ul ul li, .block-boxes-os_boxes_booktoc ul.menu ul ul li {
      list-style-type: disc;
 }
 
@@ -278,89 +257,6 @@ div.views-field-field-gallery-image-fid img {
      padding: 0;
 }
 
-#views_slideshow_singleframe_main_os_slideshow-default {
-     position: relative;
-     z-index: 5;
-}
-
-.box-os_boxes_slideshow {
-     margin-left: 3px;
-}
-
-.views-slideshow-controls-bottom {
-     background: none repeat scroll 0% 0% transparent;
-     border: medium none;
-     height: 22px;
-     margin-top: -32px;
-     position: relative;
-     width: 960px;
-     z-index: 6;
-}
-
-.views_slideshow_singleframe_pager_os_slideshow-default a {
-     text-decoration: none;
-}
-
-#views_slideshow_singleframe_prev_os_slideshow-default, #views_slideshow_singleframe_next_os_slideshow-default, .views-field-title {
-     display: none;
-}
-
-.views_slideshow_controls .views_slideshow_pause, .views_slideshow_controls .views_slideshow_play {
-     left: 5px;
-     margin-top: 1px;
-}
-
-.views_slideshow_controls .views_slideshow_pause {
-     background: url("../images/pause.gif") no-repeat scroll 0 0 transparent;
-     height: 19px;
-     width: 18px;
-}
-
-.views_slideshow_controls .views_slideshow_play {
-     background: url("../images/play.gif") no-repeat scroll 0 0 transparent;
-     height: 19px;
-     width: 18px;
-}
-
-div.pager-item {
-     font-size: 11px;
-     height: 24px;
-     width: 24px;
-}
-
-.views_slideshow_singleframe_pager div {
-     display: inline;
-     padding-left: 7px;
-}
-
-#views_slideshow_singleframe_pager_os_slideshow-default {
-     float: none;
-     margin-left: 23px;
-}
-
-.pager-item a {
-     background: none repeat scroll 0% 0% #FFFFFF;
-     border-radius: 0 0 0 0;
-     border: 1px solid #C1C1C1;
-     color: #333333;
-     padding: 2px 5px;
-     text-decoration: none;
-}
-
-.pager-item a:hover {
-     background: none repeat scroll 0% 0% #D9D9D9;
-     color: #293352;
-     text-decoration: none;
-}
-
-.pager-item.activeSlide a {
-     background: none repeat scroll 0% 0% #D9D9D9;
-     color: #293352;
-}
-
-.pager a {
-     text-decoration: none;
-}
 
 
 
@@ -419,7 +315,7 @@ margin:-54px -2px 0;
      width: 50%;
 }
 
-#boxes-box-scholar_book_current_toc a:first-of-type, .box-os_boxes_booktoc a:first-of-type {
+#boxes-box-scholar_book_current_toc a:first-of-type, .block-boxes-os_boxes_booktoc a:first-of-type {
      display: none;
 }
 
@@ -454,3 +350,50 @@ p.copy a.footer-login {
 .os-smallfont {
      font-size: 0.85em;
 }
+
+
+/* SLIDESHOW */
+
+.view-os-image-gallery-slideshow {background: #F1F2F2;margin: 0 0 15px 0;border:none;}
+
+.views_slideshow_slide img {
+    background-color: #FFF;
+    border: none;
+    padding: 0;
+    margin-bottom:-25px;
+}
+
+
+.views_slideshow_controls .views_slideshow_pause,
+.views_slideshow_controls .views_slideshow_play {
+left:97%;
+
+}
+
+.views-slideshow-controls-text a {width:22px;height:19px;text-indent: 100%;white-space: nowrap;overflow:hidden;float:left;margin-left:0;}
+.views-slideshow-controls-text-previous a {background: url('../../custom/scholar_department/images/rev_1.png')no-repeat;margin-left:5px;}
+.views-slideshow-controls-text-next a {background: url('../../custom/scholar_department/images/fwd_1.png')no-repeat;}
+.views-slideshow-controls-text-pause a {background: url('../../custom/scholar_department/images/play_1.png')no-repeat;}
+.views-slideshow-controls-text-play a {background: url('../../custom/scholar_department/images/play_1.png')no-repeat;}
+
+
+.view-os-image-gallery-slideshow .views-slideshow-controls-bottom{
+height:20px;
+border:none;
+border-top:none;
+width: 99%;
+z-index: 1;
+ color: #444;
+}
+
+.views-slideshow-controls-text {float:right;}
+
+.view-os-image-gallery-slideshow .views-field-filename {
+background:url('../images/transparentBg.png') no-repeat;
+    position: absolute;
+    bottom:-22px;
+     color: #444;
+     font-size:1.1em;
+}
+
+.view-os-image-gallery-slideshow .views-field-filename a {color:#333;}

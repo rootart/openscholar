@@ -256,7 +256,7 @@ ul.pager li.pager-current {
   float: left; /* LTR */
 }
 .ajax-progress .throbber {
-  background: transparent url('/profiles/openscholar/themes/os_basetheme/images/throbber.gif') no-repeat 0px 0;
+  background: transparent url('../images/throbber.gif') no-repeat 0px 0;
   float: left; /* LTR */
   height: 11px;
   margin: 4px 2px;
@@ -567,7 +567,8 @@ ul.nice-menu-left ul a {
     border-top: none;
 }
 
-.sidebar ul.nice-menu ul li {
+.sidebar ul.nice-menu ul li,
+#menu-bar ul.nice-menu li ul li ul li ul li {
     display:none;
 }
 
@@ -616,7 +617,7 @@ ul.nice-menu-down ul li {
 
 ul.nice-menu-down li ul li ul {
   left: 12.5em; /* LTR */
-  top: -1px;
+  top: 0;
 }
 
 ul.nice-menu-down .menuparent a {
@@ -667,10 +668,6 @@ top: 30px;
 top: 66px;
 	}
 
-#block-cp-cp-minimenu ul li {
-	background: url("/profiles/openscholar/modules/cp/theme/images/topmenu-icons-mini.png") no-repeat scroll 0 0 transparent;
-	 list-style: none;
-   }
 
 #block-cp-cp-minimenu ul li.menu-path-cp-content {
 	background-position: -1px -62px ;

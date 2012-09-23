@@ -100,7 +100,7 @@ function os_links_strongarm() {
   $strongarm->disabled = FALSE;
   $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_link';
-  $strongarm->value = '1';
+  $strongarm->value = '0';
   $export['node_preview_link'] = $strongarm;
 
   $strongarm = new stdClass();

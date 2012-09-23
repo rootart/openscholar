@@ -188,7 +188,7 @@ function os_biocv_strongarm() {
   $strongarm->disabled = FALSE;
   $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_bio';
-  $strongarm->value = '1';
+  $strongarm->value = '0';
   $export['node_preview_bio'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -196,7 +196,7 @@ function os_biocv_strongarm() {
   $strongarm->disabled = FALSE;
   $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_cv';
-  $strongarm->value = '1';
+  $strongarm->value = '0';
   $export['node_preview_cv'] = $strongarm;
 
   $strongarm = new stdClass();

@@ -7,7 +7,7 @@ jQuery(document).ready(function() {
       // add the class to this one
       $(this).addClass('checked');
     }
-    $("#edit-cp-appearance-" + $(this).attr('id')).attr("checked", "checked").change();
+    $("#edit-theme-default-" + $(this).attr('id').substr(6)).attr("checked", "checked").change();
   });
 
   $('li.item-theme-picker').find('select').change(function(){
@@ -16,7 +16,7 @@ jQuery(document).ready(function() {
     // add the class to this one
     $(this).closest('li.item-theme-picker').addClass('checked');
 
-    $("#edit-cp-appearance-" + $(this).closest('li.item-theme-picker').attr('id')).attr("checked", "checked").change();
+    $("#edit-theme-default-" + $(this).closest('li.item-theme-picker').attr('id').substr(6)).attr("checked", "checked").change();
   });
 
   $('#cp-appearance-theme-picker-form').submit(function(event) {

@@ -148,8 +148,11 @@ class os_sv_list_box extends os_boxes_default {
         $query->addField('ml', 'link_path');
         $book_nids = $query->execute()->fetchCol();
         $book_nids = preg_replace('/node\//', '', $book_nids);
+        $book_nids = array_values($book_nids);
 
-        $efq->propertyCondition('nid', $book_nids, 'IN');
+        if (count($book_nids)) {
+          $efq->propertyCondition('nid', $book_nids, 'IN');
+        }
         break;
 
 
@@ -212,7 +215,7 @@ class os_sv_list_box extends os_boxes_default {
       $parameters = array(
         'sv_list_box_delta' => $this->delta
       );
-      $pager = theme('pager', array(
+      $pager = theme('views_mini_pager', array(
         'parameters' => $parameters,
         'element' => $page,
       ));

@@ -40,6 +40,18 @@ function os_publications_menu_alter(&$items) {
     'type' => MENU_CALLBACK,
     'file' => drupal_get_path('module', 'os_publications') . '/os_publications.pages.inc',
   );
+
+  // for the toolbar
+  $items['node/add/biblio']['title'] = 'Publication';
+}
+
+/**
+ * Implements hook_vsite_og_node_type_info().
+ */
+function os_publications_vsite_og_node_type_info() {
+  return array(
+    'biblio' => 'group content',
+  );
 }
 
 /**
@@ -231,6 +243,9 @@ function os_publications_form_biblio_node_form_alter(&$form, $form_state) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
+
+  // remove the sticky content option
+  unset($form['options']['sticky']);
 
   unset($form['biblio_tabs']);
 }

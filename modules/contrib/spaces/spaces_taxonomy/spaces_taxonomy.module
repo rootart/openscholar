@@ -71,6 +71,45 @@ function spaces_taxonomy_spaces_registry() {
 }
 
 /**
+ * Implements hook_spaces_get_space_from_object().
+ */
+function spaces_taxonomy_spaces_get_space_from_object($type, $object) {
+  if ($type == 'node') {
+    if ($term = spaces_taxonomy_get_term($object)) {
+      return spaces_load('taxonomy', $term->tid);
+    }
+  }
+}
+
+/**
+ * Searches the given node for a term reference that represents a space.
+ *
+ * @param object $node
+ *   A node object.
+ *
+ * @return object|FALSE
+ *   The term object that is referenced in the node, or FALSE if it was not
+ *   found.
+ */
+function spaces_taxonomy_get_term($node) {;
+  $term = FALSE;
+  $vocab = variable_get('spaces_taxonomy_machine_name', 0);
+  $fields = field_info_fields();
+  foreach ($fields as $name => $field) {
+    if ($field['type'] == 'taxonomy_term_reference' && $vocab == $field['settings']['allowed_values'][0]['vocabulary']) {
+      if (isset($node->{$name}['und'][0]['taxonomy_term'])) {
+        $term = $node->{$name}['und'][0]['taxonomy_term'];
+      }
+      elseif (isset($node->{$name}['und'][0]['tid'])) {
+        $term = taxonomy_term_load($node->{$name}['und'][0]['tid']);
+      }
+      break;
+    }
+  }
+  return $term;
+}
+
+/**
  * Implements hook_menu().
  */
 function spaces_taxonomy_menu() {
@@ -180,25 +219,30 @@ function spaces_taxonomy_taxonomy_term_update($term) {
 
 
 /**
- * Save the Taxonomy Term preset values
+ * Save the Taxonomy Term preset values.
  *
- * @param  $term  A term object
+ * @param $term
+ *   A term object.
  */
 function _spaces_taxonomy_term_save_preset_and_modifier($term) {
-  $space = spaces_load('taxonomy', $term->tid);
-  if ($space) {
-    // Save preset values.
-    if (!empty($term->spaces_preset_taxonomy)) {
-      $space->controllers->variable->set('spaces_preset_taxonomy', $term->spaces_preset_taxonomy);
-    }
+  $spaces_taxonomy_machine_name = variable_get('spaces_taxonomy_machine_name', 0);
 
-    // Save PURL modifier.
-    $modifier = array(
-      'provider' => 'spaces_taxonomy',
-      'id' => $term->tid,
-      'value' => $term->purl['value'],
-    );
-    purl_save($modifier);
+  if ($term->vocabulary_machine_name == $spaces_taxonomy_machine_name) {
+    $space = spaces_load('taxonomy', $term->tid);
+    if ($space) {
+      // Save preset values.
+      if (!empty($term->spaces_preset_taxonomy)) {
+        $space->controllers->variable->set('spaces_preset_taxonomy', $term->spaces_preset_taxonomy);
+      }
+
+      // Save PURL modifier.
+      $modifier = array(
+        'provider' => 'spaces_taxonomy',
+        'id' => $term->tid,
+        'value' => $term->purl['value'],
+      );
+      purl_save($modifier);
+    }
   }
 }
 
@@ -208,7 +252,7 @@ function _spaces_taxonomy_term_save_preset_and_modifier($term) {
  */
 function spaces_taxonomy_taxonomy_term_delete($term) {
   spaces_delete('taxonomy', $term->tid);
-  
+
   $modifier = array(
     'provider' => 'spaces_taxonomy',
     'id' => $term->tid,
@@ -237,7 +281,7 @@ function spaces_taxonomy_taxonomy_term_delete($term) {
  */
 function spaces_taxonomy_settings($form, &$form_state) {
   $form = array();
-  
+
   // Collect an array of valid vocab options
   $vocabs = array(0 => '---');
   foreach (taxonomy_get_vocabularies() as $vocab) {

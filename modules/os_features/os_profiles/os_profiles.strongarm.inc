@@ -102,7 +102,7 @@ function os_profiles_strongarm() {
   $strongarm->disabled = FALSE;
   $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_person';
-  $strongarm->value = '1';
+  $strongarm->value = '0';
   $export['node_preview_person'] = $strongarm;
 
   $strongarm = new stdClass();

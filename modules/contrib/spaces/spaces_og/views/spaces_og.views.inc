@@ -73,8 +73,9 @@ function spaces_og_views_pre_view(&$view, &$display_id, &$args){
       }
 
       if (in_array($table, array(
-          'node',
-          'user'
+        'file_managed',
+        'node',
+        'user'
       ))) {
 
         //Check to see if the relationship has already been added via the UI
@@ -86,7 +87,7 @@ function spaces_og_views_pre_view(&$view, &$display_id, &$args){
         //Set the 'current' space filter up to use the new og relationshipt
         $view->set_item_option($display_id, 'filter', 'current', 'relationship', 'og_membership_rel');
       }
-      
+
       $i = 1;
       //For views that use multiple spaces filters tie the multiple spaces filters to thier respective og_membership tables
       while($view->get_item($display_id, 'filter', 'current_'.$i) && $view->get_item($display_id, 'relationship', 'og_membership_rel_'.$i)){

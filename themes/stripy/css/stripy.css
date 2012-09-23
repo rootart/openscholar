@@ -1,5 +1,5 @@
 @import "stripy.responsive.layout.css";
-@import "/profiles/openscholar/themes/os_basetheme/css/d6buffer.css";
+@import "../../os_basetheme/css/d6buffer.css";
 
 body {
     background: #FFF;
@@ -67,7 +67,7 @@ h1#page-title {font-size:1.3em;}
 
 /* LAYOUT ELEMENTS */
 
-#block-os-primary-menu.menu-wrapper, #columns, #footer {width:910px;margin:0 auto;}
+
 
 body.sidebar-first #columns .hg-container,
 body.header-left-main #header-container .hg-container {
@@ -94,11 +94,6 @@ body.two-sidebars .region-sidebar-first {
 /* HEADER ELEMENTS */
 
 
-#header-container {
-    padding: 25px 0 15px;
-    margin:0 auto;
-    width:910px;
-    }
 
 #header-container h1 {
     font-size: 31px;
@@ -220,20 +215,7 @@ ul.nice-menu-left a, ul.nice-menu-left ul a {
 	border:none;
 	}
 
-/* MAIN CONTENT AREA */
 
-body.sidebar-first #content {
-    margin-left: 30px;
-    }
-
-body.sidebar-second #content {
-    margin-right: 30px;
-    }
-
-body.two-sidebars #content {
-    margin-left: 20px;
-    margin-right: 20px;
-    }
 
 
 /* Nodes */

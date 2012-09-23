@@ -19,21 +19,30 @@ function os_blog_process_node(&$vars) {
 }
 
 /**
+ * Implements hook_vsite_og_node_type_info().
+ */
+function os_blog_vsite_og_node_type_info() {
+  return array(
+    'blog' => 'group content',
+  );
+}
+
+/**
  * Implements hook_os_widget().
- * 
+ *
  * Exposes blocks as OpenScholar widgets.
  */
 function os_blog_os_widget() {
   $items = array();
-  
+
   // Displays "Archive" list of blog entry nodes by month
   $items['views-os_blog-block'] = array(
-      'module' => 'views', 
-      'delta' => 'os_blog-block', 
-      'region' => 'sidebar_second', 
+      'module' => 'views',
+      'delta' => 'os_blog-block',
+      'region' => 'sidebar_second',
       'weight' => '-10',
       'info' => 'Blog Archive'
   );
-  
+
   return $items;
 }

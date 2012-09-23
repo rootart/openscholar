@@ -1,0 +1,9 @@
+<?php
+/**
+ * Implements hook_install().
+ * Set the default theme to the projects_harvard theme.
+ */
+function iqss_projects_front_install() {
+  // Set the default theme.
+  variable_set('theme_default','projects_harvard');
+}

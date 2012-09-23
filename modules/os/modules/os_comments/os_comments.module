@@ -1,46 +1,50 @@
-<?php 
+<?php
 
 /**
- * Check if this is a feature form and add comment settings if the feature provides a node
+ * @file
+ * OS Comments module file.
  */
-function os_comments_form_cp_feature_customize_form_alter(&$form, &$form_state, $form_id){
-  
-    //Get the nodes for this feature
+
+/**
+ * Check if this is a feature form and add comment settings if the feature
+ * provides a node.
+ */
+function os_comments_form_cp_feature_customize_form_alter(&$form, &$form_state, $form_id) {
+
+  // Get the nodes for this feature.
   $a_info = features_get_features($form['#feature']);
   $node_types = $a_info->info['features']['node'];
 
-  if(!empty($node_types)){
-    
+  if (!empty($node_types)) {
     foreach ($node_types as $key => $type) {
-    	$node_types[$key] = "comment_sources_".$type;
+    	$node_types[$key] = 'comment_sources_' . $type;
     }
-    
-    $form["comment_settings"] = array(
-        '#type' => 'fieldset',
-        '#id' => "comment_settings",
-        '#weight' => 0,
+
+    $form['comment_settings'] = array(
+      '#type' => 'fieldset',
+      '#id' => "comment_settings",
+      '#weight' => 0,
     );
-    
-    //Include the admin form inc file
+
+    // Include the admin form inc file.
     module_load_include('admin.inc', 'comment_sources');
     $form["comment_settings"] += drupal_retrieve_form('comment_sources_admin_settings_form', $form_state);
-    
-    //Init the actions button container
-    if(!isset($form['actions'])){
+
+    // Init the actions button container.
+    if (!isset($form['actions'])) {
       $form['actions'] = array();
     }
-    
+
     //Move the system setting form buttons
     $form['actions'] = array_merge($form["comment_settings"]['actions'], $form['actions']);
     unset($form["comment_settings"]['actions']);
-    
+
     foreach (element_children($form["comment_settings"]) as $child) {
-    	if(strpos($child, 'comment_sources_') === 0 && !in_array($child, $node_types)){
+    	if (strpos($child, 'comment_sources_') === 0 && !in_array($child, $node_types)) {
     	  unset($form["comment_settings"][$child]);
     	}
     }
-    
+
     $form['#submit'][] = 'comment_sources_save_admin_form';
   }
-
 }

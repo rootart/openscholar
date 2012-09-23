@@ -4,9 +4,10 @@
  * Expose openscholar blocks as context reactions.
  */
 class os_context_reaction_block extends context_reaction_block {
-  
+
   /**
-   * An alternative version of block_list() that provides any context enabled blocks.
+   * An alternative version of block_list() that provides any context enabled
+   * blocks.
    */
   function block_list($region) {
     module_load_include('module', 'block', 'block');
@@ -14,14 +15,14 @@ class os_context_reaction_block extends context_reaction_block {
 
     $context_blocks = &drupal_static('context_reaction_block_list');;
     $contexts = context_active_contexts();
-    
+
     if (!isset($context_blocks)) {
       $info = $this->get_blocks();
       $context_blocks = array();
       $all_blocks = array();
       $context_order = array_keys($contexts);
       usort($context_order, '_os_context_sort_by_hierarchy');
-      
+
       foreach ($context_order as $key) {
         $context = $contexts[$key];
         $options = $this->fetch_from_context($context);
@@ -32,19 +33,21 @@ class os_context_reaction_block extends context_reaction_block {
             $block->bid = "{$block->module}-{$block->delta}";
             $block->title = isset($info[$block->bid]->title) ? $info[$block->bid]->title : NULL;
             $block->cache = isset($info[$block->bid]->cache) ? $info[$block->bid]->cache : DRUPAL_NO_CACHE;
-            //Let child contexts override parents
+            // Let child contexts override parents.
             $all_blocks[$block->bid] = $block;
           }
         }
       }
-      
-      //Put blocks into regions
+
+      // Put blocks into regions.
       foreach ($all_blocks as $block) {
       	$context_blocks[$block->region][$block->bid] = $block;
       }
-      
+
       $this->is_editable_check($context_blocks);
       foreach ($context_blocks as $r => $blocks) {
+        // do nothing for blocks that are in no region
+        if (!$r) continue;
         $context_blocks[$r] = _block_render_blocks($blocks);
 
         // Make blocks editable if allowed.

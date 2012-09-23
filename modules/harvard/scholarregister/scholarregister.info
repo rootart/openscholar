@@ -1,0 +1,4 @@
+name = scholar register
+description = provide registration functionality for scholar
+package = OpenScholar Harvard
+core = 7.x

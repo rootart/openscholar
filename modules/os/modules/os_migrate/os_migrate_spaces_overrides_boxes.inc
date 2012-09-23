@@ -22,6 +22,7 @@ class SpacesOverridesBoxesMigration extends SpacesOverridesTableMigration {
 
 
   public function prepareRow(&$row) {
+
     if (($value = @unserialize($row->value)) === FALSE) {
       if (strlen($row->value) > 65535) {
         //single image saved some images inline (ie img src='data:image:png....).  these were truncated in db and don't function
@@ -49,6 +50,15 @@ class SpacesOverridesBoxesMigration extends SpacesOverridesTableMigration {
 //    $row->object_id = $object_id;
     $row->value = serialize($value);
     return parent::prepareRow($row);
+  }
+
+  /**
+   * @see Migration::preImport()
+   */
+  public function preImport() {
+    parent::preImport();
+
+    $this->_copy_shield_files();
   }
 
   //after importing boxes, create 3 special boxes for what used to be custom themes.
@@ -118,6 +128,15 @@ class SpacesOverridesBoxesMigration extends SpacesOverridesTableMigration {
 
   }
 
+  /**
+   * @see Migration::postRollback()
+   */
+  public function postRollback() {
+    parent::postRollback();
+
+    $this->_remove_shield_files();
+  }
+
   function _update_box($box, $id) {
     $BP = new BoxPorter($this);
     $box = $BP->_update_box($box, $id);
@@ -132,6 +151,67 @@ class SpacesOverridesBoxesMigration extends SpacesOverridesTableMigration {
   function _box_key_exists($key) {
     $BP = new BoxPorter($this);
     return $BP->_box_key_exists($key);
+  }
+
+  /*
+   * @function _copy_shield_files
+   *
+   * Copies shields from d6's vsite_shields.  Sets up varibles so they're accessible in shields box.
+   */
+  function _copy_shield_files() {
+    //path to legacy module
+    $src = variable_get('os_migrate_files', '');
+    $src .= '/' . parent::d6_variable_get('file_directory_path');
+    $src .= '/vsite_shields/';
+
+    //get files or bail out
+//     if (($files = scandir($src)) === FALSE) {
+//       parent::saveMessage(t('Could not read shields directory.  No shields migrated.'), MigrationBase::MESSAGE_NOTICE);
+//       return FALSE;
+//     }
+
+    $dest = 'public://os_shields';
+    file_prepare_directory($dest, FILE_CREATE_DIRECTORY);
+    $shield_info = array();
+    //$files = preg_grep('/\.png/', $files);
+
+    //get a default
+    $legacy_info = parent::d6_variable_get('vsite_shields_shield_info', FALSE);
+
+    //add each file
+    foreach ($legacy_info as $file => $info) {
+      $filepath = $src . $file;
+      $fh = fopen($filepath, 'r');
+      if ($saved = file_save_data($fh, $dest.'/'.$file)) {
+        $shield_info[$saved->filename]['hidden'] = $info['hidden'];
+        $shield_info[$saved->filename]['default'] = $info['default'];
+        $shield_info[$saved->filename]['fid'] = $saved->fid;
+        if ($info['default']) {
+          variable_set('os_shields_shield', $saved->filename);
+        }
+      }
+      fclose($fh);
+    }
+
+    //and save the settings
+    variable_set('os_shields_shield_info', $shield_info);
+  }
+
+  /**
+   * @function _remove_shield_files
+   *
+   * Removes shields added by _copy_shield_files
+   */
+  function _remove_shield_files() {
+    $shields = variable_get('os_shields_shield_info', array());
+    foreach($shields as $fn => $info) {
+      if ($file = file_load($info['fid'])) {
+        file_delete($file, TRUE);
+      }
+    }
+
+    variable_del('os_shields_shield_info');
+    variable_del('os_shields_shield');
   }
 }
 
@@ -267,6 +347,18 @@ class BoxPorter {
     }
 
     return;
+  }
+
+  public function _port_box_os_boxes_bio($box, $id, $key_only) {
+    if ($key_only) {
+      return $id; //no change
+    }
+
+    if (isset($box->options['nid'])) {
+      unset ($box->options['nid']);
+    }
+
+    return $box;
   }
 
   public function _port_box_os_boxes_modal_image($box, $id, $key_only) {
@@ -434,7 +526,11 @@ class BoxPorter {
       ->execute()
       ->fetchCol();
 
-    if ($shield_path = unserialize($value)) {
+    if (is_array($value)) {
+      $value = (count($value)) ? $value[0] : '' ;
+    }
+
+    if (strlen($value) && ($shield_path = @unserialize($value))) {
       $shield_file = end(explode('/', $shield_path));
       $box->options['shield'] = $shield_file;
     } else {

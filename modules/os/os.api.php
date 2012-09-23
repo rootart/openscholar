@@ -36,9 +36,9 @@ function hook_os_widget() {
  */
 function hook_os_widget_alter(&$widget) {
 
-  // Does this widget belong to my module
+  // Does this widget belong to my module.
   if ($widget->module == 'mymodule') {
-    // Provides a path to configure the widget that my module needs
+    // Provides a path to configure the widget that my module needs.
     $widget['config_path'] = '/my/conf/path';
   }
 }
@@ -54,11 +54,10 @@ function hook_os_widget_alter(&$widget) {
  */
 function hook_os_menus_alter(&$menus) {
 
-  // Remove this menu
+  // Remove this menu.
   if (isset($menus['primary-menu'])) {
     unset($menus['primary-menu']);
   }
-
 }
 
 /**
@@ -75,7 +74,6 @@ function hook_os_menu_tree_alter($menu_name, &$tree) {
       $tree[$id]['link']['options'] = 'xx';
     }
   }
-
 }
 
 /**
@@ -91,8 +89,8 @@ function hook_os_layout_contexts() {
 
   // Contexts provided by this module
   $provided_contexts = array(
-      'my_context'=> 'Calendar Section',
-      'another_context' => 'Twitter Page',
+    'my_context'=> 'Calendar Section',
+    'another_context' => 'Twitter Page',
   );
 
   return $provided_contexts;
@@ -100,7 +98,6 @@ function hook_os_layout_contexts() {
 
 /**
  * Implements hook_os_layout_contexts_alter().
- *
  * Modify the contexts that are avalible for a user to edit
  */
 function hook_os_layout_contexts_alter(&$all_contexts) {
@@ -112,7 +109,10 @@ function hook_os_layout_contexts_alter(&$all_contexts) {
 }
 
 /**
- * Modify items in the 'Add New' dropdown that appears on every public facing page.
+ * Implements hook_os_add_new_links_alter().
+ *
+ * Modify items in the 'Add New' dropdown that appears on every public facing
+ * page.
  * Items are passed through l(), so should follow the same structure.
  */
 function hook_os_add_new_links_alter(&$links) {

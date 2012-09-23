@@ -123,6 +123,7 @@ class SpacesOverridesContextMigration extends SpacesOverridesTableMigration {
       'features' => 'primary-menu',
       'scholar_secondary_menu' => 'secondary-menu',
       'shield_default' => 'shield',
+      'scholar_book_recent_docs' => 'os_booklets_recent_docs',
     );
 
     return (isset($delta_map[$delta])) ? $delta_map[$delta] : $delta;

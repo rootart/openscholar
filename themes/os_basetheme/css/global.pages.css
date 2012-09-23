@@ -130,9 +130,9 @@ div.messages {
    
 }
 
-#block-os-powered-by a,
+#block-os-powered-by span a,
 .os-powered-link a.os-poweredby {
-    background: url("/profiles/openscholar/themes/os_basetheme/images/poweredby.png") no-repeat scroll 0 0 transparent;
+    background: url("../images/poweredby.png") no-repeat scroll 0 0 transparent;
     border: medium none !important;
     display: block;
     height: 26px;
@@ -141,16 +141,22 @@ div.messages {
     text-indent: -999em;
     width: 85px;
     margin-top:-25px;
-   
-}
+  }
 
-#boxes-box-site_logo /* Wrapping link for logo */ {
+.page-cp #block-os-powered-by span a {
+    background: url("../images/poweredby.png") no-repeat scroll 0 -27px transparent;
+    margin-top:0;
+  }
+
+#logo /* Wrapping link for logo */ {
   padding: 10px 0;
 }
 
 
-#boxes-box-site_logo img {
-  vertical-align: bottom;
+#scholar-shield {
+    margin: 0 auto;
+    text-align: center;
+    width: 75px;
 }
 
 
@@ -189,7 +195,7 @@ div.messages {
 }
 
 
-h1#page-title, /* The title of the page. */ {
+h1#page-title /* The title of the page. */ {
 }
 
 div.messages /* Important messages (status, warning, and error) for the user. See also the declarations in messages.css. */ {
@@ -204,6 +210,13 @@ div.messages ul {
 
 
 div.status /* Normal priority messages */ {
+	
+}
+
+div#success-message.status {
+  padding:3px 0  0 25px;
+  border-color: #be7;
+  background-repeat:no-repeat;
 }
 
 
@@ -315,7 +328,7 @@ ul.links li {
 }
 
 
-bookiconsprite.png
+/*bookiconsprite.png*/
 
 .feed-icon /* The link to the RSS or Atom feed for the current list of content */ {
 }
@@ -329,6 +342,7 @@ bookiconsprite.png
   margin: 0;
 }
 
+.views-row {margin-bottom:1.5em;}
 
 /*
  * First sidebar (on left in LTR languages, on right in RTL)
@@ -407,8 +421,9 @@ bookiconsprite.png
 
 #modalContent {
   top: 0 !important;
-   color: #666;
-  }
+  color: #666;
+  position: fixed !important;
+}
 
 div.ctools-modal-content {
   color: #555;
@@ -531,12 +546,13 @@ div.ctools-modal-content .modal-content .modal-throbber-wrapper img {
 	
 
 #mediaBrowser {
-	border-radius: 0;
-	background: #FFF;
+  padding: 0;
+  border-radius: 0;
+  background: #FFF;
   -moz-box-shadow: 0 4px 26px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 4px 26px rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 26px rgba(0, 0, 0, 0.5);
-  }
+}
  
 .ui-corner-all {
     border-radius: 0;

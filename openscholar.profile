@@ -23,7 +23,7 @@ function openscholar_install_tasks($install_state) {
   $tasks['openscholar_vsite_modules_batch'] = array(
     'display_name' => t('Install supplemental modules'),
     'type' => 'batch',
-    'run' => (variable_get('os_profile_type', false) == 'vsite' || variable_get('os_profile_flavor', false) == 'development') ? INSTALL_TASK_RUN_IF_NOT_COMPLETED : INSTALL_TASK_SKIP
+    'run' => variable_get('os_profile_type', FALSE == 'vsite' || variable_get('os_profile_flavor', FALSE) == 'development') ? INSTALL_TASK_RUN_IF_NOT_COMPLETED : INSTALL_TASK_SKIP
   );
 
   return $tasks;
@@ -36,25 +36,24 @@ function openscholar_install_tasks_alter(&$tasks, $install_state) {
 }
 
 /**
- * Flavor selection form
+ * Flavor selection form.
  */
 function openscholar_flavor_form($form, &$form_state) {
-
   $options = array(
-    'production' => 'Production Deployment',
-    'development' => 'Development',
+    'production' => t('Production Deployment'),
+    'development' => t('Development'),
   );
 
   $form['os_profile_flavor'] = array(
     '#title' => t('Select a flavor'),
     '#type' => 'radios',
     '#options' => $options,
-    '#default_value' => 'personal'
+    '#default_value' => 'development'
   );
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Next'
+    '#value' => t('Next'),
   );
 
   return $form;
@@ -65,8 +64,10 @@ function openscholar_flavor_form($form, &$form_state) {
  * Install type selection form
  */
 function openscholar_install_type($form, &$form_state) {
-
-  $options = array('novsite' => 'Single site install', 'vsite' => 'Multi-tenant install');
+  $options = array(
+    'novsite' => t('Single site install'),
+    'vsite' => t('Multi-tenant install'),
+  );
 
   $form['os_profile_type'] = array(
     '#title' => t('Installation type'),
@@ -77,7 +78,7 @@ function openscholar_install_type($form, &$form_state) {
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Submit',
+    '#value' => t('Submit'),
   );
 
   return $form;

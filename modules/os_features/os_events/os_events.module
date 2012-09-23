@@ -27,3 +27,12 @@ function os_events_os_widget(){
 
   return $items;
 }
+
+/**
+ * Implements hook_vsite_og_node_type_info().
+ */
+function os_events_vsite_og_node_type_info() {
+  return array(
+    'event' => 'group content',
+  );
+}

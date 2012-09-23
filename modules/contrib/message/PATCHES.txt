@@ -1,0 +1,3 @@
+- Avoid entity_load() in MessageMetadataController
+  http://drupal.org/node/1788892
+  http://drupal.org/files/message-bypass-entity-load.patch

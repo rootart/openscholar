@@ -186,6 +186,12 @@ abstract class spaces_controller {
    * Set override values for a given controller object in this space.
    */
   function set($id, $value) {
+
+    if($this->is_default($id, $value)){
+      $this->del($id);
+      return TRUE;
+    }
+
     $override = array(
       'type' => $this->space_type,
       'id' => $this->space_id,
@@ -254,5 +260,30 @@ abstract class spaces_controller {
       case 'object':
         return filter_xss_admin(var_export($value, TRUE));
     }
+  }
+
+  /**
+   * Check if the value passed is the default value.
+   *
+   * @param $id
+   *   The id of the value to check.
+   *
+   * @param $value
+   *   The value to check against
+   */
+  function is_default($id, $value) {
+
+    $environments = array('preset', 'original');
+    $environment = array_shift($environments);
+    //We don't call ->get directly here because NULL could be the default
+    while (isset($this->values[$environment])) {
+      $this->load_values($environment, $id);
+      if (isset($this->values[$environment][$id])) {
+        return ($this->values[$environment][$id] === $value);
+      }
+      $environment = array_shift($environments);
+    }
+
+    return ($value == NULL);
   }
 }

@@ -62,6 +62,7 @@ dependencies[] = os_wysiwyg
 dependencies[] = os_search_db
 dependencies[] = os_shields
 dependencies[] = os_comments
+dependencies[] = os_taxonomy
 
 ; Control Panel
 dependencies[] = cp
@@ -81,11 +82,14 @@ dependencies[] = os_pages
 dependencies[] = os_events
 dependencies[] = os_reader
 dependencies[] = os_blog
+dependencies[] = os_classes
 dependencies[] = os_presentations
 dependencies[] = os_software
 dependencies[] = os_dataverse
 dependencies[] = os_booklets
 dependencies[] = os_profiles
+dependencies[] = os_taxonomy
+dependencies[] = os_biocv
 
 ; other
 dependencies[] = diff
