@@ -122,15 +122,12 @@ function os_activity_exit() {
 function os_activity_message_node_create($node, $op) {
   $node_wrapper = entity_metadata_wrapper('node', $node);
 
-  $action = $op == 'insert' ? t('posted') : t('edited');
+  $message_type = $op == 'insert' ? 'os_create_node' : 'os_edit_node';
   $values = array(
     'uid' => $node->uid,
-    'arguments' => array(
-      '@action' => $action,
-    ),
   );
 
-  $message = message_create('os_node', $values);
+  $message = message_create($message_type, $values);
   $wrapper = entity_metadata_wrapper('message', $message);
   $wrapper->field_node_reference->set($node);
 
