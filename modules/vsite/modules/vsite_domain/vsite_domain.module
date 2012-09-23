@@ -36,11 +36,6 @@ function vsite_domain_enable(){
     variable_set('purl_method_spaces_og', 'vsite_path');
     variable_set('purl_method_vsite_domain', 'vsite_domain');
   }
-  
-  if (! variable_get('purl_base_domain', false)) {
-    variable_set('purl_base_domain', 'http://' . str_replace('http://', '', $_SERVER['HTTP_HOST']));
-  }
-  
   // Weight vsite_domain to be after Spaces OG
   $weight = db_query("SELECT weight FROM {system} WHERE type = :type AND name = :name", array(
       ':type' => 'module',
