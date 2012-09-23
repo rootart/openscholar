@@ -1,10 +1,12 @@
 <?php
-define('OS_FILE_FILEPATH_MULTITENANT', '[vsite:site-purl]/files');
-define('OS_FILE_FILEPATH_SINGLETENANT', 'share');
 
 /**
- * File Display
+ * @file
+ * OS File module main module file.
  */
+
+define('OS_FILE_FILEPATH_MULTITENANT', '[vsite:site-purl]/files');
+define('OS_FILE_FILEPATH_SINGLETENANT', 'share');
 
 /**
  * Implements hook_menu().
@@ -24,76 +26,78 @@ function os_files_menu() {
 }
 
 /**
- * Entry point for vsite aliased file downloads
+ * Entry point for vsite aliased file downloads.
  */
-function os_files_download(){
+function os_files_download() {
   $args = func_get_args();
 
-  if(module_exists('vsite')){
-   $prefix = vsite_get_purl();
-   if($prefix){
-     //Add the prefix as an arg
-     array_unshift($args, $prefix);
-   }
+  if (module_exists('vsite')) {
+    $prefix = vsite_get_purl();
+    if ($prefix) {
+      // Add the prefix as an arg.
+      array_unshift($args, $prefix);
+    }
   }
-  //Use the public schema
+
+  // Use the public schema.
   array_unshift($args, 'public');
 
-  //Serve the file via the standard download handler
+  // Serve the file via the standard download handler.
   call_user_func_array('file_download',$args);
 }
 
 
 /**
- * File Settings
+ * File Settings.
  */
-function os_files_media_browser_params_alter(&$media_params){
+function os_files_media_browser_params_alter(&$media_params) {
 
-  //Are we in multi-tenant?  get the file path
-  if(spaces_get_space()){
+  // Are we in multi-tenant? get the file path.
+  if (spaces_get_space()) {
     $filepath = OS_FILE_FILEPATH_MULTITENANT;
-  }else {
+  }
+  else {
     $filepath = OS_FILE_FILEPATH_SINGLETENANT;
   }
 
-  if(!empty($filepath) && (empty($media_params['file_directory']) || !strstr($media_params['file_directory'], $filepath))){
-    if(!empty($media_params['file_directory'])){
-      //Prepend the file path
+  if (!empty($filepath) && (empty($media_params['file_directory']) || !strstr($media_params['file_directory'], $filepath))) {
+    if (!empty($media_params['file_directory'])) {
+      // Prepend the file path.
       $media_params['file_directory'] = $filepath."/".$media_params['file_directory'];
-    }else{
-      //Set the default file path
+    }
+    else{
+      // Set the default file path.
       $media_params['file_directory'] = $filepath;
     }
-
   }
 }
 
 /**
- * Implements hook stream_wrappers_alter
+ * Implements hook_stream_wrappers_alter().
  *
- * Used to extend the public stream wrapper
+ * Used to extend the public stream wrapper.
  *
  * @param array $wrappers
  */
-function os_files_stream_wrappers_alter(&$wrappers){
-  //Use OS Stream Wrapper
-  if(isset($wrappers['public'])){
+function os_files_stream_wrappers_alter(&$wrappers) {
+  // Use OS Stream Wrapper.
+  if (isset($wrappers['public'])) {
     $wrappers['public']['class'] = 'OSPublicStreamWrapper';
   }
 }
 
 
 /**
- * Implement hook file download to serve public files from a vsite directory
- *
  * Implements hook_file_download().
+ *
+ * Serve public files from a vsite directory.
  */
 function os_files_file_download($uri) {
   $path = file_uri_target($uri);
   $scheme = file_uri_scheme($uri);
 
-  if($scheme != 'public' || !module_exists('vsite')){
-    return null;
+  if ($scheme != 'public' || !module_exists('vsite')) {
+    return NULL;
   }
 
   $prefix = vsite_get_purl();
@@ -105,8 +109,9 @@ function os_files_file_download($uri) {
     $files = file_load_multiple(array(), array('uri' => $uri));
     if (count($files)) {
       foreach ($files as $item) {
-        // Since some database servers sometimes use a case-insensitive comparison
-        // by default, double check that the filename is an exact match.
+        // Since some database servers sometimes use a case-insensitive
+        // comparison by default, double check that the filename is an exact
+        // match.
         if ($item->uri === $uri) {
           $file = $item;
           break;
@@ -119,13 +124,13 @@ function os_files_file_download($uri) {
 
     return file_get_content_headers($file);
   }
-
 }
 
 /**
- * Implements hook views_alter
+ * Implements hook_views_alter().
  *
- * Adds necessary relationship and filters to Media Browser view to make it work with spaces
+ * Adds necessary relationship and filters to Media Browser view to make it
+ * work with spaces.
  */
 function os_files_views_default_views_alter(&$views) {
   if (module_exists('vsite') && isset($views['media_default'])) {
@@ -136,9 +141,9 @@ function os_files_views_default_views_alter(&$views) {
   }
 }
 
-
 /**
- * Media Gallery adds some fields to every file bundle. We don't want one of them.
+ * Media Gallery adds some fields to every file bundle. We don't want one of
+ * them.
  */
 function os_files_module_installed($modules) {
   if (in_array('media_gallery', $modules)) {
@@ -151,10 +156,10 @@ function _os_files_clean_up_fields() {
 }
 
 /**
- * Implements hook_field_formatter_info.
+ * Implements hook_field_formatter_info().
  *
- * Formatter that splits images into its own list
- * Used in conjunction with jCarousel
+ * Formatter that splits images into its own list Used in conjunction with
+ * jCarousel.
  */
 function os_files_field_formatter_info() {
   $formatters = array();
@@ -169,11 +174,11 @@ function os_files_field_formatter_info() {
 }
 
 /**
- * Implements hook_field_formatter_view.
+ * Implements hook_field_formatter_view().
  *
  * This formatter renders a list of files as two elements:
- * 1. A list of images
- * 2. A table of everything else
+ *  1. A list of images
+ *  2. A table of everything else
  */
 function os_files_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $elements = array(
@@ -196,8 +201,15 @@ function os_files_field_formatter_view($entity_type, $entity, $field, $instance,
           $image_info = image_get_info($i['uri']);
           $images[] = array(
             'href' => file_create_url($i['uri']),
-            'title' => theme('image_style', array('path' => $i['uri'], 'style_name' => 'thumbnail', 'title' => $title, 'alt' => $alt, 'width' => $image_info['width'], 'height' => $image_info['height'])),
-            'html' => TRUE
+            'title' => theme('image_style', array(
+              'path' => $i['uri'],
+              'style_name' => 'thumbnail',
+              'title' => $title,
+              'alt' => $alt,
+              'width' => $image_info['width'],
+              'height' => $image_info['height'],
+            )),
+            'html' => TRUE,
           );
         }
         else {
@@ -207,7 +219,7 @@ function os_files_field_formatter_view($entity_type, $entity, $field, $instance,
           $other[] = array(
             array(
               'data' => theme('file_icon', array('file' => (object)$i)),
-              'class' => array('mime', 'mime-'.$extension)
+              'class' => array('mime', 'mime-'.$extension),
             ),
             array(
               'data' => l($text, $href),
@@ -227,7 +239,7 @@ function os_files_field_formatter_view($entity_type, $entity, $field, $instance,
         '#attributes' => array(
           'class' => array(
             'os-files-image-list',
-            'jcarousel-skin-default'
+            'jcarousel-skin-default',
           ),
         ),
       );
@@ -256,7 +268,7 @@ function os_files_jcarousel_add($elements) {
 }
 
 /**
- * Implements hook_views_data_alter.
+ * Implements hook_views_data_alter().
  *
  * Adds file_managed as a table the pseudo-table spaces can be joined to.
  * This enables files to use the spaces_current_space filter

@@ -17,6 +17,14 @@ class SpacesOverridesVariableMigration extends SpacesOverridesTableMigration {
   }
 
   public function prepareRow(&$row) {
+    //correct some known unserialized rows
+    if ($row->value == '0') {
+      $row->value = 'b:0;';
+    }
+    if ($row->value == '1') {
+      $row->value = 'b:1;';
+    }
+
     if (($value = @unserialize($row->value)) === FALSE) {
       if (empty($row->value) || $row->value == 'NULL') {
         return; //unless we have to update object_ids.
@@ -120,6 +128,8 @@ class SpacesOverridesVariableMigration extends SpacesOverridesTableMigration {
     $discontinued = array(
       'vsite_design_disable_shield',
       'vsite_shields_disable_shield',
+      'vsite_design_maintheme', //Populated directly from og_theme
+      'scholar_front_show_title', //No longer used
     );
     return in_array($object_id, $discontinued);
   }

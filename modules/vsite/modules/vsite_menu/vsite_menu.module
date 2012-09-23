@@ -497,12 +497,9 @@ function _vsite_menu_get_mlid(){
 
   $mlid = variable_get('vsite_menu_mlid_increment',VSITE_MENU_CUSTOM_MLID);
 
-  //increment the mlid vsite-wide
-  if($vsite){
-    $vsite->controllers->variable->set('vsite_menu_mlid_increment',($mlid + 1));
-  }else{
-    variable_set('vsite_menu_mlid_increment',($mlid + 1));
-  }
+  // Increment the mlid site-wide, this only needs to
+  // be distinct per menu, but no need to keep the var for each site
+  variable_set('vsite_menu_mlid_increment',($mlid + 1));
 
   return $mlid;
 }

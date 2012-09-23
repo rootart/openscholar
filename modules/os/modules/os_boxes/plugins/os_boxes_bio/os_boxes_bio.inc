@@ -57,7 +57,7 @@ class os_boxes_bio extends os_boxes_default {
     $block = parent::render();
 
     // Returns the bio node object, or FALSE if none.
-    $node = _os_biocv_get_bio_node();
+    $node = os_biocv_get_bio_node();
 
     if ($node === FALSE) {
       $block['content'] = $this->render_no_bio();

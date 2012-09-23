@@ -52,17 +52,17 @@ function os_booklets_context_default_contexts() {
           'region' => 'sidebar_second',
           'weight' => '-10',
         ),
-        'views-os_booklets-block' => array(
-          'module' => 'views',
-          'delta' => 'os_booklets-block',
+        'boxes-os_booklets_recent_docs' => array(
+          'module' => 'boxes',
+          'delta' => 'os_booklets_recent_docs',
           'region' => 'sidebar_second',
-          'weight' => '-9',
+          'weight' => '-8',
         ),
         'boxes-os_addthis' => array(
           'module' => 'boxes',
           'delta' => 'os_addthis',
           'region' => 'sidebar_second',
-          'weight' => '-8',
+          'weight' => '-7',
         ),
       ),
     ),

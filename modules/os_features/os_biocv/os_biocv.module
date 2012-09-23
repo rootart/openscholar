@@ -11,7 +11,7 @@
 include_once 'os_biocv.features.inc';
 
 /**
- * Drupal hooks
+ * Implements hook_menu().
  */
 function os_biocv_menu() {
   $items = array();
@@ -50,38 +50,30 @@ function os_biocv_menu() {
 }
 
 /**
- * Implements hook_form_alter().
- *
- * Edit cv form to add link to settings page.
+ * Implements hook_form_FORM_ID_form_alter() for cv_node_form
  */
-function os_biocv_form_alter(&$form, $form_state, $form_id) {
-  if ($form_id !== 'cv_node_form') {
-    return;
-  }
-  $settings_link = l('Bio feature settings', 'features/os_biocv');
+function os_biocv_form_cv_node_form_alter(&$form, &$form_state, $form_id) {
+  $settings_link = l(t('Bio feature settings'), 'features/os_biocv');
 }
 
 /**
- * Implements hook_menu_alter().
+ * Implements hook_node_access().
  *
- * Prevents new bio/cv nodes from being created if a bio node already exists.
+ * Denies users from creating more than 1 Bio or CV node.
+ * Site-wide for single tenant, or per-vsite on multi-tenant.
  */
-function os_biocv_menu_alter(&$items) {
-  // Only proceeds if current user has access to create bios in the first place.
-  if (!isset($items['node/add/bio']) && !isset($items['node/add/cv'])) {
-    return;
+function os_biocv_node_access($node, $op, $account) {
+  if ($op !== 'create') {
+    return NODE_ACCESS_IGNORE;
   }
-
-  // Prevents a duplicate node from being created if Bio already exists.
-  $bio_exists = _os_biocv_bio_exists();
-  if ($bio_exists && isset($items['node/add/bio']['access callback'])) {
-    $items['node/add/bio']['access callback'] = FALSE;
+  $type = is_string($node) ? $node : $node->type;
+  if (!in_array($type, array('bio', 'cv'))) {
+    return NODE_ACCESS_IGNORE;
   }
-  // Prevents a duplicate node from being created if Bio already exists.
-  $cv_exists = _os_biocv_cv_exists();
-  if ($bio_exists && isset($items['node/add/cv']['access callback'])) {
-    $items['node/add/cv']['access callback'] = FALSE;
+  if (_os_biocv_get_first_node($type) !== FALSE) {
+    return NODE_ACCESS_IGNORE;
   }
+  return NODE_ACCESS_DENY;
 }
 
 /**
@@ -90,10 +82,12 @@ function os_biocv_menu_alter(&$items) {
  * Removes the username from $submitted info on blog type nodes.
  */
 function os_biocv_process_node(&$vars) {
-  if ($vars['type'] !== 'cv') return;
+  if ($vars['type'] !== 'cv') {
+    return;
+  }
   // Build the submitted variable used by default in node templates
   $last_updated = format_date($vars['changed'], 'custom', 'F j, Y');
-  $vars['title_suffix'] = '<p class="submitted">(Last updated: ' . $last_updated . ')</p>';
+  $vars['title_suffix'] = '<p class="submitted">' . t('(Last updated: @time)', array('@time' => $last_updated)) . '</p>';
 }
 
 /**
@@ -113,10 +107,6 @@ function os_biocv_context_load_alter(&$context) {
     'weight' => '-10',
   );
 }
-
-/**
- * OpenScholar hooks
- */
 
 /**
  * Implements hook_os_add_new_links_alter()
@@ -156,7 +146,7 @@ function os_biocv_vsite_admin_link($type, $object) {
   $links = array();
 
   // Only proceeds for admin links when viewing Bio and CV exists.
-  $cv_node = _os_biocv_get_cv_node();
+  $cv_node = os_biocv_get_cv_node();
   if (!($type == 'node' && $object->type == 'bio' && $cv_node !== FALSE)) {
     return $links;
   }
@@ -183,20 +173,16 @@ function os_biocv_vsite_admin_link($type, $object) {
 }
 
 /**
- * Custom functions
- */
-
-/**
  * Finds the Bio of the user with the lowest NID value, FALSE if none.
  */
-function _os_biocv_get_bio_node() {
+function os_biocv_get_bio_node() {
   return _os_biocv_get_first_node('bio');
 }
 
 /**
  * Finds the CV of the user with the lowest NID value, FALSE if none.
  */
-function _os_biocv_get_cv_node() {
+function os_biocv_get_cv_node() {
   return _os_biocv_get_first_node('cv');
 }
 
@@ -207,7 +193,6 @@ function _os_biocv_get_cv_node() {
  *   A Drupal node object in the current space, if found; otherwise FALSE.
  */
 function _os_biocv_get_first_node($type = 'bio') {
-
   // Note that this OSNodeFieldQuery will filter the current space if
   // vsite module is enabled. Otherwise it leaves out that condition and will
   // tell us whether any published bio nodes exist on this installation at all.
@@ -235,7 +220,7 @@ function _os_biocv_get_first_node($type = 'bio') {
  * @see os_biocv_os_add_new_links_alter()
  */
 function _os_biocv_bio_exists() {
-  $node = _os_biocv_get_bio_node();
+  $node = os_biocv_get_bio_node();
   return (bool)($node !== FALSE);
 }
 
@@ -246,7 +231,7 @@ function _os_biocv_bio_exists() {
  * @see os_biocv_os_add_new_links_alter()
  */
 function _os_biocv_cv_exists() {
-  $node = _os_biocv_get_cv_node();
+  $node = os_biocv_get_cv_node();
   return (bool)($node !== FALSE);
 }
 
@@ -260,9 +245,8 @@ function _os_biocv_bio_page_contents() {
 
   $cv_filepath = FALSE;
   if (!_os_biocv_show_local_tasks()) {
-    $cv_node = _os_biocv_get_cv_node();
+    $cv_node = os_biocv_get_cv_node();
     if ($cv_node !== FALSE) {
-      dpm('getting filepath...');
       $cv_filepath = _os_biocv_get_cv_filepath($cv_node);
     }
   }
@@ -271,7 +255,7 @@ function _os_biocv_bio_page_contents() {
   }
 
   // Loads the Bio node
-  $node = _os_biocv_get_bio_node();
+  $node = os_biocv_get_bio_node();
   if ($node) {
     drupal_set_title($node->title);
     $output .= render(node_view($node, 'full'));
@@ -290,7 +274,7 @@ function _os_biocv_cv_page_contents() {
 
   if (_os_biocv_access_admin()) {
     $links = array();
-    $node = _os_biocv_get_cv_node();
+    $node = os_biocv_get_cv_node();
     if ($node !== FALSE) {
       $links[] = array(
       	'title' => 'Edit your CV',
@@ -312,7 +296,7 @@ function _os_biocv_cv_page_contents() {
     $output .= theme('links', $vars);
   }
 
-  $node = _os_biocv_get_cv_node();
+  $node = os_biocv_get_cv_node();
 
   if ($node === FALSE) {
     return $output;
@@ -323,16 +307,6 @@ function _os_biocv_cv_page_contents() {
   $node->title = '';
   $output .= render(node_view($node, 'full', TRUE, TRUE));
   return $output;
-
-  /* 2012-09-14 it looks like this isn't being executed on production -oren
-  $cv_filepath = _os_biocv_get_cv_filepath($node);
-  if ($cv_filepath !== FALSE) {
-    $output .= t("<h3>") . l('Download CV', $cv_filepath, array('attributes' => array('class' => "cv-direct-download"))) . t("</h3><p>Please use the above link to download a PDF copy of my CV</p>");
-  }
-  else {
-    $output .= render(node_view($node, 'full', TRUE, TRUE));
-  }
-  */
 }
 
 /**

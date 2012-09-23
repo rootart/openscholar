@@ -4,7 +4,7 @@
  * Default front page, stub
  */
 function os_frontpage(){
-  
+
   return "I AM THE HOME PAGE";
 }
 
@@ -13,14 +13,14 @@ function os_frontpage(){
  */
 function os_page_not_found_page() {
   $t = '<strong>' . t('This page can not be found.') . '</strong>';
-  $t = t('The URL might be incorrect or have changed.  Please go back to the !link', 
+  $t = t('The URL might be incorrect or have changed.  Please go back to the !link',
       array('!link' => l('homepage', '<front>')));
   return $t;
 }
 
 /**
  * User Page (replacement for core /user)
- * 
+ *
  * This adds redirection if you click a stale login link
  */
 /**
@@ -32,9 +32,9 @@ function os_page_not_found_page() {
 function os_user_page() {
   global $user;
   module_load_include('pages.inc', 'user');
-  
-  if ($user->uid && $_GET['destination'] && $_GET['destination'] != 'user'){
-    //Redirect to destination
+
+  if ($user->uid && isset($_GET['destination']) && isset($_GET['destination']) != 'user'){
+  	//Redirect to destination
     drupal_goto();
   }elseif ($user->uid) {
     menu_set_active_item('user/' . $user->uid);

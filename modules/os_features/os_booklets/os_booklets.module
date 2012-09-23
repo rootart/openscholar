@@ -60,26 +60,6 @@ function os_booklets_form_book_node_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implements hook_os_widget().
- *
- * Exposes blocks as OpenScholar widgets.
- */
-function os_booklets_os_widget() {
-  $items = array();
-
-  // Displays "Archive" list of blog entry nodes by month
-  $items['views-os_booklets-block'] = array(
-      'module' => 'views',
-      'delta' => 'os_booklets-block',
-      'region' => 'sidebar_second',
-      'weight' => '-10',
-      'info' => 'Recent Documents'
-  );
-
-  return $items;
-}
-
-/**
  * Hides book options and ensures new book is created on node save.
  *
  * @param array $form

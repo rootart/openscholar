@@ -155,7 +155,7 @@ input[disabled] {
 }
 
 
-#block-os-login a {
+#footer #block-os-login a {
 -moz-border-radius:5px;
 -webkit-border-radius:5px;
 border-radius:5px;
@@ -173,6 +173,7 @@ font-weight:bold;
 text-shadow:1px 1px 0 rgba(255, 255, 255, 0.7);
 font-style:normal;
 line-height: 18px;
+text-decoration:none;
 }
 
 #block-os-login a:hover{

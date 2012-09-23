@@ -1,10 +1,11 @@
-<?php 
+<?php
 
 /**
- * Implement hook_install to perform install time config
+ * Implement hook_install().
+ *
+ * Perform install time config.
  */
-function os_comments_install(){
-  //Include the admin form inc file
-//   module_load_include('inc', 'ctools','includes/export-ui');s
-
+function os_comments_install() {
+  // Include the admin form inc file.
+  // module_load_include('inc', 'ctools','includes/export-ui');
 }

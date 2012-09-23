@@ -1,4 +1,6 @@
 <?php
+// $Id$
+
 include_once ('cp.features.inc');
 
 /**
@@ -8,11 +10,11 @@ include_once ('cp.features.inc');
 define('CP_MENU_OFF', 'off');
 define('CP_MENU_MINI', 'mini');
 define('CP_MENU_FULL', 'full');
-
-function cp_invoke($hook, $args = array()){
-  if (! isset($_GET['cp']) || is_null($_GET['cp']))
-    return; // we're not in a
-                                                             // cp mode
+function cp_invoke($hook, $args = array()) {
+  // we're not in a cp mode
+  if (!isset($_GET['cp']) || is_null($_GET['cp'])) {
+    return;
+  }
 
   module_load_include('inc', 'cp', 'includes/cp.' . $module);
   $function = 'cp_' . $module . '_' . $hook;
@@ -24,69 +26,69 @@ function cp_invoke($hook, $args = array()){
 /**
  * Loads an include file based on a get
  */
-function cp_init(){
+function cp_init() {
   cp_invoke('init');
 }
 
 /**
  * Implements hook_menu
  */
-function cp_menu(){
+function cp_menu() {
   $items = array();
 
   $spaces_path = drupal_get_path('module', 'spaces');
   $items["cp/build"] = array(
-      'title' => 'Site building',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array(
-          'spaces_features_form'
-      ),
-      'file' => 'spaces.admin.inc',
-      'file path' => $spaces_path,
-      'weight' => 10
+    'title' => 'Site building',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+      'spaces_features_form',
+    ),
+    'file' => 'spaces.admin.inc',
+    'file path' => $spaces_path,
+    'weight' => 10,
   );
 
   $items["cp/build/features"] = array(
-      'title' => 'Features',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array(
-          'spaces_features_form'
-      ),
-      'type' => MENU_NORMAL_ITEM,
-      'file' => 'spaces.admin.inc',
-      'file path' => $spaces_path,
-      'weight' => 10
+    'title' => 'Features',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+      'spaces_features_form',
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'spaces.admin.inc',
+    'file path' => $spaces_path,
+    'weight' => 10,
   );
 
   $items["cp/build/taxonomy"] = array(
-      'title' => 'Taxonomy',
-      'type' => MENU_NORMAL_ITEM,
-      'weight' => 10,
-      //'page callback' => 'cp_taxonomy',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('taxonomy_overview_vocabularies'),
-      'access arguments' => array('administer taxonomy'),
-      'file' => 'taxonomy.admin.inc',
-      'file path' => drupal_get_path('module', 'taxonomy'),
+    'title' => 'Taxonomy',
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 10,
+    //'page callback' => 'cp_taxonomy',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('taxonomy_overview_vocabularies'),
+    'access arguments' => array('administer taxonomy'),
+    'file' => 'taxonomy.admin.inc',
+    'file path' => drupal_get_path('module', 'taxonomy'),
   );
 
   $items["cp/build/taxonomy/add"] = array(
-      'title' => 'Add vocabulary',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('taxonomy_form_vocabulary'),
-      'access arguments' => array('administer taxonomy'),
-      'type' => MENU_LOCAL_ACTION,
-      'file' => 'taxonomy.admin.inc',
-      'file path' => drupal_get_path('module', 'taxonomy'),
+    'title' => 'Add vocabulary',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('taxonomy_form_vocabulary'),
+    'access arguments' => array('administer taxonomy'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'taxonomy.admin.inc',
+    'file path' => drupal_get_path('module', 'taxonomy'),
   );
 
   // feature customize forms
   $features = spaces_features('site');
   foreach ($features as $name => $feature) {
-    $items['cp/build/features/%ctools_js/'.$name] = array(
+    $items['cp/build/features/%ctools_js/' . $name] = array(
       'title' => 'Features',
       'page callback' => 'cp_feature_customize',
-      'page arguments' => array(3,4),
+      'page arguments' => array(3, 4),
       'access callback' => 'spaces_access_admin',
       'file' => 'cp.pages.inc',
     );
@@ -113,7 +115,7 @@ function cp_menu(){
     'options' => array(
       'alter' => TRUE,
       'html' => TRUE,
-    )
+    ),
   );
 
   $items['cp/account/logout'] = array(
@@ -126,24 +128,24 @@ function cp_menu(){
     'options' => array(
       'alter' => TRUE,
       'html' => TRUE,
-    )
+    ),
   );
 
   return $items;
 }
 
-function cp_menu_alter(&$items){
+function cp_menu_alter(&$items) {
   // make them all part of 'cp' menu
-  foreach ( $items as $path => $item ) {
+  foreach ($items as $path => $item) {
     if (strpos($path, 'cp') === 0) {
-      if (! array_key_exists('menu_name', $item))
+      if (!array_key_exists('menu_name', $item)) {
         $items[$path]['menu_name'] = 'cp';
+      }
 
-        // @todo maybe provide our own permissoin instead ?
-      if (! array_key_exists('access callback', $item))
-        $items[$path]['access arguments'] = array(
-            'access control panel'
-        );
+      // @todo maybe provide our own permissoin instead ?
+      if (!array_key_exists('access callback', $item)) $items[$path]['access arguments'] = array(
+        'access control panel',
+      );
     }
   }
 }
@@ -153,7 +155,7 @@ function cp_menu_alter(&$items){
  */
 function cp_user_title() {
   if (user_is_logged_in()) {
-    return t('Hello <strong>@username</strong>', array('@username' => ''.format_username($GLOBALS['user']).''));
+    return t('Hello <strong>@username</strong>', array('@username' => '' . format_username($GLOBALS['user']) . ''));
   }
   return t('Login');
 }
@@ -167,32 +169,32 @@ function cp_translated_menu_link_alter(&$link) {
   }
 }
 
-function cp_theme(){
+function cp_theme() {
   $theme = array();
   $theme['cp-toolbar'] = array(
-      'render element' => 'cp_toolbar',
-      'template' => 'cp-toolbar',
-      'path' => drupal_get_path('module', 'cp') . '/theme'
+    'render element' => 'cp_toolbar',
+    'template' => 'cp-toolbar',
+    'path' => drupal_get_path('module', 'cp') . '/theme',
   );
 
   return $theme;
 }
 
-function cp_permission(){
+function cp_permission() {
   return array(
-      'access control panel' => array(
-          'title' => t('Access Control Panel')
-      )
+    'access control panel' => array(
+      'title' => t('Access Control Panel'),
+    ),
   );
 }
 
 /**
  * cp/build/taxonomy callback
  */
-function cp_taxonomy(){
-  if(module_exists('vsite')){
-	  $vsite = spaces_get_space();
-	  return l("Edit/ADD this Groups Vocabularies","group/{$vsite->group_type}/{$vsite->id}/admin/taxonomy").t("(outside CP for now)");
+function cp_taxonomy() {
+  if (module_exists('vsite')) {
+    $vsite = spaces_get_space();
+    return l("Edit/ADD this Groups Vocabularies", "group/{$vsite->group_type}/{$vsite->id}/admin/taxonomy") . t("(outside CP for now)");
   }
 
   return drupal_get_form('taxonomy_overview_vocabularies');
@@ -201,7 +203,7 @@ function cp_taxonomy(){
 /**
  * Make a decision about the active theme
  */
-function cp_custom_theme(){
+function cp_custom_theme() {
 
   //Turn the CP theme on
   if (cp_use_cp_theme()) {
@@ -214,11 +216,12 @@ function cp_custom_theme(){
  *
  * @return Bool indicating whether or not to use cp theme.
  */
-function cp_use_cp_theme(){
+function cp_use_cp_theme() {
   if ((arg(0) == 'cp') ||
-      (arg(0) == 'os') ||
-      (arg(0) == 'media') ||
-      (arg(0) == 'node' && (arg(1) == 'add' || arg(2) == 'edit' || arg(2) == 'delete'))) {
+    (arg(0) == 'os') ||
+    (arg(0) == 'media') ||
+    (arg(0) == 'node' && (arg(1) == 'add' || arg(2) == 'edit' || arg(2) == 'delete'))
+  ) {
     return TRUE;
   }
   return FALSE;
@@ -236,47 +239,51 @@ function cp_use_cp_theme(){
  * @param
  *          $form_id
  */
-function cp_form_spaces_features_form_alter(&$form, &$form_state, $form_id){
+function cp_form_spaces_features_form_alter(&$form, &$form_state, $form_id) {
   // Only make changes if we are in the Openscholar Admin section
-  if (context_isset('context', 'os_cp')) {
-    ctools_include('ajax');
-    ctools_include('modal');
-    ctools_modal_add_js();
-
-    $spaces_features = variable_get('spaces_features', array());
-
-    foreach ( array_keys($form['spaces_features']) as $f_name ) {
-      if ($f_name[0] == '#') continue;
-
-      // is this feature customizable ?
-      // by convenction feature settings form is at features/feature_name
-      $item = menu_get_item('features/' . $f_name);
-
-      $class = (isset($_GET['open_feature_settings']) && $_GET['open_feature_settings'] == $f_name)?"modal_click_onload":"";
-
-      $link = ctools_modal_text_button('customize', 'cp/build/features/nojs/' . $f_name, 'customize ' . $f_name, $class); //, 'ctools-modal-openscholar-style-default');
-      $form['settings'][$f_name] = array(
-        '#type' => 'markup',
-        '#markup' => $link
-      );
-
-    }
-
-    if (isset($form['site_frontpage'])) {
-      // Only allow users with administer spaces permission to change the site
-      // path
-      $form['site_frontpage']['#access'] = user_access('administer spaces');
-      $form['site_frontpage_path']['#access'] = user_access('administer spaces');
-    }
-
-    if (module_exists('vsite') && ($vsite = spaces_get_space())) {
-      $form['actions']['space_overrides'] = array(
-          '#markup' => l('overrides', 'node/'.$vsite->id.'/features/overrides'),
-          '#weight' => 100,
-          '#access' => user_access('administer spaces'),
-      );
-    }
+  if (!context_isset('context', 'os_cp')) {
+    return;
   }
+  ctools_include('ajax');
+  ctools_include('modal');
+  ctools_modal_add_js();
+
+  $spaces_features = variable_get('spaces_features', array());
+
+  foreach (array_keys($form['spaces_features']) as $f_name) {
+    if ($f_name[0] == '#') {
+      continue;
+    }
+
+    // is this feature customizable ?
+    // by convention feature settings form is at features/feature_name
+    $item = menu_get_item('features/' . $f_name);
+
+    $class = (isset($_GET['open_feature_settings']) && $_GET['open_feature_settings'] == $f_name) ? "modal_click_onload" : "";
+
+    //, 'ctools-modal-openscholar-style-default');
+    $link = ctools_modal_text_button('customize', 'cp/build/features/nojs/' . $f_name, 'customize ' . $f_name, $class);
+    $form['settings'][$f_name] = array(
+      '#type' => 'markup',
+      '#markup' => $link,
+    );
+  }
+
+  if (isset($form['site_frontpage'])) {
+    // Allows users with administer spaces permission to change the site path
+    $form['site_frontpage']['#access'] = user_access('administer spaces');
+    $form['site_frontpage_path']['#access'] = user_access('administer spaces');
+  }
+
+  if (!(module_exists('vsite') && ($vsite = spaces_get_space()))) {
+    return;
+  }
+
+  $form['actions']['space_overrides'] = array(
+    '#markup' => l('overrides', 'node/' . $vsite->id . '/features/overrides'),
+    '#weight' => 100,
+    '#access' => user_access('administer spaces'),
+  );
 }
 
 /**
@@ -312,3 +319,4 @@ function cp_cp_settings() {
 
   return $setting;
 }
+

@@ -148,9 +148,6 @@ class os_boxes_slideshow extends os_boxes_default {
 
     if ($view = views_get_view('os_image_gallery_slideshow')) {
 
-      if (((int)$this->options['gallery_nid']) > 0) {
-        $view->set_arguments($this->options['gallery_nid']);
-      }
       $view->init_display();
       $handler = $view->display_handler;
       $style_options = $handler->get_option('style_options');
@@ -162,13 +159,33 @@ class os_boxes_slideshow extends os_boxes_default {
         }
       }
 
+      //limit to one gallery
+      if (((int)$this->options['gallery_nid']) > 0) {
+        $filters = $handler->get_option('filters');
+        $filters['nid'] = array(
+          'id' => 'nid',
+          'table' => 'node',
+          'field' => 'nid',
+          'relationship' => 'file_to_node',
+          'group_type' => 'group',
+          'ui_name' => '',
+          'operator' => '=',
+          'group' => '1',
+          'exposed' => FALSE,
+          'expose' => array(),
+          'value' => array('min'=>'', 'max'=>'', 'value'=>$this->options['gallery_nid']),
+        );
+        $handler->set_option('filters', $filters);
+      }
+
+      //effects
       $style_options['views_slideshow_cycle']['effect'] = $this->options['effect'];
       $handler->set_option('style_options', $style_options);
 
       //title
       if ($this->options['show_image_titles'] == 'none') {
         $fields = $handler->get_option('fields');
-        $fields['filename']['exclude'] = TRUE;
+        $fields['media_title']['exclude'] = TRUE;
         $handler->set_option('fields', $fields);
       }
 

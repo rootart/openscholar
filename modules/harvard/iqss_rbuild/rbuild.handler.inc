@@ -58,10 +58,6 @@ class rbuild_handler implements os_software_handler {
   }
 
   /**
-   * Public functions
-   */
-
-  /**
    * Gets all packages
    *
    * @return array $packages
@@ -124,7 +120,7 @@ class rbuild_handler implements os_software_handler {
    *
    * @param object $project_node
    */
-  public function init_releases(&$project_node) {
+  public function fetch_releases(&$project_node) {
     if (!is_numeric($project_node->nid)) {
       return FALSE;
     }
@@ -194,38 +190,6 @@ class rbuild_handler implements os_software_handler {
       );
     }
   }
-
-  /**
-   * Proccesses cron job to check for updates.
-   */
-  public function find_new_release(&$project_node, $fetch_releases = FALSE) {
-    $added_new_release = FALSE;
-
-    // Only proceeds if we have a package
-    $package = $this->get_package();
-    // FALSE
-    if (!($package)) {
-      return $added_new_release;
-    }
-
-    // Updates title and description
-    $changed = $this->alter_project($project_node);
-    if ($changed) {
-      node_save($project_node);
-    }
-
-    // Adds this new Software Release node if new, then returns TRUE
-    $filename = $this->short_name . '_' . $package['version'] . '.tar.gz';
-    $added_new_release = _rbuild_add_release_node_wrapper($project_node, $package['version'], $filename, $package, $this->url);
-
-    // Returns TRUE only if the node did not already exist
-    // Returns FALSE if the node already exists (no content was added)
-    return $added_new_release;
-  }
-
-  /**
-   * Private functions
-   */
 
   /**
    * Creates URL path.

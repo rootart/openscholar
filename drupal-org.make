@@ -8,15 +8,45 @@ projects[addressfield][subdir] = "contrib"
 projects[admin_menu][version] = 3.0-rc3
 projects[admin_menu][subdir] = "contrib"
 
+projects[biblio][version] = 1.0-rc4
+projects[biblio][subdir] = "biblio"
+projects[biblio][patch][] = "http://drupal.org/files/biblio-md5_hash-1722772-1.patch"
+
 projects[boxes][version] = 1.0
 projects[boxes][subdir] = "contrib"
 
 projects[calendar][version] = 3.4
 projects[calendar][subdir] = "contrib"
 
+projects[colorbox][version] = 1.3
+projects[colorbox][subdir] = "contrib"
+
+projects[comment_sources][type] = module
+projects[comment_sources][subdir] = "contrib"
+projects[comment_sources][download][type] = git
+projects[comment_sources][download][url] = "git://github.com/openscholar/comment_sources.git"
+
 projects[ctools][version] = 1.2
 projects[ctools][subdir] = "contrib"
-projects[ctools][patch][] = "http://drupal.org/files/1707810-ctools-fields-mock-field-5.patch"
+projects[ctools][patch][] = "http://drupal.org/files/1707810-ctools-fields-mock-field-7.patch"
+
+projects[eva][version] = 1.2
+projects[eva][subdir] = "contrib"
+
+projects[filefield_paths][version] = 1.0-beta3
+projects[filefield_paths][subdir] = "contrib"
+
+projects[google_feedapi][version] = 1.0-beta1
+projects[google_feedapi][subdir] = "contrib"
+
+projects[jcarousel][version] = 2.6
+projects[jcarousel][subdir] = "contrib"
+
+projects[job_scheduler][version] = 2.0-alpha3
+projects[job_scheduler][subdir] = "contrib"
+
+projects[context][version] = 3.0-beta4
+projects[context][subdir] = "contrib"
 
 projects[date][version] = 2.6
 projects[date][subdir] = "contrib"
@@ -122,7 +152,7 @@ projects[oembed][subdir] = "contrib"
 
 projects[og][version] = 2.x-dev
 projects[og][subdir] = "contrib"
-projects[og][patch][] = "http://drupal.org/files/1730678-complex-widget-6.patch"
+;projects[og][patch][] = "http://drupal.org/files/1730678-complex-widget-6.patch"
 
 projects[og_vocab][version] = 1.x-dev
 projects[og_vocab][subdir] = "contrib"
@@ -144,6 +174,9 @@ projects[search_api][subdir] = "contrib"
 
 projects[search_api_db][version] = 1.x-dev
 projects[search_api_db][subdir] = "contrib"
+
+projects[password_hustle][version] = 1.0
+projects[password_hustle][subdir] = "contrib"
 
 projects[spaces][version] = 3.0-alpha1
 projects[spaces][subdir] = "contrib"
@@ -177,6 +210,9 @@ projects[views_slideshow][subdir] = "contrib"
 
 projects[wysiwyg][version] = 2.1
 projects[wysiwyg][subdir] = "contrib"
+
+projects[wysiwyg_filter][version] = 1.6-rc2
+projects[wysiwyg_filter][subdir] = "contrib"
 
 ; Libraries.
 

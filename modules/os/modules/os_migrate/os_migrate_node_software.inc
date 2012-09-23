@@ -95,18 +95,17 @@ class SoftwareReleaseNodeOSMigration extends AbstractNodeOSMigration {
     $this->addFieldMapping('field_software_version:language', 'language');
 
     //file package
-    $this->addFieldMapping('field_software_package', 'filepath');
+    $this->addFieldMapping('field_software_package', 'field_software_package')->defaultValue(NULL);
     $this->addFieldMapping('field_software_package:language', 'language');
     $this->addFieldMapping('field_software_package:source_dir')->defaultValue(variable_get('os_migrate_files', FALSE));
-    $this->addFieldMapping('field_software_package:destination_file', 'filepath');
+    ;
+    $this->addFieldMapping('field_software_package:destination_file', 'field_software_package:destination_file');
     $this->addFieldMapping('field_software_package:description', 'field_scholar_software_file_data');
     $this->addFieldMapping('field_software_package:display', 'field_scholar_software_file_list');
 
-    $this->addFieldMapping('file_class', 'file_class'); //can be overridden to accept a url
+    $this->addUnmigratedDestinations(parent::subfields('field_software_package', array('destination_dir', 'preserve_files', 'file_class', 'file_replace')));
 
-    $this->addUnmigratedDestinations(parent::subfields('field_software_package', array('destination_dir', 'file_replace', 'preserve_files')));
-
-
+    $this->removeFieldMapping('title');
   }
 
   public function query($content_type) {
@@ -114,6 +113,7 @@ class SoftwareReleaseNodeOSMigration extends AbstractNodeOSMigration {
 
     $query->join('files', 'f', 'f.fid = ct.field_scholar_software_file_fid');
     $query->addField('f', 'filepath');
+    $query->condition('f.filepath', 'http://r.iq.%', 'NOT LIKE');
 
     /**
      * Modify the query.  Add joins and fields here.  content_type_${content_type} and its fields are already included.
@@ -129,11 +129,19 @@ class SoftwareReleaseNodeOSMigration extends AbstractNodeOSMigration {
     /**
      * Describe each of the source columns
     */
+    $subfields = parent::subfields('field_software_package', array('destination_file', 'file_class', 'file_replace'));
+    $subfields[] = 'field_software_version';
+    $subfields[] = 'field_software_package';
+    $fields += array_combine($subfields, $subfields);
 
     return $fields;
   }
 
   public function prepareRow(&$current_row) {
+
+    if ($description = @unserialize($current_row->field_scholar_software_file_data)) {
+      $current_row->field_scholar_software_file_data = $description;
+    }
 
     $current_row->field_software_version = $current_row->field_versionmajor_value;
     if (strlen($current_row->field_versionextra_value)) {
@@ -143,19 +151,15 @@ class SoftwareReleaseNodeOSMigration extends AbstractNodeOSMigration {
       $current_row->field_software_version .= ':' . $current_row->field_versionpatch_value;
     }
 
-    $http = '/http:\/\//';
-    if (preg_match($http, $current_row->filepath)) {
-      $current_row->file_class = 'MigrateFileUri';
+    $file = parent::get_file_by_fid($current_row->field_scholar_software_file_fid);
+    if ($file) {
+      parent::os_migrate_prepare_files(array($file), $current_row, 'field_software_package');
+      $current_row->{'field_software_package:destination_file'} = $current_row->filepath;
+
     }
-//     $file = parent::get_file_by_fid('field_scholar_software_file_fid');
-//     if ($file) {
-
-//       $fields = array('destination_file', 'description', 'display');
-//     }
-
-
 
     return parent::prepareRow($current_row); //false -> skip this row
 
   }
+
 }

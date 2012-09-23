@@ -72,6 +72,32 @@ function os_wysiwyg_node_update($node){
   os_wysiwyg_update_files($node);
 }
 
+function os_wysiwyg_node_delete($node) {
+  $files = array();
+  $body = field_get_items('node', $node, 'body');
+  if (isset($body[0]['value'])) {
+
+    $matches = array();
+    if (preg_match_all("/\[\[.*?\]\]/s", $body[0]['value'], $matches)) {
+
+      $matches = $matches[0];
+      $matches = str_replace("[[", "", $matches);
+      $matches = str_replace("]]", "", $matches);
+      foreach ($matches as $tag) {
+        if (!is_string($tag)) {
+          continue;
+        }
+
+        $tag_info = drupal_json_decode($tag);
+        if ($tag_info['type'] == 'media' && $tag_info['fid'] && $file = file_load($tag_info['fid'])) {
+          file_usage_delete($file, 'os_wysiwyg', 'node', $node->nid, 1);
+          file_delete($file);
+        }
+      }
+    }
+  }
+}
+
 function os_wysiwyg_wysiwyg_editor_settings_alter(&$settings, $context){
 
   // settings there are no UI options for
@@ -119,16 +145,35 @@ function os_wysiwyg_wysiwyg_include_directory($type){
   }
 }
 
+function os_wysiwyg_media_wysiwyg_allowed_view_modes_alter(&$view_modes, $file) {
+  $scheme = file_uri_scheme($file->uri);
+  switch ($scheme) {
+    case 'oembed':
+      $temp['media_original'] = $view_modes['media_original'];
+      $view_modes = $temp;
+    break;
+    case 'public':
+      $mime = explode('/', $file->filemime);
+      $type = $mime[0];  // I do this to get the type in case bundles for files are ever expanded out of just mime type
+      if ($type == 'image') {
+        $temp['media_original'] = $view_modes['media_original'];
+        $temp['media_small'] = $view_modes['media_small'];
+        $temp['media_large'] = $view_modes['media_large'];
+        $temp['media_link'] = $view_modes['media_link'];
+      }
+      else {  // until there is support for the audio or video tags, this is the best we can do for that kind of file.
+        $temp['media_link'] = $view_modes['media_link'];
+      }
+      $view_modes = $temp;
+    break;
+  }
+}
+
 /**
  * Implements hook_element_info_alter
  *
  * Adds a prerender to the text_format element
  */
 function os_wysiwyg_element_info_alter(&$elements) {
-  $elements['text_format']['#pre_render'][] = 'os_wysiwyg_format_toggle';
-}
-
-function os_wysiwyg_format_toggle($element) {
-  $element['#attached']['js'][] = drupal_get_path('module', 'os_wysiwyg').'/os_wysiwyg.js';
-  return $element;
+  $elements['text_format']['#attached']['js'][] = drupal_get_path('module', 'os_wysiwyg').'/os_wysiwyg.js';
 }

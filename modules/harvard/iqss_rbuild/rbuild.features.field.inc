@@ -51,7 +51,7 @@ function rbuild_field_default_fields() {
           'label' => 'above',
           'module' => 'text',
           'settings' => array(),
-          'type' => 'text_default',
+          'type' => 'hidden',
           'weight' => 6,
         ),
         'teaser' => array(

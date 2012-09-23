@@ -15,9 +15,7 @@ function cp_user_menu(){
     'title' => 'Users',
     'description' => 'Find and manage site members.',
     'page callback' => 'cp_user_admin',
-    'access arguments' => array(
-        'administer users'
-    ),
+    'access callback' => 'cp_user_admin_access',
     'weight' => 50,
     'menu_name' => 'cp',
   );
@@ -26,7 +24,7 @@ function cp_user_menu(){
     'title' => 'Manage Members',
     'description' => 'Find and manage site members.',
     'page callback' => 'cp_user_admin',
-    'access arguments' => array('administer users'),
+    'access callback' => 'cp_user_admin_access',
     'file' => 'cp_user.form.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 20,
@@ -35,15 +33,7 @@ function cp_user_menu(){
   $items['cp/users/add'] = array(
     'title' => 'Add User to Site',
     'page arguments' => array('add'),
-    'access arguments' => array('administer users'),
-    'type' => MENU_LOCAL_ACTION,
-    'context' => MENU_CONTEXT_PAGE,
-  );
-
-  $items['cp/users/create'] = array(
-    'title' => 'Create New User',
-    'page arguments' => array('create'),
-    'access arguments' => array('administer users'),
+    'access callback' => 'cp_user_admin_access',
     'type' => MENU_LOCAL_ACTION,
     'context' => MENU_CONTEXT_PAGE,
   );
@@ -51,6 +41,12 @@ function cp_user_menu(){
   return $items;
 }
 
+/**
+ * Menu access; Return TRUE if user can access user admin page.
+ */
+function cp_user_admin_access() {
+  return user_access('administer users') && spaces_get_space();
+}
 
 /**
  * Page callback; CP user admin delegator.
@@ -59,22 +55,21 @@ function cp_user_menu(){
  *   The operation needed. Defaults to "members".
  */
 function cp_user_admin($op = 'members') {
-  $og_context = og_context();
+  $vsite = spaces_get_space();
 
   switch ($op) {
     case 'add':
       module_load_include('inc', 'og_ui', 'og_ui.admin');
-      $build['user_add'] = drupal_get_form('og_ui_add_users', 'node', $og_context['gid']);
-      break;
-
-    case 'create':
+      $build['user_add'] = drupal_get_form('og_ui_add_users', 'node', $vsite->id);
+      // Move up the user_register_form from "create" as we're removing that option.
+      // Both forms should display and be controlled by jQuery to hide one or the other depending
+      // on the action the user wants to take.
       $build['user_register'] = drupal_get_form('user_register_form');
       break;
-
     case 'members':
     default:
       module_load_include('inc', 'og_ui', 'og_ui.admin');
-      $build = og_ui_admin_account('node', $og_context['gid']);
+      $build = og_ui_admin_account('node', $vsite->id);
   }
   return $build;
 }
@@ -87,6 +82,19 @@ function cp_user_admin($op = 'members') {
 function cp_user_form_og_ui_add_users_alter(&$form, $form_state) {
   $node = node_load($form['gid']['#value']);
   $form['og_user']['#title'] = t('Add an existing user to %label', array('%label' => $node->title));
+
+  // Create and add a link for the user to click on to create a new user.
+  $ajax_link = '<a href="javascript:void(0)" id="new-user-link">' . t('Add a new user') . '</a>';
+  // Added the link onto the form as just text and set the weight higher to bump it down the add user form.
+  $form['og_user']['name']['#description'] = t('Type in a persons username to search for their account.');
+  $form['og_user']['link_text'] = array(
+    '#type' => 'item',
+    '#markup' => t('If you can\'t find their account, click "!create_new" to create a new account.',
+        array('!create_new' => $ajax_link)),
+    '#weight' => 2,
+  );
+  // Attach the custom js file to control the toggle of the two forms.
+  $form['og_user']['#attached'] = array('js' => array(drupal_get_path('module', 'cp_user') . '/cp_user.js'));
 
   $form['og_user']['state'] = array(
     '#type' => 'value',
@@ -115,4 +123,42 @@ function cp_user_field_access($op, $field, $entity_type, $entity, $account) {
  */
 function cp_user_create_new_user(){
 
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ * Altering the user_register_form to add a secondary submit function
+ * that will also add a user to the site
+ */
+function cp_user_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+  // Create a hidden field to control our JS
+  $form['switch'] = array(
+    '#title' => t('switch'),
+    '#default_value' => 1,
+    '#type' => 'hidden',
+    '#attributes' => array('id'=>'switch'),
+  );
+
+  $form['#submit'][] = 'cp_user_user_register_submit';
+
+}
+
+/**
+ * Function for the secondary user_registration_form submit function
+ * that will add the newly created user to the current site.
+ */
+function cp_user_user_register_submit($form, &$form_state) {
+  $og_context = spaces_get_space();
+  // Grab the newly created username
+  if(!empty($form_state['values']['name'])) {
+    $user_name = $form_state['values']['name'];
+
+    // Recreate the add users form
+    $pass_form_state = array();
+    $pass_form_state['values']['name'] = $user_name;
+    $pass_form_state['values']['state'] = OG_STATE_ACTIVE;
+    $pass_form_state['build_info']['args'] = array('group_type'=>$og_context->group_type,'gid'=>$og_context->id);
+	// Submit the og_ui_add_users form
+    drupal_form_submit('og_ui_add_users',$pass_form_state);
+  }
 }

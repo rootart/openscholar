@@ -1,7 +1,6 @@
 <?php
 // $Id$
 
-
 /**
  * @file
  * Code for the OS Classes feature.
@@ -10,65 +9,66 @@
 include_once 'os_classes.features.inc';
 
 /**
- * Drupal hooks
- */
-
-/**
- * Implements hook_init().
+ * Implements hook_field_extra_fields().
  *
- * @todo verify works -oren
- */
-function os_classes_init() {
-  global $conf;
-
-  // Do not show files in teaser (overrides vsite strongarm) this will be handled by strongarm when we update it
-  $conf['itweak_upload_teaser_display_class'] = 0;
-}
-
-/**
- * Implements hook_content_extra_fields().
+ * Exposes a draggable widget for our custom fields, to control field weight.
  *
- * @todo verify works -oren
+ * @see os_classes_node_view()
  */
-function os_classes_content_extra_fields($type) {
-  if ($type !== 'class') {
-    return;
-  }
-
-  $extras = array();
-
-  $extras['classes_add_class_material_link'] = array(
-    'label' => t('Add "class material" link'),
-    'description' => t('Add "Class Material" to this class'),
-    'weight' => 100
+function os_classes_field_extra_fields() {
+  $extra = array();
+  $extra['node']['class'] = array(
+    'form' => array(
+      'add_class_material' => array(
+        'label' => t('Add "class material" link'),
+        'description' => t('Add "Class Material" to this class'),
+        'weight' => 100,
+      ),
+    ),
   );
 
-  return $extras;
+  return $extra;
 }
 
 /**
  * Implements hook_node_view().
  *
- * @todo verify works -oren
+ * Adds "Add class material" link to the bottom of Class nodes, for admins only.
+ *
+ * @see os_classes_field_extra_fields()
  */
 function os_classes_node_view($node, $view_mode, $langcode) {
+  // Only proceeds for class nodes, where the current user has update access.
   if ($node->type !== 'class') {
     return;
   }
-  $link = nodereference_url_build_all_links($node, FALSE);
-  $weight = (module_exists('content')) ? content_extra_field_weight($node->type, 'classes_add_class_material_link') : 100;
-  $node->content['classes_add_class_material_link'] = array(
-    '#weight' => $weight,
-    '#value' => theme('links', $link, $attributes = array(
-      'class' => 'add-reference-node'
-    ))
+  if (!node_access('update', $node)) {
+    return;
+  }
+
+  // Finds the weight of the extra field.
+  $name = 'add_class_material';
+  $node->content[$name] = array();
+  $extra_fields = field_info_extra_fields('node', 'class', 'form');
+  if (isset($extra_fields[$name]['weight'])) {
+    $node->content[$name]['#weight'] = $extra_fields[$name]['weight'];
+  }
+
+  // Populates the render array with the "Add class material" link.
+  $links = array();
+  $links[] = array(
+    'title' => t("Add class material"),
+    'href' => 'node/add/class-material',
+    'query' => array('field_class' => $node->nid),
   );
+  $node->content[$name]['#markup'] = theme('links', array(
+      'links' => $links,
+      'attributes' => array('class' => array('node-reference-node')),
+    ));
 }
 
 /**
  * Implements hook_node_delete().
- *
- * @todo verify works -oren
  */
 function os_classes_node_delete($node) {
   if ($node->type !== 'class') {
@@ -77,64 +77,53 @@ function os_classes_node_delete($node) {
   _os_classes_delete_children($node->nid);
 }
 
-
 /**
  * Implements hook_link_alter().
  *
  * @todo verify works -oren
- */
-function os_classes_node_view_alter(&$build) {
-  if (isset($links['class_material_field_class'])) {
-    unset($links['class_material_field_class']);
-  }
-}
-
-/**
- * OpenScholar hooks
- */
+ *
+ function os_classes_node_view_alter(&$build) {
+ if (isset($links['class_material_field_class'])) {
+ unset($links['class_material_field_class']);
+ }
+ } */
 
 /**
  * Implements hook_vsite_og_node_type_info().
- *
- * Replaces OpenScholar 2.0 hook_vsite_content_types_alter().
  */
 function os_classes_vsite_og_node_type_info() {
   return array(
     'class' => 'group content',
+    'class_material' => 'group content',
   );
 }
 
 /**
  * Implements hook_context_links_alter().
- *
- * @todo verify works -oren
  */
-function os_classes_context_links_alter(&$links) {
+function os_classes_os_add_new_links_alter(&$links) {
   if (isset($links['class_material'])) {
     unset($links['class_material']);
   }
 }
 
 /**
- * Custom functions
- */
-
-/**
- * Deletes all Class Material nodes that reference a given Deleted class node.
+ * Deletes all Class Material nodes that reference a given deleted Class node.
  *
  * @param int $nid
+ *
+ * @todo not working because group ref field is missing
  */
 function _os_classes_delete_children($nid) {
   include_once drupal_get_path('module', 'os') . '/includes/node.inc';
   $query = new OSNodeFieldQuery('class_material');
-  $query
-    ->fieldCondition('field_class', 'target_id', $nid);
+  $query->fieldCondition('field_class', 'target_id', $nid);
   $result = $query->execute();
 
   if (!isset($result['node'])) {
     return;
   }
-  else {
-    node_delete_multiple(array_keys($result['node']));
-  }
+
+  node_delete_multiple(array_keys($result['node']));
 }
+

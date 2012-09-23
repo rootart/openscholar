@@ -12,7 +12,7 @@ function os_biocv_settings() {
   );
 
   $upload_link = l(t('upload a PDF'), 'node/add/cv');
-  $node = _os_biocv_get_cv_node();
+  $node = os_biocv_get_cv_node();
   if ($node !== FALSE) {
     $upload_link = l(t('upload a PDF'), 'node/' . $node->nid . '/edit');
   }
@@ -22,7 +22,7 @@ function os_biocv_settings() {
 
   if ($filepath !== FALSE) {
     $edit_link = l(t('remove or replace'), 'node/' . $node->nid . '/edit');
-    $description = t('You may ') . $edit_link . t(' your PDF Upload');
+    $description = t('You may @edit_link your PDF Upload', array('@edit_link' => $edit_link));
   }
 
   $form['os_biocv_use_pdf_as_cv'] = array(
@@ -32,7 +32,6 @@ function os_biocv_settings() {
     '#default_value' => variable_get('os_biocv_use_pdf_as_cv', 0),
     '#options' => $options,
     '#description' => $description,
-    //'#access' => $admin,
   );
 
   return system_settings_form($form);

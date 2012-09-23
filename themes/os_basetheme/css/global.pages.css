@@ -130,7 +130,7 @@ div.messages {
    
 }
 
-#block-os-powered-by a,
+#block-os-powered-by span a,
 .os-powered-link a.os-poweredby {
     background: url("../images/poweredby.png") no-repeat scroll 0 0 transparent;
     border: medium none !important;
@@ -141,8 +141,12 @@ div.messages {
     text-indent: -999em;
     width: 85px;
     margin-top:-25px;
-   
-}
+  }
+
+.page-cp #block-os-powered-by span a {
+    background: url("../images/poweredby.png") no-repeat scroll 0 -27px transparent;
+    margin-top:0;
+  }
 
 #logo /* Wrapping link for logo */ {
   padding: 10px 0;
@@ -324,7 +328,7 @@ ul.links li {
 }
 
 
-bookiconsprite.png
+/*bookiconsprite.png*/
 
 .feed-icon /* The link to the RSS or Atom feed for the current list of content */ {
 }
@@ -338,6 +342,7 @@ bookiconsprite.png
   margin: 0;
 }
 
+.views-row {margin-bottom:1.5em;}
 
 /*
  * First sidebar (on left in LTR languages, on right in RTL)
@@ -541,12 +546,13 @@ div.ctools-modal-content .modal-content .modal-throbber-wrapper img {
 	
 
 #mediaBrowser {
-	border-radius: 0;
-	background: #FFF;
+  padding: 0;
+  border-radius: 0;
+  background: #FFF;
   -moz-box-shadow: 0 4px 26px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 4px 26px rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 26px rgba(0, 0, 0, 0.5);
-  }
+}
  
 .ui-corner-all {
     border-radius: 0;

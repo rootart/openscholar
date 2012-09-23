@@ -48,6 +48,7 @@ features[variable][] = biblio_base_title
 features[variable][] = biblio_contrib_fields_delta
 features[variable][] = biblio_export_links
 features[variable][] = biblio_init_auth_count
+features[variable][] = biblio_sort_tabs
 features[variable][] = comment_biblio
 features[variable][] = comment_anonymous_biblio
 features[variable][] = comment_default_mode_biblio

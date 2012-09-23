@@ -28,7 +28,6 @@ class SpacesOverridesMenuMigration extends SpacesOverridesTableMigration {
 
     ctools_include('menu', 'os');
 
-
     //menu storage has changed a bit.  there's more info now.
     //biggest concern: mlid.  custom menu items forge it.  legit menu items interit it from menu_links.
     //os_menu_link_save <- reference
@@ -42,7 +41,6 @@ class SpacesOverridesMenuMigration extends SpacesOverridesTableMigration {
       $id = $new_menu_item['mlid'];
       $new_menu[$id] = $new_menu_item;
     }
-
 
     $row->object_id = $object_id;
     //$row->value = serialize($value);

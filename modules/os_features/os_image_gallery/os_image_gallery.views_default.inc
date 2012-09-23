@@ -198,6 +198,7 @@ function os_image_gallery_views_default_views() {
   $handler->display->display_options['fields']['filename']['table'] = 'file_managed';
   $handler->display->display_options['fields']['filename']['field'] = 'filename';
   $handler->display->display_options['fields']['filename']['label'] = '';
+  $handler->display->display_options['fields']['filename']['exclude'] = TRUE;
   $handler->display->display_options['fields']['filename']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['filename']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['filename']['element_label_colon'] = FALSE;
@@ -232,13 +233,19 @@ function os_image_gallery_views_default_views() {
   $handler->display->display_options['fields']['uri']['alter']['alter_text'] = TRUE;
   $handler->display->display_options['fields']['uri']['alter']['text'] = '<img src="[uri]" width="100%" height="100%">';
   $handler->display->display_options['fields']['uri']['element_label_colon'] = FALSE;
+  /* Field: File: Title */
+  $handler->display->display_options['fields']['media_title']['id'] = 'media_title';
+  $handler->display->display_options['fields']['media_title']['table'] = 'field_data_media_title';
+  $handler->display->display_options['fields']['media_title']['field'] = 'media_title';
+  $handler->display->display_options['fields']['media_title']['label'] = '';
+  $handler->display->display_options['fields']['media_title']['element_label_colon'] = FALSE;
   /* Field: Global: View result counter */
   $handler->display->display_options['fields']['counter']['id'] = 'counter';
   $handler->display->display_options['fields']['counter']['table'] = 'views';
   $handler->display->display_options['fields']['counter']['field'] = 'counter';
   $handler->display->display_options['fields']['counter']['label'] = '';
   $handler->display->display_options['fields']['counter']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['counter']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['counter']['alter']['text'] = '[media_title]';
   $handler->display->display_options['fields']['counter']['alter']['make_link'] = TRUE;
   $handler->display->display_options['fields']['counter']['alter']['path'] = '[uri]';
   $handler->display->display_options['fields']['counter']['alter']['absolute'] = TRUE;

@@ -66,7 +66,7 @@ function vsite_group_default_homepage_value($entity_type, $entity, $field, $inst
 
   list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
   // Is this a group node
-  if (og_is_group_type($entity_type, $bundle)) {
+  if (og_is_group_type($entity_type, $bundle) && isset($entity->purl)) {
     // When a site is first created it does not have a domain provider, use the
     // path provider that is attached to the entity, we can't use the standard
     // purl modifier here because the entry has not been made in the table yet

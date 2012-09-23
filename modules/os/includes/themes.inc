@@ -90,16 +90,6 @@ function os_theme_get() {
   }
 }
 
-
-function os_theme_del() {
-  if ($space = spaces_get_space()) {
-    return $space->controllers->variable->del('theme_default');
-  }
-  else {
-    return variable_del('theme_default');
-  }
-}
-
 /**
  * gets the flavor of the currently selected theme
  */

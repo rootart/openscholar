@@ -7,6 +7,7 @@ dependencies[] = boxes
 dependencies[] = ctools
 dependencies[] = features
 dependencies[] = strongarm
+dependencies[] = os_stats
 features[box][] = iqss_projects_fp_features
 features[box][] = iqss_projects_fp_infoblock
 features[box][] = iqss_projects_fp_logoblock

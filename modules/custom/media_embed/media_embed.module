@@ -77,7 +77,25 @@ function media_embed_add($form, &$form_state = array(), $types = NULL) {
   $form['#file'] = $file;
   $form_state['file'] = $file;
 
+  $old = $form;
+
   field_attach_form('file', $file, $form, $form_state);
+
+  $diff = array_diff_key($form, $old);
+
+  // remove unnecessary fields
+  $whitelist = array(
+    'field_html_title',
+    'field_html_code',
+    'og_group_ref',
+  );
+  foreach ($diff as $key => $value) {
+    if (strpos($key, '#' === 0) || in_array($key, $whitelist)) {
+      $old[$key] = $value;
+    }
+  }
+
+  $form = $old;
 
   $white = media_embed_get_whitelist();
   if (count($white)) {

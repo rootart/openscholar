@@ -692,29 +692,29 @@ class csl_name extends csl_format {
   }
 
   function get_latin1_regex() {
-    $alnum = "[:alnum:]Ã„Ã…Ã�Ã€Ã‚ÃƒÃ‡Ã‰ÃˆÃŠÃ‹Ã‘Ã–Ã˜Ã“Ã’Ã”Ã•ÃœÃšÃ™Ã›Ã�ÃŒÃŽÃ�Ã†Ã¤Ã¥Ã¡Ã Ã¢Ã£Ã§Ã©Ã¨ÃªÃ«Ã±Ã¶Ã¸Ã³Ã²Ã´ÃµÃ¼ÃºÃ¹Ã»Ã­Ã¬Ã®Ã¯Ã¦Ã¿ÃŸ";
+    $alnum = "[:alnum:]Ãƒâ€žÃƒâ€¦Ãƒï¿½Ãƒâ‚¬Ãƒâ€šÃƒÆ’Ãƒâ€¡Ãƒâ€°ÃƒË†ÃƒÅ Ãƒâ€¹Ãƒâ€˜Ãƒâ€“ÃƒËœÃƒâ€œÃƒâ€™Ãƒâ€�Ãƒâ€¢ÃƒÅ“ÃƒÅ¡Ãƒâ„¢Ãƒâ€ºÃƒï¿½ÃƒÅ’ÃƒÅ½Ãƒï¿½Ãƒâ€ ÃƒÂ¤ÃƒÂ¥ÃƒÂ¡ÃƒÂ ÃƒÂ¢ÃƒÂ£ÃƒÂ§ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ±ÃƒÂ¶ÃƒÂ¸ÃƒÂ³ÃƒÂ²ÃƒÂ´ÃƒÂµÃƒÂ¼ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ¦ÃƒÂ¿ÃƒÅ¸";
     // Matches ISO-8859-1 letters:
-    $alpha = "[:alpha:]Ã„Ã…Ã�Ã€Ã‚ÃƒÃ‡Ã‰ÃˆÃŠÃ‹Ã‘Ã–Ã˜Ã“Ã’Ã”Ã•ÃœÃšÃ™Ã›Ã�ÃŒÃŽÃ�Ã†Ã¤Ã¥Ã¡Ã Ã¢Ã£Ã§Ã©Ã¨ÃªÃ«Ã±Ã¶Ã¸Ã³Ã²Ã´ÃµÃ¼ÃºÃ¹Ã»Ã­Ã¬Ã®Ã¯Ã¦Ã¿ÃŸ";
+    $alpha = "[:alpha:]Ãƒâ€žÃƒâ€¦Ãƒï¿½Ãƒâ‚¬Ãƒâ€šÃƒÆ’Ãƒâ€¡Ãƒâ€°ÃƒË†ÃƒÅ Ãƒâ€¹Ãƒâ€˜Ãƒâ€“ÃƒËœÃƒâ€œÃƒâ€™Ãƒâ€�Ãƒâ€¢ÃƒÅ“ÃƒÅ¡Ãƒâ„¢Ãƒâ€ºÃƒï¿½ÃƒÅ’ÃƒÅ½Ãƒï¿½Ãƒâ€ ÃƒÂ¤ÃƒÂ¥ÃƒÂ¡ÃƒÂ ÃƒÂ¢ÃƒÂ£ÃƒÂ§ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ±ÃƒÂ¶ÃƒÂ¸ÃƒÂ³ÃƒÂ²ÃƒÂ´ÃƒÂµÃƒÂ¼ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ¦ÃƒÂ¿ÃƒÅ¸";
     // Matches ISO-8859-1 control characters:
     $cntrl = "[:cntrl:]";
     // Matches ISO-8859-1 dashes & hyphens:
-    $dash = "-â€“";
+    $dash = "-Ã¢â‚¬â€œ";
     // Matches ISO-8859-1 digits:
     $digit = "[\d]";
     // Matches ISO-8859-1 printing characters (excluding space):
-    $graph = "[:graph:]Ã„Ã…Ã�Ã€Ã‚ÃƒÃ‡Ã‰ÃˆÃŠÃ‹Ã‘Ã–Ã˜Ã“Ã’Ã”Ã•ÃœÃšÃ™Ã›Ã�ÃŒÃŽÃ�Ã†Ã¤Ã¥Ã¡Ã Ã¢Ã£Ã§Ã©Ã¨ÃªÃ«Ã±Ã¶Ã¸Ã³Ã²Ã´ÃµÃ¼ÃºÃ¹Ã»Ã­Ã¬Ã®Ã¯Ã¦Ã¿ÃŸ";
+    $graph = "[:graph:]Ãƒâ€žÃƒâ€¦Ãƒï¿½Ãƒâ‚¬Ãƒâ€šÃƒÆ’Ãƒâ€¡Ãƒâ€°ÃƒË†ÃƒÅ Ãƒâ€¹Ãƒâ€˜Ãƒâ€“ÃƒËœÃƒâ€œÃƒâ€™Ãƒâ€�Ãƒâ€¢ÃƒÅ“ÃƒÅ¡Ãƒâ„¢Ãƒâ€ºÃƒï¿½ÃƒÅ’ÃƒÅ½Ãƒï¿½Ãƒâ€ ÃƒÂ¤ÃƒÂ¥ÃƒÂ¡ÃƒÂ ÃƒÂ¢ÃƒÂ£ÃƒÂ§ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ±ÃƒÂ¶ÃƒÂ¸ÃƒÂ³ÃƒÂ²ÃƒÂ´ÃƒÂµÃƒÂ¼ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ¦ÃƒÂ¿ÃƒÅ¸";
     // Matches ISO-8859-1 lower case letters:
-    $lower = "[:lower:]Ã¤Ã¥Ã¡Ã Ã¢Ã£Ã§Ã©Ã¨ÃªÃ«Ã±Ã¶Ã¸Ã³Ã²Ã´ÃµÃ¼ÃºÃ¹Ã»Ã­Ã¬Ã®Ã¯Ã¦Ã¿ÃŸ";
+    $lower = "[:lower:]ÃƒÂ¤ÃƒÂ¥ÃƒÂ¡ÃƒÂ ÃƒÂ¢ÃƒÂ£ÃƒÂ§ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ±ÃƒÂ¶ÃƒÂ¸ÃƒÂ³ÃƒÂ²ÃƒÂ´ÃƒÂµÃƒÂ¼ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ¦ÃƒÂ¿ÃƒÅ¸";
     // Matches ISO-8859-1 printing characters (including space):
-    $print = "[:print:]Ã„Ã…Ã�Ã€Ã‚ÃƒÃ‡Ã‰ÃˆÃŠÃ‹Ã‘Ã–Ã˜Ã“Ã’Ã”Ã•ÃœÃšÃ™Ã›Ã�ÃŒÃŽÃ�Ã†Ã¤Ã¥Ã¡Ã Ã¢Ã£Ã§Ã©Ã¨ÃªÃ«Ã±Ã¶Ã¸Ã³Ã²Ã´ÃµÃ¼ÃºÃ¹Ã»Ã­Ã¬Ã®Ã¯Ã¦Ã¿ÃŸ";
+    $print = "[:print:]Ãƒâ€žÃƒâ€¦Ãƒï¿½Ãƒâ‚¬Ãƒâ€šÃƒÆ’Ãƒâ€¡Ãƒâ€°ÃƒË†ÃƒÅ Ãƒâ€¹Ãƒâ€˜Ãƒâ€“ÃƒËœÃƒâ€œÃƒâ€™Ãƒâ€�Ãƒâ€¢ÃƒÅ“ÃƒÅ¡Ãƒâ„¢Ãƒâ€ºÃƒï¿½ÃƒÅ’ÃƒÅ½Ãƒï¿½Ãƒâ€ ÃƒÂ¤ÃƒÂ¥ÃƒÂ¡ÃƒÂ ÃƒÂ¢ÃƒÂ£ÃƒÂ§ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ±ÃƒÂ¶ÃƒÂ¸ÃƒÂ³ÃƒÂ²ÃƒÂ´ÃƒÂµÃƒÂ¼ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ¦ÃƒÂ¿ÃƒÅ¸";
     // Matches ISO-8859-1 punctuation:
     $punct = "[:punct:]";
     // Matches ISO-8859-1 whitespace (separating characters with no visual representation):
     $space = "[\s]";
     // Matches ISO-8859-1 upper case letters:
-    $upper = "[:upper:]Ã„Ã…Ã�Ã€Ã‚ÃƒÃ‡Ã‰ÃˆÃŠÃ‹Ã‘Ã–Ã˜Ã“Ã’Ã”Ã•ÃœÃšÃ™Ã›Ã�ÃŒÃŽÃ�Ã†";
+    $upper = "[:upper:]Ãƒâ€žÃƒâ€¦Ãƒï¿½Ãƒâ‚¬Ãƒâ€šÃƒÆ’Ãƒâ€¡Ãƒâ€°ÃƒË†ÃƒÅ Ãƒâ€¹Ãƒâ€˜Ãƒâ€“ÃƒËœÃƒâ€œÃƒâ€™Ãƒâ€�Ãƒâ€¢ÃƒÅ“ÃƒÅ¡Ãƒâ„¢Ãƒâ€ºÃƒï¿½ÃƒÅ’ÃƒÅ½Ãƒï¿½Ãƒâ€ ";
     // Matches ISO-8859-1 "word" characters:
-    $word = "_[:alnum:]Ã„Ã…Ã�Ã€Ã‚ÃƒÃ‡Ã‰ÃˆÃŠÃ‹Ã‘Ã–Ã˜Ã“Ã’Ã”Ã•ÃœÃšÃ™Ã›Ã�ÃŒÃŽÃ�Ã†Ã¤Ã¥Ã¡Ã Ã¢Ã£Ã§Ã©Ã¨ÃªÃ«Ã±Ã¶Ã¸Ã³Ã²Ã´ÃµÃ¼ÃºÃ¹Ã»Ã­Ã¬Ã®Ã¯Ã¦Ã¿ÃŸ";
+    $word = "_[:alnum:]Ãƒâ€žÃƒâ€¦Ãƒï¿½Ãƒâ‚¬Ãƒâ€šÃƒÆ’Ãƒâ€¡Ãƒâ€°ÃƒË†ÃƒÅ Ãƒâ€¹Ãƒâ€˜Ãƒâ€“ÃƒËœÃƒâ€œÃƒâ€™Ãƒâ€�Ãƒâ€¢ÃƒÅ“ÃƒÅ¡Ãƒâ„¢Ãƒâ€ºÃƒï¿½ÃƒÅ’ÃƒÅ½Ãƒï¿½Ãƒâ€ ÃƒÂ¤ÃƒÂ¥ÃƒÂ¡ÃƒÂ ÃƒÂ¢ÃƒÂ£ÃƒÂ§ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ±ÃƒÂ¶ÃƒÂ¸ÃƒÂ³ÃƒÂ²ÃƒÂ´ÃƒÂµÃƒÂ¼ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ¦ÃƒÂ¿ÃƒÅ¸";
     // Defines the PCRE pattern modifier(s) to be used in conjunction with the above variables:
     // More info: <http://www.php.net/manual/en/reference.pcre.pattern.modifiers.php>
     $patternModifiers = "";
@@ -1105,7 +1105,6 @@ class csl_text extends csl_format {
 
   function render($data = NULL, $mode = NULL) {
     $text = '';
-
     switch ($this->source) {
       case 'variable':
         if (!isset($data->{$this->variable}) || empty($data->{$this->variable})) return;
@@ -1176,7 +1175,8 @@ class csl_label extends csl_format {
     }
     if (empty($text)) {
     foreach ($variables as $variable) {
-      if (($term = $this->citeproc->get_locale('term', $variable, $form, $plural))) {
+      $t = (array)$data;
+      if (isset($t[$this->citeproc->map_field($variable)]) && ($term = $this->citeproc->get_locale('term', $variable, $form, $plural))) {
         $text = $term;
         break;
       }
@@ -1616,7 +1616,7 @@ class csl_mapper {
           'translator'                  => 'biblio_contributors:3',
           'recipient'                   => ':',
           'interviewer'                 => ':',
-          'publisher'                   => 'biblio_publisher:',
+          'publisher'                   => 'biblio_publisher',
           'composer'                    => ':',
       ));
     }

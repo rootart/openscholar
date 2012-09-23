@@ -42,6 +42,7 @@ features[variable][] = comment_form_location_vsite
 features[variable][] = comment_preview_vsite
 features[variable][] = comment_subject_field_vsite
 features[variable][] = comment_vsite
+features[variable][] = locale_custom_strings_en
 features[variable][] = node_options_vsite
 features[variable][] = node_preview_vsite
 features[variable][] = node_submitted_vsite

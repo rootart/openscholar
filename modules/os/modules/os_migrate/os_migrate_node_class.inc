@@ -1,68 +1,54 @@
-<?php 
+<?php
 
 class ClassNodeOSMigration extends AbstractNodeOSMigration {
   public function __construct() {
-    
+
     // Let AbstractNode handle the source, dest, and map.
     parent::__construct('class', 'class'); //current types are vsite, article, and page.  lets start with one of those instead?
-    $this->description = t('OS Class Nodes');    
-    
+    $this->description = t('OS Class Nodes');
 
-    
-//    
-//    $fields = array(
-//      'url' =>          array('source_field' => 'field_class_link_url'),
-//      'title' =>        array('source_field' => 'field_class_link_title'),
-//      'attributes' =>   array('source_field' => 'field_class_link_attributes'), //doublecheck that these don't need fudging
-//    );
-    
-    
-    // $arguments = MigrateLinkFieldHandler::arguments($fields);
-    //pass info from fields to arguments[] in field_link's prepare()
-//    $this->addFieldMapping('field_link', 'field_link')->arguments($fields);
-    
+    //semester
     $this->addFieldMapping('field_semester', 'field_class_semester_value');
-    $this->addFieldMapping('field_offered',  'field_class_year_value');
 
-    $this->addUnmigratedSources(array('field_class_link_url', 'field_class_link_title', 'field_class_link_attributes'), t('DNM'));
-    
+    //year
+    $this->addFieldMapping('field_offered_year',  'field_class_year_value');
+    $this->addFieldMapping('field_offered_year:from',  'field_class_year_value');
+    $this->addUnmigratedDestinations(parent::subfields('field_offered_year', array('timezone', 'rrule', 'to')));
+
+    //link
+    $this->addFieldMapping('field_class_link', 'field_class_link_url');
+    $this->addFieldMapping('field_class_link:title', 'field_class_link_title');
+    $this->addFieldMapping('field_class_link:attributes', 'field_class_link_attributes');
+
+
     /************************************************************************
      *  Field mappings tell Migrate which d7 column to deposit d6 data into *
      ************************************************************************/
-    
-  }
-  
-  //also include content type's data
-  public function query($content_type) {
-    $query = parent::query($content_type);
-    
-//    $query->join('content_type_class', 'ct', 'n.vid = ct.vid');
-//    $query->fields('ct', array('field_class_link_url', 'field_class_link_title', 'field_class_link_attributes', 'field_class_semester_value', 'field_class_year_value'));
 
-    return $query;
   }
-  
-  
-  public function sourceFields($content_type) {
-    $fields = parent::sourceFields($content_type);
-    //$fields['field_link'] = t('Linked URL');
-    return $fields;
-  }
-  
-  public function prepareRow($current_row) {
 
-    //field_link
-    if (strlen($current_row->field_class_link_url)) {
-
-    /*  if (strlen($current_row->field_class_link_attributes)) {
-        $current_row->field_class_link_attributes = unserialize($current_row->field_class_link_attributes);
-      }*/
-      //$current_row->field_class_link_attributes = ($current_row->field_class_clink_attributes) ? 
-        //unserialize($current_row->field_class_link_attributes) : array();
-      $current_row->field_link[] = $current_row->field_class_link_url; //add link
-    }
-    
+  public function prepareRow(&$current_row) {
     return parent::prepareRow($current_row); //false -> skip this row
-    
+
+  }
+}
+
+class ClassMaterialNodeOSMigration extends AbstractNodeOSMigration {
+  public function __construct() {
+
+    // Let AbstractNode handle the source, dest, and map.
+    parent::__construct('class_material', 'class_material'); //current types are vsite, article, and page.  lets start with one of those instead?
+    $this->description = t('OS Class Material Nodes');
+
+    /************************************************************************
+     *  Field mappings tell Migrate which d7 column to deposit d6 data into *
+    ************************************************************************/
+
+    $this->addFieldMapping('field_class', 'field_class_nid');
+  }
+
+  public function prepareRow(&$current_row) {
+    return parent::prepareRow($current_row); //false -> skip this row
+
   }
 }

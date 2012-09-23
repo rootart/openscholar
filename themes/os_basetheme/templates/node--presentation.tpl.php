@@ -10,26 +10,26 @@
 hide($content['comments']);
 hide($content['links']);
 
-// Accesses field values safely using $content[FIELD], not $node->FIELD
-if (isset($content['field_presentation_location']) && $content['field_presentation_location']['#items'][0]['value'] !== NULL) {
-  $location_value = $content['field_presentation_location']['#items'][0]['value'];
-}
+if (!$page) {
+  if (isset($content['field_presentation_location']) && $content['field_presentation_location']['#items'][0]['value'] !== NULL) {
+    $location_value = $content['field_presentation_location']['#items'][0]['value'];
+  }
 
-if (isset($content['field_presentation_date']) && $content['field_presentation_date'][0]['#markup'] !== NULL) {
-  $date_value = $content['field_presentation_date'][0]['#markup'];
-}
+  if (isset($content['field_presentation_date']) && $content['field_presentation_date'][0]['#markup'] !== NULL) {
+    $date_value = $content['field_presentation_date'][0]['#markup'];
+  }
 
-if (isset($content['field_presentation_file'])) {
-  // Renders all files in a list
-  $file_value = render($content['field_presentation_file']);
+  if (isset($content['field_presentation_file'])) {
+    // Renders all files in a list
+    $file_value = render($content['field_presentation_file']);
+  }
 }
 
 ?>
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
+  <?php if (!$page): // begin teaser ?>
   <div class="node-inner">
   <?php print render($title_prefix); ?>
-
-  <?php if (!$page): // begin teaser ?>
     <span class="title">
     	<strong>
     		<a href="<?php print $node_url; ?>" title="<?php print $title ?>">
@@ -50,28 +50,36 @@ if (isset($content['field_presentation_file'])) {
     <?php endif; ?>
   <?php endif; // end teaser ?>
   <?php if ($page): // begin default adaptivetheme full page node tpl ?>
-    <?php if(!empty($user_picture) || $display_submitted): ?>
-      <footer<?php print $footer_attributes; ?>>
-        <?php print $user_picture; ?>
-        <p class="author-datetime">
-          <?php print $submitted; ?>
-        </p>
-      </footer>
-    <?php endif; ?>
+  <?php print render($title_prefix); ?>
+  <?php if ($title && !$page): ?>
+    <header<?php print $header_attributes; ?>>
+      <?php if ($title): ?>
+        <h1<?php print $title_attributes; ?>>
+          <a href="<?php print $node_url; ?>" rel="bookmark"><?php print $title; ?></a>
+        </h1>
+      <?php endif; ?>
+    </header>
+  <?php endif; ?>
 
-    <div<?php print $content_attributes; ?>>
-      <?php print render($content); ?>
-    </div>
+  <?php if(!empty($user_picture) || $display_submitted): ?>
+    <footer<?php print $footer_attributes; ?>>
+      <?php print $user_picture; ?>
+      <p class="author-datetime"><?php print $submitted; ?></p>
+    </footer>
+  <?php endif; ?>
 
-    <?php if ($links = render($content['links'])): ?>
-      <nav<?php print $links_attributes; ?>>
-        <?php print $links; ?>
-      </nav>
-    <?php endif; ?>
+  <div<?php print $content_attributes; ?>>
+    <?php print render($content); ?>
+  </div>
 
-    <?php print render($content['comments']); ?>
+  <?php if ($links = render($content['links'])): ?>
+    <nav<?php print $links_attributes; ?>><?php print $links; ?></nav>
+  <?php endif; ?>
 
-    <?php print render($title_suffix); ?>
+  <?php print render($content['comments']); ?>
+
+  <?php print render($title_suffix); ?>
+
   <?php endif; ?>
   </div> <!-- /div.node-inner -->
 </article>
