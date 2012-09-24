@@ -30,7 +30,7 @@ class OsOgVocabMigratePrepare extends Migration {
     $this->source = new MigrateSourceSQL($this->query);
     $this->destination = new MigrateDestinationTable('og_vocab_relation');
 
-    $this->addFieldMapping('nid', 'gid');
+    $this->addFieldMapping('gid', 'nid');
     $this->addFieldMapping('vid', 'vid');
     $this->addFieldMapping('group_type', NULL)->defaultValue('node');
   }
