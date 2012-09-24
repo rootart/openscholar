@@ -45,13 +45,14 @@ class OsOgVocabMigrate extends DynamicMigration {
 
 
   public function prepareRow($row) {
+    dpm($row);
     $this->addOgVocab($row);
     $row->{OG_VOCAB_FIELD}[] = $row->tid;
     parent::prepareRow($row);
   }
 
   /**
-   * Add an OG vocab entity, if needed.
+   * Helper function to add the OG-vocab entity.
    */
   private function addOgVocab($row) {
     $term = taxonomy_term_load($row->tid);
@@ -90,15 +91,4 @@ class OsOgVocabMigrate extends DynamicMigration {
     }
   }
 
-  /**
-   * Helper function to add the OG-vocab entity.
-   *
-   * @param $vid
-   *   The vocabulary ID related to the group.
-   * @param $field_name
-   *   The taxonomy term reference field, that needs to be converted to
-   *   and OG-vocab entity.
-   */
-  protected function addOgVocab($vid, $field_name) {
-  }
 }
