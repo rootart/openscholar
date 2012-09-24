@@ -175,13 +175,46 @@ function og_vocab_schema_7000() {
 /**
  * Upgrade tables from Drupal 6 to 7.
  */
-function og_vocab_update_7000() {
-  db_rename_table('og_vocab', 'd6_og_vocab');
+function og_vocab_update_7000(&$sandbox) {
+  $schema = og_vocab_schema_7000();
+  if (!isset($sandbox['total'])) {
+    db_rename_table('og_vocab', 'og_vocab_relation');
 
-  foreach (og_vocab_schema_7000() as $table => $schema) {
-    db_create_table($table, $schema);
+    // Drop the current primary key, as we are adding a serial column.
+    db_drop_primary_key('og_vocab_relation');
+    db_add_field('og_vocab_relation', 'id', $schema['og_vocab_relation']['fields']['id'], array('primary key' => array('id')));
+
+    // Rename nid to gid.
+    db_change_field('og_vocab_relation', 'nid', 'gid', $schema['og_vocab_relation']['fields']['gid']);
+
+    // Add group-type field.
+    db_add_field('og_vocab_relation', 'group_type', $schema['og_vocab_relation']['fields']['group_type']);
+
+    $query = db_select('og_vocab_relation');
+    $sandbox['last'] = 0;
+    $sandbox['total'] = $query->countQuery()->execute()->fetchField();
+    $sandbox['#finished'] = 0;
+  }
+  elseif ($sandbox['last'] <= $sandbox['total']  && $sandbox['total'] > 0) {
+    // Populate "group-type" with "node".
+    $batch_size = 200;
+    db_update('og_vocab_relation')
+      ->fields(array('group_type' => 'node'))
+      ->condition('id', $sandbox['last'], '>')
+      ->execute();
+
+    $sandbox['last'] += $batch_size;
+    $sandbox['#finished'] = min(0.99, $sandbox['last'] / $sandbox['total']);
+  }
+  else {
+    // Finished processing.
+    $sandbox['#finished'] = 1;
   }
 
-  variable_set('og_vocab_needs_migrate', TRUE);
-  return t('Renamed OG vocabulary old. Enable "Migrate" module to continue the migration of data.');
+  db_drop_table('og_vocab');
+  db_create_table('og_vocab', $schema['og_vocab']);
+
+  // Temporary variable to indicate we need to migrate the fields.
+  variable_set('og_vocab_7000', TRUE);
+  return t('Enable Migrate and OG-vocabulary modules to continue the migration of data.');
 }

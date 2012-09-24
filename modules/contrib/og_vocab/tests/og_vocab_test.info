@@ -4,10 +4,3 @@ core = 7.x
 dependencies[] = og_vocab
 dependencies[] = og_context
 hidden = TRUE
-
-; Information added by drupal.org packaging script on 2012-09-02
-version = "7.x-1.x-dev"
-core = "7.x"
-project = "og_vocab"
-datestamp = "1346589301"
-

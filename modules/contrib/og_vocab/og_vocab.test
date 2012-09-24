@@ -9,9 +9,9 @@ class OgVocabMenuAccessTestCase extends DrupalWebTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => t('OG vocabulary access'),
-      'description' => t('Check access to vocabulary related menu items.'),
-      'group' => t('Organic groups vocabulary'),
+      'name' => 'OG vocabulary access',
+      'description' => 'Check access to vocabulary related menu items.',
+      'group' => 'Organic groups vocabulary',
     );
   }
 
@@ -101,9 +101,9 @@ class OgVocabComplexWidgetTestCase extends DrupalWebTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => t('OG vocabulary widget'),
-      'description' => t('Test the comlpex widget behavior.'),
-      'group' => t('Organic groups vocabulary'),
+      'name' => 'OG vocabulary widget',
+      'description' => 'Test the comlpex widget behavior.',
+      'group' => 'Organic groups vocabulary',
     );
   }
 
@@ -285,4 +285,88 @@ class OgVocabComplexWidgetTestCase extends DrupalWebTestCase {
   }
 }
 
+
+
+/**
+ * Test the revocation of group roles.
+ */
+class OgVocabMigrateTestCase extends UpgradePathTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Migrate from 6.x to 7.x',
+      'description' => 'Test the upgrade from Drupal 6.x to to 7.x.',
+      'group' => 'Organic groups vocabulary',
+      'dependencies' => array('migrate'),
+    );
+  }
+
+  function setUp() {
+    // Path to the database dump files.
+    $this->databaseDumpFiles = array(
+      drupal_get_path('module', 'og_vocab') . '/tests/og-vocab-6.database.php',
+    );
+    parent::setUp();
+  }
+
+  function testUpgrade() {
+    $this->assertTrue($this->performUpgrade(), 'The upgrade was completed successfully.');
+
+    // spl_autoload_register() wasn't called, so we do it here, to allow
+    // classes to be auto-loaded.
+    spl_autoload_register('drupal_autoload_class');
+    spl_autoload_register('drupal_autoload_interface');
+
+    module_enable(array('og_vocab', 'migrate'));
+
+    // FIXME: migrate_flush_caches() crashes, so we register manually.
+    foreach (node_type_get_names() as $bundle => $value) {
+      // Register a dynamic migration.
+      $machine_name = 'OgVocabMigrate' . ucfirst($bundle);
+      Migration::registerMigration('OgVocabMigrate', $machine_name, array('bundle' => $bundle));
+
+      $migration = Migration::getInstance($machine_name, 'OgVocabMigrate', array('bundle' => $bundle));
+      $result = $migration->processImport();
+      $this->assertEqual($result, Migration::RESULT_COMPLETED, "$machine_name migration executed.");
+    }
+
+    // Assert field OG-vocab exists on class and departments.
+    $this->assertTrue(field_info_instance('node', OG_VOCAB_FIELD, 'class') && field_info_instance('node', OG_VOCAB_FIELD, 'department'), 'OG vocabulary found on node-types.');
+
+
+    // Assert OG-vocabs were created.
+
+    // Multiple.
+    $og_vocab = entity_load_single('og_vocab', 1);
+    $settings = array(
+      'required' => FALSE,
+      'widget_type' => 'options_select',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    );
+    $this->assertEqual($og_vocab->settings, $settings, 'Multiple converted correctly.');
+
+    // Required.
+    $og_vocab = entity_load_single('og_vocab', 3);
+    $settings = array(
+      'required' => TRUE,
+      'widget_type' => 'options_select',
+      'cardinality' => 1,
+    );
+    $this->assertEqual($og_vocab->settings, $settings, 'Required converted correctly.');
+
+    // Tags.
+    $og_vocab = entity_load_single('og_vocab', 5);
+    $settings = array(
+      'required' => FALSE,
+      'widget_type' => 'entityreference_autocomplete_tags',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    );
+    $this->assertEqual($og_vocab->settings, $settings, 'Tags converted correctly.');
+
+    // there are 6 vocabularies, but we expect only 5 OG-vocabs, as one
+    // of the vocabularies is not assigned to any content-type.
+    $this->assertEqual(count(entity_load('og_vocab')), 5, 'All expected OG vocabs were created.');
+  }
+
+}
 

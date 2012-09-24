@@ -11,9 +11,6 @@ files[] = includes/og_vocab.exception.inc
 ; Test files
 files[] = og_vocab.test
 
-; Information added by drupal.org packaging script on 2012-09-02
-version = "7.x-1.x-dev"
-core = "7.x"
-project = "og_vocab"
-datestamp = "1346589301"
-
+; Migrate files
+files[] = includes/migrate/og_vocab.migrate.inc
+; files[] = includes/migrate/delete_fields.inc
