@@ -13,7 +13,8 @@ class OsOgVocabMigratePrepare extends Migration {
 
     $this->description = t('Prepare the OG-vocab migration.');
 
-    $this->dependencies = array('OgUsersOS', 'VocabularyOSMigration');
+    // TODO:
+    $this->dependencies = array();
 
     $this->query = OSMigration::d6_db_select('og_vocab', 'ogv')
       ->fields('ogv');
