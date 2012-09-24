@@ -152,7 +152,6 @@ projects[oembed][subdir] = "contrib"
 
 projects[og][version] = 2.x-dev
 projects[og][subdir] = "contrib"
-;projects[og][patch][] = "http://drupal.org/files/1730678-complex-widget-6.patch"
 
 projects[og_vocab][version] = 1.x-dev
 projects[og_vocab][subdir] = "contrib"
