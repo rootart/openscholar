@@ -14,16 +14,18 @@
  * Implements hook_menu().
  *
  * Admin menu for setting site api key and mailing list.
- * Ajax url for processing sub requests.  (using ajax so I can have one unified sub function).
+ * Ajax url for processing sub requests.  (using ajax so I can have one unified
+ * sub function).
  */
 function os_mailchimp_menu() {
   $items ['admin/settings/os_mailchimp'] = array(
     'title' => t( 'MailChimp' ),
-	'page callback' => 'drupal_get_form',
-	'page arguments' => array('os_mailchimp_admin' ),
-	'file' => 'os_mailchimp.admin.inc',
-	'access arguments' => array('access administration pages' ),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('os_mailchimp_admin' ),
+    'file' => 'os_mailchimp.admin.inc',
+    'access arguments' => array('access administration pages' ),
   );
+
   $items['os_mailchimp/%ctools_js/subscribe/%'] = array(
     'title' => t('Subscribe to mailing list'),
     'page callback' => 'os_mailchimp_subscribe_page',
@@ -36,8 +38,8 @@ function os_mailchimp_menu() {
 }
 
 /**
- *
  * Implements hook_user_insert().
+ *
  * On new registration of users, grabs
  * their email and name and subscribes them to
  * the global MailChimp mailing list.
@@ -56,7 +58,7 @@ function os_mailchimp_user_insert(&$edit, $account, $category) {
 /**
  * Implemens of hook_boxes_plugins().
  */
-function os_mailchimp_boxes_plugins(){
+function os_mailchimp_boxes_plugins() {
   $info = array();
   $path = drupal_get_path('module', 'os_mailchimp') . '/plugins';
   $css = drupal_get_path('module', 'os_mailchimp') . '/theme/os-mailchimp.css';
@@ -65,19 +67,16 @@ function os_mailchimp_boxes_plugins(){
     'title' => 'Mailing List',
     'description' => 'Lets users subscribe to your MailChimp mailing list',
     'css' => $css,
-    'tags' => array(
-      'Social'
-    ),
+    'tags' => array('Social'),
     'handler' => array(
       'class' => 'os_boxes_mailchimp',
       'file' => 'os_mailchimp_box.inc',
       'path' => $path,
-      'parent' => 'os_boxes_default'
-    )
+      'parent' => 'os_boxes_default',
+    ),
   );
 
   return $info;
-
 }
 
 /**
@@ -99,23 +98,33 @@ function os_mailchimp_subscribe_page($js=TRUE, $delta) {
 }
 
 /**
- * @function os_mailchimp_subscribe()
  * Subscribe a user to a mailing list.
  *
- * @param $api	mailchimp api key
- * @param $list	list to subscribe to
- * @param $email email address to subscribe
- * @param $fn  user's firstname (optional)
- * @param $ln  user's lastname (optional)
+ * @param $api
+ *  Mailchimp api key,
+ * @param $list
+ *  List to subscribe to.
+ * @param $email
+ *  Email address to subscribe.
+ * @param $fn
+ *  User's firstname (optional).
+ * @param $ln
+ *  User's lastname (optional).
  */
-function os_mailchimp_subscribe($api, $listid, $email, $fn=NULL, $ln=NULL) {
+function os_mailchimp_subscribe($api, $listid, $email, $fn = NULL, $ln = NULL) {
   include_once( drupal_get_path('module', 'os_mailchimp') . '/MCAPI.class.php');
   $MC = new MCAPI($api);
 
   if ($MC->listSubscribe($listid, $email)) {
-    return array('success'=>TRUE);
-  } else {
-  	return array('success'=>FALSE,'msg'=>$MC->errorMessage);
+    return array(
+      'success' => TRUE,
+    );
+  }
+  else {
+  	return array(
+  	 'success' => FALSE,
+  	 'msg' => $MC->errorMessage,
+    );
   }
 }
 
