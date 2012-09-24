@@ -43,3 +43,24 @@ function os_migrate_menu() {
 function os_migrate_form_migrate_ui_dashboard_form_alter(&$form, &$form_state, $form_id) {
   $form['operations']['options']['force']['#default_value'] = variable_get('os_migrate_ignore_dependencies', FALSE);
 }
+
+/**
+ * Implements hook_modules_enabled().
+ *
+ * Register dynamic migrate plugins for upgrading from OG6.
+ */
+function os_migrate_modules_enabled($modules) {
+  if (!variable_get('og_vocab_7000', FALSE)) {
+    return;
+  }
+
+  if (!in_array('migrate', $modules) && !module_exists('migrate')) {
+    return;
+  }
+
+  foreach (node_type_get_names() as $bundle => $value) {
+    // Register a dynamic migration.
+    Migration::registerMigration('OsOgVocabMigrate', 'OsOgVocabMigrate' . ucfirst($bundle), array('bundle' => $bundle));
+  }
+}
+

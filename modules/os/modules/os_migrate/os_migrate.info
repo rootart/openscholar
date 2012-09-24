@@ -39,6 +39,9 @@ files[] = os_migrate_vocabulary.inc
 files[] = os_migrate_term.inc
 files[] = os_migrate_og_user.inc
 
+files[] = os_migrate_og_vocab_preapre.inc
+files[] = os_migrate_og_vocab.inc
+
 files[] = os_migrate_spaces_overrides.inc
 files[] = os_migrate_spaces_overrides_context.inc
 files[] = os_migrate_spaces_overrides_menu.inc

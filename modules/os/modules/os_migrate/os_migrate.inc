@@ -39,7 +39,7 @@ abstract class OSMigration extends Migration {
    * As db_select, but targets old d6 database
    * Sends users to admin page on a misconfigured db
    */
-  public function d6_db_select($target, $alias = NULL, array $options = array()) {
+  static public function d6_db_select($target, $alias = NULL, array $options = array()) {
     static $os_migrate_database;
     if (!isset($os_migrate_database)) {
       $os_migrate_database =  variable_get('os_migrate_database', '');
