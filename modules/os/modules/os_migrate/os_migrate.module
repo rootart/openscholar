@@ -50,10 +50,6 @@ function os_migrate_form_migrate_ui_dashboard_form_alter(&$form, &$form_state, $
  * Register dynamic migrate plugins for upgrading from OG6.
  */
 function os_migrate_modules_enabled($modules) {
-  if (!variable_get('og_vocab_7000', FALSE)) {
-    return;
-  }
-
   if (!in_array('migrate', $modules) && !module_exists('migrate')) {
     return;
   }

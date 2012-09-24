@@ -17,9 +17,6 @@ class OsOgVocabMigrate extends DynamicMigration {
 
     $this->dependencies = array('OsOgVocabMigratePrepare');
 
-    // Indicate we're updating existing data.
-    $this->systemOfRecord = Migration::DESTINATION;
-
     $query = OSMigration::d6_db_select('term_node', 'tn');
     $query->innerJoin('og_vocab', 'ogv', 'tn.vid = ogv.vid');
     $query->innerJoin('node', 'n', 'tn.nid = n.nid');
@@ -29,34 +26,26 @@ class OsOgVocabMigrate extends DynamicMigration {
       ->condition('n.type', $bundle)
       ->orderBy('n.nid');
 
+    $source_key = MigrateDestinationNode::getKeySchema();
+    // Set the alias, so the query in MigrateSourceSQL::performRewind()
+    // will not fail.
+    $source_key['nid']['alias'] = 'n';
+
     $this->query = $query;
-    $this->map = new MigrateSQLMap($this->machineName, MigrateDestinationNode::getKeySchema(), MigrateDestinationNode::getKeySchema());
+    $this->map = new MigrateSQLMap($this->machineName, $source_key, MigrateDestinationNode::getKeySchema());
 
     // Create a MigrateSource object, which manages retrieving the input data.
     $this->source = new MigrateSourceSQL($this->query);
     $this->destination = new MigrateDestinationNode($bundle);
 
     $this->addFieldMapping('nid', 'nid');
-    $this->addFieldMapping(OG_VOCAB_FIELD, OG_VOCAB_FIELD);
   }
 
 
   public function prepareRow($row) {
-    // We don't have the fields in the $row, so we load the entity to get
-    // them.
-    $wrapper = entity_metadata_wrapper('node', $row->nid);
-    $tids = array();
-    foreach ($field_names as $field_name) {
-      $field = field_info_field($field_name);
-      $vocabulary = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][0]['vocabulary']);
-      $this->addOgVocab($vocabulary->vid, $field_name);
-      if ($values = $wrapper->{$field_name}->value(array('identifier' => TRUE))) {
-        $values = is_array($values) ? $values : array($values);
-        $tids = array_merge($tids, $values);
-      }
-    }
+    dpm($row);
 
-    $row->{OG_VOCAB_FIELD} = $tids;
+    $row->{OG_VOCAB_FIELD}[] = $row->tid;
     parent::prepareRow($row);
   }
 
