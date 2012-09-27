@@ -249,6 +249,10 @@ function vsite_register_form_submit(&$form, &$state) {
     $commands[] = _vsite_register_form_error();
   }
 
+  // Nofity that the user registered the site for disabling the ajax validation
+  // all over again.
+  $_SESSION['vsite_registered'] = 'registered';
+
   //call any other submit functions here
   foreach($form['#submit'] as $fnc){
     if (__FUNCTION__ !== $fnc){
@@ -299,6 +303,12 @@ function vsite_register_form_validate(&$form, &$state) {
  */
 function vsite_register_ajax_validation(&$form, &$state) {
   drupal_get_messages(); //clear this to avoid having notices clutter the form during ajax validation
+  if (isset($_SESSION['vsite_registered'])) {
+    // Preventing the ajax validation. Change the value of the session so it
+    // will be deleted next page request.
+    $_SESSION['vsite_registered'] = 'delete';
+    return;
+  }
   $elem = $state['triggering_element']['#name'];
   return theme('vsite_register_form_errors', (array(
     'name' => $elem,

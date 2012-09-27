@@ -6,6 +6,18 @@
  */
 
 /**
+ * Implements hook_init().
+ *
+ * A new site was registered and a session for preventing validation all over
+ * again is setted. Now we can remove it.
+ */
+function vsite_register_init() {
+  if (isset($_SESSION['vsite_registered']) && $_SESSION['vsite_registered'] == 'delete') {
+    unset($_SESSION['vsite_registered']);
+  }
+}
+
+/**
  * Implements hook_menu
  */
 function vsite_register_menu() {
@@ -16,7 +28,7 @@ function vsite_register_menu() {
     'access callback' => 'vsite_vsite_exists_access',
     'file' => 'vsite_register.form.inc',
   );
-  
+
   $items['admin/config/openscholar/vsite_register'] = array(
     'title' => 'Vsite Registration',
     'page callback' => 'drupal_get_form',
@@ -25,7 +37,7 @@ function vsite_register_menu() {
     'access arguments' => array('access administration pages'),
     //'type' => MENU_LOCAL_TASK,
   );
-  
+
   return $items;
 }
 
@@ -45,37 +57,37 @@ function vsite_register_block_info() {
 function vsite_register_block_view($delta = '') {
   $block = array();
   ctools_include('vsite','vsite');
-  
+
   switch ($delta) {
     case 'get_your_site_block':
       if (vsite_vsite_exists_access()) {
         $content = l('Create your site', 'site/register', array());
-        
+
       } elseif ($vsites = vsite_get_vsite_by_owner()) {
-        
+
         if (count($vsites > 1)) {
           $content = l('Go to your sites', 'user');
         } else {
           $content = l('Go to your site', $vsites[0]->og->purl);
         }
       }
-      
+
     break;
   }
-  
+
   if (isset($content)) {
     $block['content'] = array(
     	'content' => array('#markup' => $content),
     );
   }
-  
+
   return $block;
 }
 
 
 /**
  * Implements hook_theme
- * 
+ *
  * Provides theming for form errors
  */
 function vsite_register_theme() {
@@ -104,11 +116,11 @@ function vsite_register_message($form, $domain){
 
   $message  = '<div id="success-message" class="status">';
   $message .= '<p>Success! ' . ucfirst($word_replace) . ' new site has been created.</p>';
-  
+
   if (in_array('anonymous user', $user -> roles)){
     $message .= '<p>Check your email account for further details on how to login in to start adding features and content.</p>';
   }
-  
+
   $message .= '<p>The url of ' . $word_replace . ' site is ' . $base_url . '/' . $domain . ' ' . l(t("Go there now"), $base_url . '/' . $domain) . '</p>';
   $message .= '</div>';
 
