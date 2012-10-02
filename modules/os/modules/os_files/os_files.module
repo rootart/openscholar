@@ -26,6 +26,50 @@ function os_files_menu() {
 }
 
 /**
+ * Implements hook_menu_alter().
+ */
+function os_files_menu_alter(&$callbacks) {
+  $callbacks['file-list'] = $callbacks['admin/content/file'];
+  $callbacks['file-list']['access callback'] = 'os_files_file_list';
+}
+
+/**
+ * Implements hook_query_QUERY_ID_alter().
+ */
+function os_files_query_file_load_multiple_alter(&$query) {
+  if (!$space = spaces_get_space()) {
+    return;
+  }
+
+
+  $query->innerJoin('og_membership', 'ogm', "ogm.etid = base.fid");  $query->condition('ogm.gid', $space->id);
+}
+
+/**
+ * Implements hook_og_permissions().
+ */
+function os_files_og_permissions() {
+  return array(
+    'administer files' => array(
+      'title' => t('Manage site files'),
+      'description' => t('Manage the files for the virtual site.'),
+    ),
+  );
+}
+
+/**
+ * Access callback function - return true/false if the user can manage the files
+ * for the virtual site.
+ */
+function os_files_file_list() {
+  if (!$space = spaces_get_space()) {
+    return;
+  }
+
+  return og_user_access('node', $space->id, 'administer files');
+}
+
+/**
  * Entry point for vsite aliased file downloads.
  */
 function os_files_download() {
