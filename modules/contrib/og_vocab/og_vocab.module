@@ -748,16 +748,62 @@ function og_vocab_form_taxonomy_overview_vocabularies_alter(&$form, $form_state)
 }
 
 /**
- * Preprocess table; Change the "Empty" link to redirect to correct page.
+ * Implements hook_theme_registry_alter().
+ *
+ * @see theme_og_vocab_taxonomy_overview_vocabularies()
  */
-function og_vocab_preprocess_table(&$variables) {
+function og_vocab_theme_registry_alter(&$theme_registry) {
+  $theme_registry['taxonomy_overview_vocabularies']['function'] = 'theme_og_vocab_taxonomy_overview_vocabularies';
+}
+
+/**
+ * Override theme_taxonomy_overview_vocabularies() to make it group aware.
+ *
+ * The empty text (i.e. when there are no vocabularies) will redirect to
+ * the correct path.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - form: A render element representing the form.
+ *
+ * @see theme_taxonomy_overview_vocabularies()
+ */
+function theme_og_vocab_taxonomy_overview_vocabularies($variables) {
   if (!$context = og_vocab_is_group_admin_context()) {
-    return;
+    return theme_taxonomy_overview_vocabularies($variables);
   }
 
   $item = menu_get_item();
+  $empty = t('No vocabularies available. <a href="@link">Add vocabulary</a>.', array('@link' => url($item['href'] . '/add')));
 
-  $variables['empty'] = t('No vocabularies available. <a href="@link">Add vocabulary</a>.', array('@link' => url($item['href'] . '/add')));
+  $form = $variables['form'];
+
+  $rows = array();
+
+  foreach (element_children($form) as $key) {
+    if (isset($form[$key]['name'])) {
+      $vocabulary = &$form[$key];
+
+      $row = array();
+      $row[] = drupal_render($vocabulary['name']);
+      if (isset($vocabulary['weight'])) {
+        $vocabulary['weight']['#attributes']['class'] = array('vocabulary-weight');
+        $row[] = drupal_render($vocabulary['weight']);
+      }
+      $row[] = drupal_render($vocabulary['edit']);
+      $row[] = drupal_render($vocabulary['list']);
+      $row[] = drupal_render($vocabulary['add']);
+      $rows[] = array('data' => $row, 'class' => array('draggable'));
+    }
+  }
+
+  $header = array(t('Vocabulary name'));
+  if (isset($form['actions'])) {
+    $header[] = t('Weight');
+    drupal_add_tabledrag('taxonomy', 'order', 'sibling', 'vocabulary-weight');
+  }
+  $header[] = array('data' => t('Operations'), 'colspan' => '3');
+  return theme('table', array('header' => $header, 'rows' => $rows, 'empty' => $empty, 'attributes' => array('id' => 'taxonomy'))) . drupal_render_children($form);
 }
 
 

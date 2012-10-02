@@ -35,18 +35,6 @@ class OgVocab extends Entity {
     parent::__construct($values, 'og_vocab');
   }
 
-  public function save() {
-    if (og_vocab_load_og_vocab($this->vid, $this->entity_type, $this->bundle)) {
-      $params = array(
-        '@vid' => $this->vid,
-        '@entity' => $this->entity_type,
-        '@bundle' => $this->bundle,
-      );
-      throw new OgVocabException(format_string('OG vocab for vocabulry ID @vid already exists in @entity - @bundle.', $params));
-    }
-    parent::save();
-  }
-
   /**
    * Return form element.
    */
