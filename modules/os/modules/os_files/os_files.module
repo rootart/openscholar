@@ -54,7 +54,7 @@ function os_files_form_media_add_upload_alter($form, &$form_state) {
   if ($item['path'] != 'file/add') {
     return;
   }
-  $form_state['build_info']['args'][0]['uri_scehma'] = 'private';
+  $form_state['build_info']['args'][0]['uri_scheme'] = 'private';
 }
 /**
  * Implements hook_og_permissions().
