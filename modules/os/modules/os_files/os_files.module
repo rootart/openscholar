@@ -43,6 +43,19 @@ function os_files_file_insert($file) {
   }
 }
 
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Set the URI schema to private when adding a new file via file/add.
+ */
+function os_files_form_media_add_upload_alter($form, &$form_state) {
+  $item = menu_get_item();
+  if ($item['path'] != 'file/add') {
+    return;
+  }
+  $form_state['build_info']['args'][0]['uri_scehma'] = 'private';
+}
 /**
  * Implements hook_og_permissions().
  */
