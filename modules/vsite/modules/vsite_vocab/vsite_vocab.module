@@ -14,8 +14,7 @@ function vsite_vocab_field_create_instance($instance) {
   if (!og_is_group_audience_field($instance['field_name'])) {
     return;
   }
-  $field_instance = og_fields_info(OG_VOCAB_FIELD);
-  og_create_field(OG_VOCAB_FIELD, $instance['entity_type'], $instance['bundle'], $field_instance);
+  og_create_field(OG_VOCAB_FIELD, $instance['entity_type'], $instance['bundle']);
 }
 
 /**
