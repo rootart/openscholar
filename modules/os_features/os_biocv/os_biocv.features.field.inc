@@ -246,84 +246,9 @@ function os_biocv_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-cv-og_vocabulary'
-  $fields['node-cv-og_vocabulary'] = array(
-    'field_config' => array(
-      'active' => '1',
-      'cardinality' => '-1',
-      'deleted' => '0',
-      'entity_types' => array(),
-      'field_name' => 'og_vocabulary',
-      'foreign keys' => array(
-        'taxonomy_term_data' => array(
-          'columns' => array(
-            'target_id' => 'tid',
-          ),
-          'table' => 'taxonomy_term_data',
-        ),
-      ),
-      'indexes' => array(
-        'target_id' => array(
-          0 => 'target_id',
-        ),
-      ),
-      'module' => 'entityreference',
-      'settings' => array(
-        'handler' => 'base',
-        'handler_settings' => array(
-          'behaviors' => array(
-            'og_vocab' => array(
-              'status' => TRUE,
-            ),
-          ),
-          'target_bundles' => array(),
-        ),
-        'target_type' => 'taxonomy_term',
-      ),
-      'translatable' => '0',
-      'type' => 'entityreference',
-    ),
-    'field_instance' => array(
-      'bundle' => 'cv',
-      'default_value' => NULL,
-      'deleted' => '0',
-      'description' => '',
-      'display' => array(
-        'default' => array(
-          'label' => 'above',
-          'module' => 'og_vocab',
-          'settings' => array(),
-          'type' => 'og_vocab',
-          'weight' => 2,
-        ),
-        'teaser' => array(
-          'label' => 'above',
-          'settings' => array(),
-          'type' => 'hidden',
-          'weight' => 0,
-        ),
-      ),
-      'entity_type' => 'node',
-      'field_name' => 'og_vocabulary',
-      'label' => 'OG vocabulary',
-      'required' => FALSE,
-      'settings' => array(
-        'user_register_form' => FALSE,
-      ),
-      'widget' => array(
-        'module' => 'og_vocab',
-        'settings' => array(),
-        'type' => 'og_vocab_complex',
-        'weight' => 32,
-      ),
-    ),
-  );
-
   // Translatables
   // Included for use with string extractors like potx.
   t('Body');
-  t('Groups audience');
-  t('OG vocabulary');
   t('PDF Upload');
 
   return $fields;
