@@ -48,6 +48,8 @@ function os_files_file_insert($file) {
  * Implements hook_form_FORM_ID_alter().
  *
  * Set the URI schema to private when adding a new file via file/add.
+ *
+ * @see media_add_upload_submit()
  */
 function os_files_form_media_add_upload_alter($form, &$form_state) {
   $item = menu_get_item();
