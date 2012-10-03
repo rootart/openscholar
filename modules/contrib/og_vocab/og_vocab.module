@@ -697,9 +697,19 @@ function og_vocab_ctools_plugin_directory($module, $plugin) {
 
 /**
  * Implements hook_query_TAG_alter().
+ *
+ * Alter loading vocabularies. If the static variable is set to "skip",
+ * no altering will occour.
+ *
+ * @see og_vocab_machine_name_validate()
  */
 function og_vocab_query_taxonomy_vocabulary_load_multiple_alter(QueryAlterableInterface $query) {
   $cache = &drupal_static(__FUNCTION__, FALSE);
+
+  if ($cache == 'skip') {
+    return;
+  }
+
   if ($cache) {
     // Prevent recursion.
     return;
@@ -718,7 +728,6 @@ function og_vocab_query_taxonomy_vocabulary_load_multiple_alter(QueryAlterableIn
     ->condition('ogr.group_type', $group_type)
     ->condition('ogr.gid', $gid);
 }
-
 
 /**
  * Implements hook_form_FORM-ID_alter().
@@ -832,6 +841,8 @@ function og_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
   $group = entity_load_single($group_type, $gid);
   list(,, $group_bundle) = entity_extract_ids($group_type, $group);
 
+  $form['machine_name']['#element_validate'][] = 'og_vocab_machine_name_validate';
+
   $form['og_vocab_relation'] = array(
     '#type' => 'value',
     '#value' => array('group_type' => $group_type, 'gid' => $gid),
@@ -936,6 +947,36 @@ function og_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
     }
   }
   $form['#submit'][] = 'og_vocab_form_taxonomy_form_vocabulary_submit';
+}
+
+/**
+ * Element validate; Auto-set a new machine name if vocabulary already
+ * exists.
+ */
+function og_vocab_machine_name_validate($element, &$form_state) {
+  if (empty($form_state['values']['machine_name'])) {
+    return;
+  }
+
+  $machine_name = $form_state['values']['machine_name'];
+
+  // Set the static variable to "skip" to prevent altering while we verify
+  // the machine name doesn't exist yet.
+  $cache = &drupal_static('og_vocab_query_taxonomy_vocabulary_load_multiple_alter', FALSE);
+  $cache = 'skip';
+
+  if (!taxonomy_vocabulary_machine_name_load($machine_name)) {
+    return;
+  }
+
+  // Start iterating over machine names until we hit one that doesn't
+  // exist yet.
+  $i = 1;
+  while (taxonomy_vocabulary_machine_name_load($machine_name)) {
+    $machine_name = substr($machine_name, 0, 32 - strlen($i)) . $i;
+    ++$i;
+  }
+  form_set_value($element, $machine_name, $form_state);
 }
 
 /**
