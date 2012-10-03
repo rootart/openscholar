@@ -911,7 +911,7 @@ function og_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
 
       module_load_include('inc', 'field_ui', 'field_ui.admin');
       $widget_types = field_ui_widget_type_options('entityreference');
-      unset($widget_types['og_vocab_complex']);
+      unset($widget_types['og_vocab_complex'], $widget_types['og_complex']);
 
       $element_name = "og_vocab[$entity_type:$bundle][status]";
       $states = array(
