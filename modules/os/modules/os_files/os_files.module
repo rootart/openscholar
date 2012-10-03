@@ -161,11 +161,25 @@ function os_files_stream_wrappers_alter(&$wrappers) {
  * Serve public files from a vsite directory.
  */
 function os_files_file_download($uri) {
+  global $user;
   $path = file_uri_target($uri);
   $scheme = file_uri_scheme($uri);
 
   if ($scheme != 'public' || !module_exists('vsite')) {
     return NULL;
+  }
+
+  if ($files = file_load_multiple(array(), array('uri' => $uri))) {
+    foreach ($files as $file) {
+      $wrapper = entity_metadata_wrapper('file', $file);
+      if (!isset($wrapper->{OG_AUDIENCE_FIELD}) || !$gid = $wrapper->{OG_AUDIENCE_FIELD}->value(array('identifier' => TRUE))) {
+        continue;
+      }
+
+      if (og_is_member('node', $gid)) {
+        return 1;
+      }
+    }
   }
 
   $prefix = vsite_get_purl();
@@ -174,7 +188,7 @@ function os_files_file_download($uri) {
   if (strpos($path, $prefix.'/') === 0) {
 
     // Get the file record based on the URI. If not in the database just return.
-    $files = file_load_multiple(array(), array('uri' => $uri));
+
     if (count($files)) {
       foreach ($files as $item) {
         // Since some database servers sometimes use a case-insensitive
