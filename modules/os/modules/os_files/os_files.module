@@ -34,13 +34,37 @@ function os_files_menu_alter(&$callbacks) {
 }
 
 /**
+ * Implements hook_file_insert().
+ */
+function os_files_file_insert($file) {
+  if ($context = og_context()) {
+    $file->skip_og_membership = TRUE;
+
+    // Skip altering the load file query, so the file is properly saved.
+    $skip = &drupal_static('os_files_query_file_load_multiple_alter');
+    $skip = TRUE;
+    og_group('node', $context['gid'], array('entity_type' => 'file', 'entity' => $file));
+  }
+}
+
+/**
  * Implements hook_query_QUERY_ID_alter().
+ *
+ * Make sure to show only the files a user belongs to in a space.
+ * It is possible to skip this, by settings the static varaible to TRUE.
+ * This is done as we cannot rely on menu_get_item() which will cause a
+ * recurssion while a file is saved.
+ *
+ * @see os_files_file_insert()
  */
 function os_files_query_file_load_multiple_alter(&$query) {
-  if (!$space = spaces_get_space()) {
+  if ($skip = &drupal_static(__FUNCTION__, FALSE)) {
     return;
   }
 
+  if (!$space = spaces_get_space()) {
+    return;
+  }
 
   $query->innerJoin('og_membership', 'ogm', "ogm.etid = base.fid");  $query->condition('ogm.gid', $space->id);
 }
