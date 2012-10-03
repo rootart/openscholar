@@ -6,12 +6,6 @@
 function openscholar_install_tasks($install_state) {
   $tasks = array();
 
-  // Set the private file folder.
-  $tasks['openscholar_private_file_system'] = array(
-    'display_name' => t('Private file system'),
-    'type' => 'form',
-  );
-
   // OS flavors (production, development, etc)
   $tasks['openscholar_flavor_form'] = array(
     'display_name' => t('Choose a enviroment'),
@@ -133,40 +127,6 @@ function openscholar_vsite_modules_batch(&$install_state){
   }
 
   return _opnescholar_module_batch($modules);
-}
-
-/**
- * Set the private file system.
- */
-function openscholar_private_file_system($form, &$form_state) {
-  $form['private_directory'] = array(
-    '#title' => st('Private files directory'),
-    '#description' => st('An existing local file system path for storing private files. It should be writable by Drupal and not accessible over the web.'),
-    '#type' => 'textfield',
-    '#required' => TRUE,
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-  );
-
-  return $form;
-}
-
-/**
- * Validate handler - verify that the private files directory is writeable and
- * exists.
- */
-function openscholar_private_file_system_validate($form, &$form_state) {
-  system_check_directory($form['private_directory']);
-}
-
-/**
- * Submit handler - save the private file directory path.
- */
-function openscholar_private_file_system_submit($form, $form_state) {
-  variable_set('file_private_path', $form_state['values']['private_directory']);
 }
 
 /**

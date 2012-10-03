@@ -26,11 +26,32 @@ function os_files_menu() {
 }
 
 /**
+ * Implements hook_os_add_new_links_alter().
+ *
+ * Adds a page contextual link for importing biblio nodes.
+ */
+function os_files_os_add_new_links_alter(&$links) {
+  $item = menu_get_item();
+
+  if (!in_array($item['path'], array('file-list', 'file/%', 'file/%/edit'))) {
+    return;
+  }
+
+  $links['add_new_file'] = array(
+    'title' => t('Add file'),
+    'href' => 'file/add',
+    'html' => TRUE,
+  );
+}
+
+/**
  * Implements hook_menu_alter().
  */
 function os_files_menu_alter(&$callbacks) {
   $callbacks['file-list'] = $callbacks['admin/content/file'];
   $callbacks['file-list']['access callback'] = 'os_files_file_list';
+  $callbacks['file-list']['page callback'] = 'views_embed_view';
+  $callbacks['file-list']['page arguments'] = array('cp_files');
 }
 
 /**
@@ -88,7 +109,6 @@ function os_files_download() {
   call_user_func_array('file_download',$args);
 }
 
-
 /**
  * File Settings.
  */
@@ -129,39 +149,6 @@ function os_files_stream_wrappers_alter(&$wrappers) {
 }
 
 /**
- * Implements hook_file_download_access().
- */
-function os_files_file_download_access($file_item, $entity_type, $entity) {
-  if (file_uri_scheme($file_item['uri']) != 'private') {
-    return;
-  }
-
-  global $user;
-
-  $space = spaces_gett_space();
-  if ($space->id || !$user->uid) {
-
-    // Anonymous users canno't download files.
-    if (!$user->uid) {
-      $redirect = '';
-      // // Redirect to page where the access key in the session will be set to
-      // // true.
-      // drupal_goto($redirect);
-    }
-
-    // Check if authnticated user can download this files.
-    $user_group = og_get_groups_by_user(user_load($user->uid));
-    $wrapper = entity_metadata_wrapper('file', $file_item['fid']);
-    $group_ref = $wrapper->og_group_ref->value();
-
-    if (empty($group_ref) || $wrapper->og_group_ref->get(0)->getIdentifier() != reset($user_group['node'])) {
-      drupal_deliver_page(MENU_ACCESS_DENIED);
-      drupal_goto('');
-    }
-  }
-}
-
-/**
  * Implements hook_file_download().
  *
  * Serve public files from a vsite directory.
@@ -182,8 +169,8 @@ function os_files_file_download($uri) {
         continue;
       }
 
-      if (og_is_member('node', $gid)) {
-        return 1;
+      if (!og_is_member('node', $gid[0])) {
+        return -1;
       }
     }
   }
@@ -209,9 +196,6 @@ function os_files_file_download($uri) {
     if (!isset($file)) {
       return;
     }
-
-    // Removing the session for the file information.
-    unset($_SESSION['file_data']);
 
     return file_get_content_headers($file);
   }
