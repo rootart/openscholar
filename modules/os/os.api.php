@@ -82,10 +82,13 @@ function hook_os_menu_tree_alter($menu_name, &$tree) {
  * Return Contexts along with thier label that your module creates
  * and would like to allow users to edit
  *
+ * @param $privacy array
+ * Optional privacy conditions to honor
+ *
  * @return array
  * 	Avalible contexts with thier descriptions
  */
-function hook_os_layout_contexts() {
+function hook_os_layout_contexts($privacy = false) {
 
   // Contexts provided by this module
   $provided_contexts = array(

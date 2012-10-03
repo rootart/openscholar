@@ -1,7 +1,4 @@
 <?php
-// $Id$
-
-
 /**
  * @file
  * os_booklets.features.field.inc
@@ -13,7 +10,7 @@
 function os_booklets_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'node-book-body'
+  // Exported field: 'node-book-body'.
   $fields['node-book-body'] = array(
     'field_config' => array(
       'active' => '1',
@@ -36,6 +33,7 @@ function os_booklets_field_default_fields() {
           0 => 'format',
         ),
       ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(),
       'translatable' => '0',
@@ -69,7 +67,7 @@ function os_booklets_field_default_fields() {
       'label' => 'Body',
       'required' => FALSE,
       'settings' => array(
-        'display_summary' => TRUE,
+        'display_summary' => 0,
         'text_processing' => 1,
         'user_register_form' => FALSE,
       ),
@@ -85,7 +83,7 @@ function os_booklets_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-book-field_upload'
+  // Exported field: 'node-book-field_upload'.
   $fields['node-book-field_upload'] = array(
     'field_config' => array(
       'active' => '1',
@@ -106,6 +104,7 @@ function os_booklets_field_default_fields() {
           0 => 'fid',
         ),
       ),
+      'locked' => '0',
       'module' => 'file',
       'settings' => array(
         'display_default' => 0,
@@ -181,7 +180,7 @@ function os_booklets_field_default_fields() {
           ),
           'browser_plugins' => array(
             'library' => 0,
-            'media_default--media_browser_1' => 0,
+            'media_default--media_browser_1' => 'media_default--media_browser_1',
             'media_embed' => 0,
             'media_internet' => 0,
             'upload' => 'upload',
@@ -196,9 +195,8 @@ function os_booklets_field_default_fields() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Attach Files');
   t('Body');
-  t('upload');
 
   return $fields;
 }
-

@@ -53,9 +53,7 @@ p.copy a.poweredby {
 	
 }
 
-#menu-bar #block-os-primary-menu {
-	float:left;
-}
+
 
 /* TYPOGRAPHY*/ 
  
@@ -192,7 +190,6 @@ p.copy a.footer-login:hover {
 {
 padding: 0;
 color: #F3F3F1;
-float: left;
 margin:0;
 }
 

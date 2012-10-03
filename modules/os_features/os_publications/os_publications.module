@@ -260,10 +260,16 @@ function os_publications_form_biblio_node_form_alter(&$form, $form_state) {
 function os_publications_biblio_entry_alter(&$entry, $node) {
   unset($entry['export_links']);
 
+  $entry = node_view($node, 'teaser');
+  $entry['teaser']['#weight'] = 1;
+  $entry['#attached']['css'][] = drupal_get_path('module', 'os_publications').'/misc/os_publications.css';
+  unset($entry['links']['node'], $entry['links']['biblio_google_scholar']);
+
   // add abstract link
+
   if (strlen($node->biblio_abst_e)) {
     $entry['#attached']['js'][] = drupal_get_path('module', 'os') . '/theme/os_toggle.js';
-    $html   = &$entry['entry']['#markup'];
+    $html   = &$entry['teaser']['#markup'];
     $insert = strrpos($html, '</div>');
     $extra  = l('Abstract', 'node/' . $node->nid, array('attributes' => array('class' => array('biblio-abstract-link', 'toggle'))));
     $render = array(
@@ -286,12 +292,13 @@ function os_publications_biblio_entry_alter(&$entry, $node) {
       $html = substr_replace($html, ' ' . $extra, $insert, 0);
     }
   }
+}
 
-  // add fields
-  field_attach_prepare_view('node', array($node->nid => $node), 'teaser');
-  $entry += field_attach_view('node', $node, 'teaser');
-  $entry['entry']['#weight'] = 1;
-  $entry['download_links']['#weight'] = 2;
+function os_publications_preprocess_node(&$vars) {
+  if ($vars['type'] == 'biblio' && $vars['teaser']) {
+    $vars['display_submitted'] = false;
+    $vars['title'] = false;
+  }
 }
 
 /**

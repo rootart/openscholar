@@ -629,10 +629,13 @@ function os_init() {
 /**
  * Implements hook os_layout_contexts().
  *
+ * @param $privacy boolean (optional)
+ * Privacy conditions to honor
+ *
  * @return
  *  Avalible contexts with thier descriptions.
  */
-function os_os_layout_contexts() {
+function os_os_layout_contexts($privacy = true) {
   $provided_contexts = &drupal_static(__FUNCTION__);
 
   // Static cache of avalible contexts.
@@ -648,7 +651,14 @@ function os_os_layout_contexts() {
 
   // Contexts provided by features.
   $features = spaces_features('og');
+  $site_features = variable_get('spaces_features', array());
   foreach ( $features as $name => $feature ) {
+
+    if (is_array($privacy) && (!isset($site_features[$name]) || !in_array($site_features[$name], $privacy))){
+      //This feature does not match privacy requested, skip it
+      continue;
+    }
+
     $info = $feature->info['features'];
     if (isset($info['context'])) {
       foreach ($info['context'] as $ctx) {
@@ -940,7 +950,7 @@ function os_views_pre_build(&$view) {
 
 function os_admin_paths_alter(&$paths) {
   foreach ($paths as $k => $p) {
-    if (strpos($k, 'node/*/edit') !== FALSE || strpos($k, 'node/add') !== FALSE) {
+    if (strpos($k, 'node/*/edit') !== FALSE/* || strpos($k, 'node/add') !== FALSE*/) {
       unset($paths[$k]);
     }
   }

@@ -101,7 +101,6 @@ function cp_user_user_management_page($vsite_id) {
   $rows = array();
   $header = array('Username','First Name','Last Name','Role','Admin','Manage');
   $data_load = cp_user_load_group_users($vsite_id);
-  //print_r($data_load);
   foreach($data_load as $data=>$load) {
     $rows[] = array($load['User']['username'],
       $load['User']['first_name'],
@@ -112,10 +111,10 @@ function cp_user_user_management_page($vsite_id) {
     );
   }
   $add_new_link = l('+ Add a new user','cp/users/new_list/add');
-  //$add_new_link = ctools_modal_text_button(t('+ Add a new user to your site'), 'cp/users/new_list/add', t('Add a new user to your site'));
 
-  $output = '<div><ul><li>'.$add_new_link.'</li></ul></div>';
-  $output.= theme('table',array('header'=>$header,'rows'=>$rows));
+  $output = '<div class="cp-manage-users-wrapper"><div class="cp-add-new-user"><ul><li>'.$add_new_link.'</li></ul></div><div class="cp-manager-user-content">';
+  $output .= theme('table',array('header'=>$header,'rows'=>$rows));
+  $output .= '</div></div>';
 
   return $output;
 }
@@ -126,22 +125,15 @@ function cp_user_user_management_page($vsite_id) {
  */
 function cp_user_remove_membership_confirm($form_state, $user_load) {
   $space = spaces_get_space();
-  // Values
-  $url = $space->get_absolute_url();
-  $gid = $space->group->vid;
-  $account = $user_load['build_info']['args'][0]->uid;
-  $username = $user_load['build_info']['args'][0]->name;
-  $site_name = $space->group->title;
   // Form sets.
-  $form['gid'] = array('#type' => 'value', '#value' => $gid);
-  $form['account'] = array('#type' => 'value', '#value' => $account);
-  $form['site_url'] = array('#type' => 'value', '#value' => $url);
-  $form['username'] = array('#type' => 'value', '#value' => $username);
-  $form['site_name'] = array('#type' => 'value', '#value' => $site_name);
+  $form['gid'] = array('#type' => 'value', '#value' => $space->group->vid);
+  $form['account'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->uid);
+  $form['username'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->name);
+  $form['site_name'] = array('#type' => 'value', '#value' => $space->group->title);
   // Return hook_confirm_form();
   return confirm_form($form,
-    t('Are you sure you want to remove !name from the website: %title?', array('!name' => $username, '%title' => $site_name)),
-    "".$url."/cp/users/new_list",
+    t('Are you sure you want to remove !name from the website: %title?', array('!name' => $user_load['build_info']['args'][0]->name, '%title' => $space->group->title)),
+    "cp/users/new_list",
     ' ',
     t('Remove'),
     t('Cancel')
@@ -152,24 +144,16 @@ function cp_user_remove_membership_confirm($form_state, $user_load) {
  * Function to remove the user from the selected group/site.
  */
 function cp_user_remove_membership_confirm_submit($form, &$form_state) {
-  global $user;
-  // Variable sets from the form values.
-  $account = $form_state['values']['account'];
-  $gid = $form_state['values']['gid'];
-  $username = $form_state['values']['username'];
-  $site_name = $form_state['values']['site_name'];
-  $site_url = $form_state['values']['site_url'];
-
   // Admin sanity check
-  if(cp_user_check_admin($account,$gid) == TRUE) {
+  if(cp_user_check_admin($form_state['values']['account'],$form_state['values']['gid']) == TRUE) {
     // Ungroup the user from the node
-    og_ungroup('node',$gid,'user',$account);
+    og_ungroup('node',$form_state['values']['gid'],'user',$form_state['values']['account']);
     // Set the message and redirect back to the cp/users page
-    drupal_set_message(t('!user has been removed from !website', array('!user'=>$username,'!website'=>$site_name)));
-    drupal_goto($site_url.'/cp/users/new_list');
+    drupal_set_message(t('!user has been removed from !website', array('!user'=>$form_state['values']['username'],'!website'=>$form_state['values']['site_name'])));
+    drupal_goto('cp/users/new_list');
   }else {
-  	drupal_set_message(t('Error: site admin cannot be removed from !website', array('!website'=>$site_name)));
-    drupal_goto($site_url.'/cp/users/new_list');
+  	drupal_set_message(t('Error: site admin cannot be removed from !website', array('!website'=>$form_state['values']['site_name'])));
+    drupal_goto('cp/users/new_list');
   }
 }
 
@@ -179,22 +163,15 @@ function cp_user_remove_membership_confirm_submit($form, &$form_state) {
  */
 function cp_user_make_admin_confirm($form_state, $user_load) {
   $space = spaces_get_space();
-  // Values
-  $url = $space->get_absolute_url();
-  $gid = $space->group->vid;
-  $account = $user_load['build_info']['args'][0]->uid;
-  $username = $user_load['build_info']['args'][0]->name;
-  $site_name = $space->group->title;
   // Form sets.
-  $form['gid'] = array('#type' => 'value', '#value' => $gid);
-  $form['account'] = array('#type' => 'value', '#value' => $account);
-  $form['site_url'] = array('#type' => 'value', '#value' => $url);
-  $form['username'] = array('#type' => 'value', '#value' => $username);
-  $form['site_name'] = array('#type' => 'value', '#value' => $site_name);
+  $form['gid'] = array('#type' => 'value', '#value' => $gid = $space->group->vid);
+  $form['account'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->uid);
+  $form['username'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->name);
+  $form['site_name'] = array('#type' => 'value', '#value' => $space->group->title);
   // Return hook_confirm_form();
   return confirm_form($form,
-    t('Are you sure you want to make !name a group administrator for the website: %title?', array('!name' => $username, '%title' => $site_name)),
-    "".$url."/cp/users/new_list",
+    t('Are you sure you want to make !name a group administrator for the website: %title?', array('!name' => $user_load['build_info']['args'][0]->name, '%title' => $space->group->title)),
+    "cp/users/new_list",
     ' ',
     t('Confirm'),
     t('Cancel')
@@ -205,28 +182,21 @@ function cp_user_make_admin_confirm($form_state, $user_load) {
  * Function to promote the user to vsite admin of the selected group/site.
  */
 function cp_user_make_admin_confirm_submit($form, &$form_state) {
-  global $user;
-  // Variable sets from the form values.
-  $account = $form_state['values']['account'];
-  $gid = $form_state['values']['gid'];
-  $username = $form_state['values']['username'];
-  $site_name = $form_state['values']['site_name'];
-  $site_url = $form_state['values']['site_url'];
   // Get the vsite admin key.
   $og_roles = og_roles('node', 'vsite');
   $key = array_search('vsite admin', $og_roles);
   $vsite_admin_role = $key;
 
   // Admin sanity check
-  if(cp_user_check_admin($account,$gid) == TRUE) {
+  if(cp_user_check_admin($form_state['values']['account'],$form_state['values']['gid']) == TRUE) {
     // Grant them the admin role
-    og_role_grant('node', $gid, $account, $vsite_admin_role);
+    og_role_grant('node', $form_state['values']['gid'], $form_state['values']['account'], $vsite_admin_role);
     // Set the message and redirect back to the cp/users page
-    drupal_set_message(t('!user has been promoted to administrator for !website', array('!user'=>$username,'!website'=>$site_name)));
-    drupal_goto($site_url.'/cp/users/new_list');
+    drupal_set_message(t('!user has been promoted to administrator for !website', array('!user'=>$form_state['values']['username'],'!website'=>$form_state['values']['site_name'])));
+    drupal_goto('cp/users/new_list');
   }else {
-  	drupal_set_message(t('Error: site admin/manager already exists for !website', array('!user'=>$username,'!website'=>$site_name)));
-    drupal_goto($site_url.'/cp/users/new_list');
+  	drupal_set_message(t('Error: site admin/manager already exists for !website', array('!website'=>$form_state['values']['site_name'])));
+    drupal_goto('cp/users/new_list');
   }
 }
 
@@ -236,24 +206,17 @@ function cp_user_make_admin_confirm_submit($form, &$form_state) {
  */
 function cp_user_remove_admin_confirm($form_state, $user_load) {
   $space = spaces_get_space();
-  // Values
-  $url = $space->get_absolute_url();
-  $gid = $space->group->vid;
-  $account = $user_load['build_info']['args'][0]->uid;
-  $username = $user_load['build_info']['args'][0]->name;
-  $site_name = $space->group->title;
   // Form sets.
-  $form['gid'] = array('#type' => 'value', '#value' => $gid);
-  $form['account'] = array('#type' => 'value', '#value' => $account);
-  $form['site_url'] = array('#type' => 'value', '#value' => $url);
-  $form['username'] = array('#type' => 'value', '#value' => $username);
-  $form['site_name'] = array('#type' => 'value', '#value' => $site_name);
+  $form['gid'] = array('#type' => 'value', '#value' => $space->group->vid);
+  $form['account'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->uid);
+  $form['username'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->name);
+  $form['site_name'] = array('#type' => 'value', '#value' => $space->group->title);
   // Return hook_confirm_form();
   return confirm_form($form,
-    t('Are you sure you want to remove !name as a group administrator for the website: %title?', array('!name' => $username, '%title' => $site_name)),
-    "".$url."/cp/users/new_list",
+    t('Are you sure you want to remove !name as a group administrator for the website: %title?', array('!name' => $user_load['build_info']['args'][0]->name, '%title' => $space->group->title)),
+    "cp/users/new_list",
     ' ',
-    t('Confirm'),
+    t('Remove'),
     t('Cancel')
   );
 }
@@ -262,27 +225,20 @@ function cp_user_remove_admin_confirm($form_state, $user_load) {
  * Function to promote the user to vsite admin of the selected group/site.
  */
 function cp_user_remove_admin_confirm_submit($form, &$form_state) {
-  global $user;
-  // Variable sets from the form values.
-  $account = $form_state['values']['account'];
-  $gid = $form_state['values']['gid'];
-  $username = $form_state['values']['username'];
-  $site_name = $form_state['values']['site_name'];
-  $site_url = $form_state['values']['site_url'];
   // Get the vsite admin key.
   $og_roles = og_roles('node', 'vsite');
   $key = array_search('vsite admin', $og_roles);
   $vsite_admin_role = $key;
 
   // Admin sanity check
-  if(cp_user_check_admin($account,$gid) == TRUE) {
+  if(cp_user_check_admin($form_state['values']['account'],$form_state['values']['gid']) == TRUE) {
     // Revoke the admin role
-    og_role_revoke('node', $gid, $account, $vsite_admin_role);
+    og_role_revoke('node', $form_state['values']['gid'], $form_state['values']['account'], $vsite_admin_role);
     // Set the message and redirect back to the cp/users page
-    drupal_set_message(t('!user has been removed as administrator for !website', array('!user'=>$username,'!website'=>$site_name)));
-    drupal_goto($site_url.'/cp/users/new_list');
+    drupal_set_message(t('!user has been removed as administrator for !website', array('!user'=>$form_state['values']['username'],'!website'=>$form_state['values']['site_name'])));
+    drupal_goto('cp/users/new_list');
   }else {
-  	drupal_set_message(t('Error: Cannot remove site admin role for !website', array('!user'=>$username,'!website'=>$site_name)));
-    drupal_goto($site_url.'/cp/users/new_list');
+  	drupal_set_message(t('Error: Cannot remove site admin role for !website', array('!website'=>$form_state['values']['site_name'])));
+    drupal_goto('cp/users/new_list');
   }
 }

@@ -50,26 +50,13 @@ function os_layout_get_contexts($privacy = array(1, 2)) {
 
   $os_contexts = array();
   foreach (module_implements('os_layout_contexts') as $module) {
-    $contexts = module_invoke($module, 'os_layout_contexts');
+    $contexts = module_invoke($module, 'os_layout_contexts', $privacy);
     foreach ($contexts as $id => $name) {
       $os_contexts[$id] = $name;
     }
   }
 
   drupal_alter('os_layout_contexts_alter', $os_contexts);
-
-  // Check privacy settings if needed.
-  if (is_array($privacy)) {
-    // // Retrieve the features that match the privacy settings.
-    // $avalible_features = array_intersect(variable_get('spaces_features',
-  // array()), $privacy);
-    //
-    // // Map contexts to features.
-    // $context_map = features_get_component_map('context');
-    // foreach ( $os_contexts as $value ) {
-    // ;
-    // }
-  }
 
   return $os_contexts;
 }

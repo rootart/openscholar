@@ -182,7 +182,7 @@ function vsite_vsite_exists_access($vsites = array()) {
     if(current_path() == 'site/register') {
       // Set error message when appropriate.
       drupal_get_messages();  // Clear message queue.
-      drupal_set_message(t('You have already created the maximum of %num OpenScholar !sites. !link', 
+      drupal_set_message(t('You have already created the maximum of %num OpenScholar !sites. !link',
         array('%num' => count($vsites),
               '!sites' => count($vsites) > 1 ? 'sites' : 'site',
               '!link' => l(t('Go to your site' . (count($vsites) > 1 ? 's.' : '.')), count($vsites) > 1 ? 'user' : $vsites[0]->get_absolute_url()),
@@ -294,7 +294,6 @@ function vsite_field_attach_create_bundle($entity_type, $bundle){
  */
 function vsite_attach_fields_to_group_content($entity_type, $bundle){
   $og_field = og_fields_info(OG_AUDIENCE_FIELD);
-  $og_field['instance']['default_value_function'] = 'vsite_group_audience_field_default_value';
   $og_field['instance']['display'] = array(
     'default' => array(
       'type' => 'hidden'
@@ -302,6 +301,14 @@ function vsite_attach_fields_to_group_content($entity_type, $bundle){
     'teaser' => array(
       'type' => 'hidden'
     )
+  );
+  // Enable Entity reference prepopulate.
+  $og_field['instance']['settings']['behaviors']['prepopulate'] = array(
+    'status' => TRUE,
+    'action' => 'hide',
+    'fallback' => 'none',
+    'skip_perm' => 'administer group',
+    'og_context' => TRUE,
   );
   og_create_field(OG_AUDIENCE_FIELD, $entity_type, $bundle, $og_field);
 }
@@ -674,23 +681,6 @@ function _vsite_purl_init(){
 }
 
 /**
- * Sets the default value for the group audience fields.
- * This works even if the widget is not shown, e.g. due to restricted field access.
- */
-function vsite_group_audience_field_default_value(){
-  $vsite = spaces_get_space();
-
-  if ($vsite) {
-    // Set the group audience value to automatically be the current active site
-    $default[] = array(
-      'target_id' => $vsite->group->nid
-    );
-
-    return $default;
-  }
-}
-
-/**
  * Implements hook_field_attach_form().
  */
 function vsite_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode){
@@ -815,15 +805,17 @@ function vsite_user_view_alter(&$build){
         $css_selector = array(
           'class' => 'plural'
         );
+        $website_title = t('My Websites:');
       }
       else {
         $css_selector = array(
           'class' => 'single'
         );
+        $website_title = t('My Website:');
       }
       $vsites_list .= theme_item_list(array(
         'items' => $owner_sites,
-        'title' => 'My Websites',
+        'title' => $website_title,
         'type' => 'ul',
         'attributes' => $css_selector
       ));
@@ -833,22 +825,24 @@ function vsite_user_view_alter(&$build){
         $css_selector = array(
           'class' => 'plural'
         );
+        $membership_title = t('Websites I am a member of:');
       }
       else {
         $css_selector = array(
           'class' => 'single'
         );
+        $membership_title = t('Website I am a member of:');
       } // end if
       $vsites_list .= theme_item_list(array(
         'items' => $member_sites,
-        'title' => 'Websites I am a member of:',
+        'title' => $membership_title,
         'type' => 'ul',
         'attributes' => $css_selector
       ));
     }
     // Set a new field.
     $build['web_sites'] = array(
-      '#title' => 'Website Membership Summary:',
+      '#title' => t('Website Membership Summary:'),
       '#type' => 'user_profile_item',
       '#markup' => $vsites_list,
       '#weight' => '10'

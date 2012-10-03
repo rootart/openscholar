@@ -383,7 +383,7 @@ function cp_menu_wizard_cancel(&$form_state) {
 	$cached = cp_menu_cache_get($form_state['object_id']);
   cp_menu_cache_clear($form_state['object_id']);
 
-  if ($cached['js']) {
+  if ($cached['js'] || $form_state['ajax']) {
   	ctools_include('ajax');
   	ctools_include('modal');
   	$commands = array();

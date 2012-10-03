@@ -12,7 +12,7 @@ function cp_user_menu(){
   $items = array();
 
   $items['cp/users'] = array(
-    'title' => 'Users',
+    'title' => 'Manage Users',
     'description' => 'Find and manage site members.',
     'page callback' => 'cp_user_admin',
     'access callback' => 'cp_user_admin_access',
@@ -166,6 +166,21 @@ function cp_user_form_og_ui_add_users_alter(&$form, $form_state) {
     '#type' => 'value',
     '#value' => 'og_user_node',
   );
+
+  // Remove the "Last Message" form element that gets hooked into the og_ui_add_users form.
+  if(isset($form['membership_fields']) && isset($form['membership_fields']['field_message'])) {
+  	$form['membership_fields']['field_message']['#access'] = FALSE;
+  }
+
+  // Add a secondary submit function that redirects the users out of the admin overlay
+  $form['#submit'][] = 'cp_user_og_ui_add_users_submit';
+}
+
+/**
+ * Function to redirect the user back to the /cp/users/new_list page after submitting the add user.
+ */
+function cp_user_og_ui_add_users_submit(&$form, &$form_state){
+  $form_state['redirect'] = 'cp/users/new_list';
 }
 
 /**
@@ -206,7 +221,6 @@ function cp_user_form_user_register_form_alter(&$form, &$form_state, $form_id) {
     // as well as creating the user, in one step.
     $form['actions']['submit']['#value'] = 'Create and Add User';
   }
-
 }
 
 /**
@@ -226,6 +240,8 @@ function cp_user_user_register_submit($form, &$form_state) {
     $pass_form_state['build_info']['args'] = array('group_type'=>$og_context->group_type,'gid'=>$og_context->id);
 	// Submit the og_ui_add_users form
     drupal_form_submit('og_ui_add_users',$pass_form_state);
+    // Redirect the user after they add/create someone.
+    $form_state['redirect'] = 'cp/users/new_list';
   }
 }
 

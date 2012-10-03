@@ -451,21 +451,39 @@ form table .item-list ul {
 }
 
 /* PUBLICATIONS SETTING FORM IN MODAL */
-.page-publications .column.column-left,
-.page-publications #comment_settings,
-.page-publications .form-actions {
+.os_publications-customize-form #edit-left,
+.os_publications-customize-form #comment_settings {
 	float:left;
-	display:inline;
+	width:50%;
 }
 
-.page-publications .column.column-right {
+.os_publications-customize-form .form-actions {
+	clear:both;
+}
+
+.os_publications-customize-form #comment_settings {
+	width:150px;
+}
+
+.os_publications-customize-form #edit-right {
 	float:right;
-	display:inline;
-	margin-top:-800px;
+	margin-top: -680px;
+	width:50%;
+}
+
+.page-cp .os_publications-customize-form #edit-right {
+	margin-top: -775px;
+	
 }
 
 @-moz-document url-prefix() { 
-  .page-publications .column.column-right {
-	margin-top:-815px;
+.os_publications-customize-form #edit-right {
+	margin-top:-726px;
+ }
+}
+
+@-moz-document url-prefix() { 
+.page-cp .os_publications-customize-form #edit-right {
+	margin-top:-810px;
  }
 }

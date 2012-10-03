@@ -134,14 +134,13 @@ function _os_publications_plain_citation($node) {
 
   $citation = theme('biblio_style', array('node' => $node, 'base' => $base, 'style' => $style));
 
+  $citation = strip_tags($citation);
+
   // add url to citation
-  if (function_exists('shorten_url') && variable_get('os_publications_shorten_citations', 0)) {
-    global $base_url;
+  if (function_exists('shorten_url') && variable_get('os_publications_shorten_citations')) {
     /* replace punctuation at end of citation with period.
      * biblio_coins follow end of citation and block an easy RE match, so we're appending them.
      */
-
-
     $coins = filter_xss($node->biblio_coins, array('span'));
     $re = '/' . '[!-~] (<\/\w*>)?' . preg_quote($coins, '/') . '/';
 
@@ -149,10 +148,11 @@ function _os_publications_plain_citation($node) {
       $citation = preg_replace($re, ", </span>$coins", $citation);
     }
 
-    $citation .= ' copy at ' . shorten_url(url('node/' . $node->nid, array('absolute' => TRUE)));
+    $short_url = 'http://' . shorten_url(url('node/' . $node->nid, array('absolute' => TRUE)));
+
+    $citation .= ' Copy at ' . l($short_url, $short_url);
   }
 
-  $citation = strip_tags($citation);
   drupal_add_js('function selectText(ele) {
 	try {
   	var div = document.createRange();

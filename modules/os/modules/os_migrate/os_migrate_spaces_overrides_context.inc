@@ -100,7 +100,8 @@ class SpacesOverridesContextMigration extends SpacesOverridesTableMigration {
     $block = array_intersect_key($block, array_flip($keep));
 
     if (in_array($id, array(
-      'boxes-scholar_reader-latest_feed_items'
+      'boxes-scholar_reader-latest_feed_items',
+      'scholar_front-get_started',
     ))) {
       //Remove depricated blocks
       return FALSE;
@@ -249,141 +250,144 @@ class SpacesOverridesContextMigration extends SpacesOverridesTableMigration {
       return;
     }
 
-    //only keep these blocks in the context
-    $whitelist = array(
-      'boxes-site_info',
-      'boxes-site_logo',
-      'os-primary-menu',
-      'boxes-shield',
-      'boxes-shield_default',
-      'os-secondary-menu'
-    );
+    if (parent::is_domain('http://scholar.harvard.edu')) {
 
-    //null out the region of these blcoks
-    $null_region_list = array(
-      //kshepsle
-      '1' => array(),
-      //rbates
-      '8' => array(
-        'os-primary-menu'
-      ),
-      //agordon.net
-      '10057' => array(
-        'os-primary-menu',
+      //only keep these blocks in the context
+      $whitelist = array(
         'boxes-site_info',
         'boxes-site_logo',
-        'os-secondary-menu',
-        'boxes-shield_default'
-      )
-    );
+        'os-primary-menu',
+        'boxes-shield',
+        'boxes-shield_default',
+        'os-secondary-menu'
+      );
 
-    //if blocks above aren't overridden, here they are to include.
-    $preset_boxes = array(
-      'boxes-site_logo' => array(
-        'module' => 'boxes',
-        'delta' => 'site_logo',
-        'region' => FALSE,
-        'weight' => 0,
-        'status' => 0,
-        'title' => ''
-      ),
-      'boxes-shield' => array(
-        'module' => 'boxes',
-        'delta' => 'shield',
-        'region' => FALSE,
-        'weight' => 0,
-        'status' => 0,
-        'title' => ''
-      ),
-      'boxes-site_info' => array(
-        'module' => 'boxes',
-        'delta' => 'site_info',
-        'region' => FALSE,
-        'weight' => 0,
-        'status' => 0,
-        'title' => ''
-      ),
-      'os-primary-menu' => array(
-        'module' => 'os',
-        'delta' => 'primary-menu',
-        'region' => FALSE,
-        'weight' => 0,
-        'status' => 0,
-        'title' => ''
-      ),
-      'os-secondary-menu' => array(
-        'module' => 'os',
-        'delta' => 'secondary-menu',
-        'region' => FALSE,
-        'weight' => 0,
-        'status' => 0,
-        'title' => ''
-      )
-    );
-
-    //add these blocks to context
-    $add_blocks = array(
-      '1' => array(
-        'kshepsle_custom_box' => array(
-          'module' => 'boxes',
-          'delta' => 'kshepsle_custom_box',
-          'weight' => 0,
-          'region' => 'content_top',
-          'label' => '',
-          'info' => 'kshepsle_custom_box'
-        )
-      ),
-
-      '8' => array(
-        'rbates_custom_box' => array(
-          'module' => 'boxes',
-          'delta' => 'rbates_custom_box',
-          'weight' => 0,
-          'region' => 'content_top',
-          'label' => '',
-          'info' => 'rbates_custom_box'
-        )
-      ),
-
-      '10057' => array(
-        'agordon_custom_header_box' => array(
-          'module' => 'boxes',
-          'delta' => 'agordon_custom_header_box',
-          'weight' => 0,
-          'region' => 'header_second',
-          'label' => '',
-          'info' => 'agordon_custom_header_box'
+      //null out the region of these blcoks
+      $null_region_list = array(
+        //kshepsle
+        '1' => array(),
+        //rbates
+        '8' => array(
+          'os-primary-menu'
         ),
-        'agordon_custom_menu_box' => array(
+        //agordon.net
+        '10057' => array(
+          'os-primary-menu',
+          'boxes-site_info',
+          'boxes-site_logo',
+          'os-secondary-menu',
+          'boxes-shield_default'
+        )
+      );
+
+      //if blocks above aren't overridden, here they are to include.
+      $preset_boxes = array(
+        'boxes-site_logo' => array(
           'module' => 'boxes',
-          'delta' => 'agordon_custom_menu_box',
+          'delta' => 'site_logo',
+          'region' => FALSE,
           'weight' => 0,
-          'region' => 'menu_bar',
-          'label' => '',
-          'info' => 'agordon_custom_menu_box'
+          'status' => 0,
+          'title' => ''
+        ),
+        'boxes-shield' => array(
+          'module' => 'boxes',
+          'delta' => 'shield',
+          'region' => FALSE,
+          'weight' => 0,
+          'status' => 0,
+          'title' => ''
+        ),
+        'boxes-site_info' => array(
+          'module' => 'boxes',
+          'delta' => 'site_info',
+          'region' => FALSE,
+          'weight' => 0,
+          'status' => 0,
+          'title' => ''
+        ),
+        'os-primary-menu' => array(
+          'module' => 'os',
+          'delta' => 'primary-menu',
+          'region' => FALSE,
+          'weight' => 0,
+          'status' => 0,
+          'title' => ''
+        ),
+        'os-secondary-menu' => array(
+          'module' => 'os',
+          'delta' => 'secondary-menu',
+          'region' => FALSE,
+          'weight' => 0,
+          'status' => 0,
+          'title' => ''
+        )
+      );
+
+      //add these blocks to context
+      $add_blocks = array(
+        '1' => array(
+          'kshepsle_custom_box' => array(
+            'module' => 'boxes',
+            'delta' => 'kshepsle_custom_box',
+            'weight' => 0,
+            'region' => 'content_top',
+            'label' => '',
+            'info' => 'kshepsle_custom_box'
+          )
+        ),
+
+        '8' => array(
+          'rbates_custom_box' => array(
+            'module' => 'boxes',
+            'delta' => 'rbates_custom_box',
+            'weight' => 0,
+            'region' => 'content_top',
+            'label' => '',
+            'info' => 'rbates_custom_box'
+          )
+        ),
+
+        '10057' => array(
+          'agordon_custom_header_box' => array(
+            'module' => 'boxes',
+            'delta' => 'agordon_custom_header_box',
+            'weight' => 0,
+            'region' => 'header_second',
+            'label' => '',
+            'info' => 'agordon_custom_header_box'
+          ),
+          'agordon_custom_menu_box' => array(
+            'module' => 'boxes',
+            'delta' => 'agordon_custom_menu_box',
+            'weight' => 0,
+            'region' => 'menu_bar',
+            'label' => '',
+            'info' => 'agordon_custom_menu_box'
+          )
         )
       )
-    )
-    ;
+      ;
 
-    //gordon, bates need menus explicitly removed from the context.  they're appearing by default.
+      //gordon, bates need menus explicitly removed from the context.  they're appearing by default.
 
 
-    //filter out unwanted blocks
-    $value['blocks'] = array_intersect_key($value['blocks'], array_flip($whitelist));
+      //filter out unwanted blocks
+      $value['blocks'] = array_intersect_key($value['blocks'], array_flip($whitelist));
 
-    //hide regions by annulling their regions.
-    foreach ( $null_region_list[$nid] as $block ) {
-      if (isset($value['blocks'][$block])) {
-        $value['blocks'][$block]['region'] = FALSE;
+      //hide regions by annulling their regions.
+      foreach ( $null_region_list[$nid] as $block ) {
+        if (isset($value['blocks'][$block])) {
+          $value['blocks'][$block]['region'] = FALSE;
+        }
+        else {
+          $values['blocks'][$block] = $preset_boxes[$block];
+        }
       }
-      else {
-        $values['blocks'][$block] = $preset_boxes[$block];
-      }
+
+      //add the custom ones.
+      $value['blocks'] += $add_blocks[$nid];
     }
-
-    //add the custom ones.
-    $value['blocks'] += $add_blocks[$nid];
   }
 }
 
