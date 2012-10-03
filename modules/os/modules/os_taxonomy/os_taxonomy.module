@@ -5,8 +5,6 @@
  * Taxonomy terms API for OpenScholar.
  */
 
-include_once 'os_taxonomy.features.inc';
-
 /**
  * Implements hook_theme().
  */
@@ -139,11 +137,6 @@ function theme_volcabulary_term_list($variables) {
     'terms_description' => TRUE,
     'link_to_empty_terms' => TRUE,
   );
-
-  // Displaying the volcabulary term in a simple display using views.
-  if (!$options['bundles'] && !$options['show_empty_terms'] && !$options['terms_description'] && !$options['show_childs']) {
-    return views_embed_view('os_taxonomy_vocabulary_term_list', 'vocabulary_list', $variables['vid']);
-  }
 
   $vocabulary = taxonomy_vocabulary_load($variables['vid']);
 
@@ -321,30 +314,6 @@ function theme_taxonomy_term_tagged_node($variables) {
   $title = check_plain($taxonomy_term->name);
   $title .= $options['description'] ? '<br />' . check_plain($taxonomy_term->description) : '';
 
-  // Displays vocabulary terms using views, when not shown as tree.
-  if (!$options['tree']) {
-    $output = $title;
-    $tid = $taxonomy_term->tid;
-
-    // Show the nodes child's term with the term's nodes.
-    if ($options['child_element'] && $options['max_depth'] !== FALSE) {
-      // Get all the childrens.
-      $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['max_depth']);
-      foreach ($childrens as $children) {
-        $tids[] = $children->tid;
-      }
-
-      // Build array with the childrens and the current term id and pass it as
-      // a contextual filter the the view.
-      $tids[] = $tid;
-      $tid = implode("+", $tids);
-    }
-    //$view = views_get_view('os_taxonomy_vocabulary_term_list');
-    //$output .= $view->execute('term_list', $taxonomy_term->vid, $tid);
-    $output .= views_embed_view('os_taxonomy_vocabulary_term_list', 'term_list', $taxonomy_term->vid, $tid, array('view_mode' => $options['view_mode']));
-    return $output;
-  }
-
   if ($options['max_depth'] !== FALSE) {
     $childrens = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, $options['max_depth']);
 
@@ -499,32 +468,4 @@ function os_taxonomy_list_attached_nodes($tid, $node_bundles = array(), $range =
   }
 
   return array_keys($nids);
-}
-
-/**
- * Implements hook_view_pre_render().
- *
- * When the view mode of the node's term list is defined, change the view mode
- * of the rendered entity.
- */
-function os_taxonomy_views_pre_render(&$view) {
-  if ($view->name != 'os_taxonomy_vocabulary_term_list' && $view->current_display != 'term_list' && empty($view->args[2]['view_mode'])) {
-    return;
-  }
-
-  $rendered_content = &$view->display['term_list']->handler->view->style_plugin->row_plugin->rendered_content;
-
-  if (empty($rendered_content)) {
-    return;
-  }
-
-  foreach (array_keys($rendered_content) as $key) {
-    // Processing only integer keys, therefore skip on the key that contain the
-    // value '#sorted'.
-    if (!is_int($key)) {
-      continue;
-    }
-
-    $rendered_content[$key]['#view_mode'] = $view->args[2]['view_mode'];
-  }
 }
