@@ -289,6 +289,38 @@ abstract class AbstractNodeOSMigration extends OSMigration {
     return parent::prepareRow($current_row);
   }
 
+  /*
+   * Implements complete()
+   *
+   * files with list=0 should be copied, but should not show up as attachments.
+   * Instead of letting the field decide if they're attached, we're going to remove
+   * their connection to the node, leaving the file in the filesystem.
+   */
+  public function complete($entity, $row) {
+    if (!isset($row->field_upload_display) || empty($row->field_upload_display)) {
+      return;
+    }
+
+    $dirty = FALSE;
+    foreach ($entity->field_upload as $lang => $fields) {
+      foreach ($fields as $delta => $upload) {
+        if ($row->field_upload_display[$delta] == '0') {
+          file_usage_add(file_load($upload['fid']), 'file', 'node', $entity->nid);
+          unset($entity->field_upload[$lang][$delta]);
+          $dirty = TRUE;
+        }
+      }
+    }
+
+    //resave the node
+    if ($dirty) {
+      foreach($entity->field_upload as $lang => $fields) {
+        $entity->field_upload[$lang] = array_values($entity->field_upload[$lang]); //refresh the deltas
+      }
+      node_save($entity);
+    }
+  }
+
   /**
    * @see Migration::postImport()
    */
@@ -310,7 +342,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
       $files_query = parent::os_migrate_node_get_files_query($row->vid);
       $fields = array(
         'description' => 'description',
-        'list' => 'display',
+        'display' => 'list',
         'filepath' => 'field_upload'
       );
       parent::os_migrate_prepare_files($files_query->execute(), $row, 'field_upload', $fields);

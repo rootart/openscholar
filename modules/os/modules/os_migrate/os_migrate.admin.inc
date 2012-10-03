@@ -99,6 +99,13 @@ EOF
     '#type' => 'markup',
     '#markup' => '<strong>Dynamic Migration</strong><br />' . l('Re-run registration of dynamic migrations', 'admin/config/openscholar/os_migrate/register_dynamic'),
   );
+
+  $form['dev_fieldset']['os_migrate_use_domain'] = array(
+    '#title' => t('Treat source as domain'),
+    '#default_value' => variable_get('os_migrate_use_domain'),
+    '#type' => 'textfield',
+    '#description' => t('OpenScholar migration includes a few edge case scenarios where a certain vsite gets special treatment.  To prevent this from interfering with the general case, the special treatment only happens when the legacy database has a certain base domain.  This setting overrides that domain.  Useful when you\'re trying to test migration of http://prod.com, but are doing so from http://dev.local.'),
+  );
   return system_settings_form($form);
 }
 

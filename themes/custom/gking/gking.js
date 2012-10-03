@@ -30,32 +30,10 @@
           }
         });
       }
-  
-      /**
-       * Prepares the People page with tabs.
-       */
-      if (!$('.page-iqss-gking-research-group').length) {
-        return;
-      }
-      $("<ul id='research-group-tablist' class=\"ui-tabs-nav\"></ul>")
-        .insertBefore("#content-main .taxonomy-term-child:first");
-      var terms = Drupal.settings.gking.research_group_terms;
-      for (var i = 0; i < terms.length; i++) {
-        var url = "#iqss_gking_term_" + terms[i].tid;
-        $('ul#research-group-tablist')
-          .append("<li class='research_group_tab'><a href='" + url + "'>" + terms[i].name + "</a></li>");
-      }
-      $("#content").tabs({fx: {opacity: 'toggle'}, cache: true, load: function (event, ui) { Drupal.behaviors.CToolsDropdown(); }});
       
       /**
        * Prepares the "Areas of Research" front page taxonomy widget.
        */
-      // DAN'S HOVER TO SHOW AOR DESCR - IT ONLY 1/2 WORKS (LACKS ABILITY TO SHOW DESCRIPTION WHEN MOUSE OFF OF A TERM)
-//      $("ul.termchild-Methods a, ul.termchild-Applications a").hover(function(){
-//    	$(this).removeClass("active");
-//        $(this).toggleClass("line");
-//        $(this).next("div.description").toggle();
-//      });
       // Original method
       var $sel = '#content-column .block-boxes-os_taxonomy_fbt .boxes-box-content';
       var areas = $($sel + ' ul li ul li:not(.aor-processed)');

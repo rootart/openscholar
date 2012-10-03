@@ -98,9 +98,7 @@ a.advanced-help-link {
 }
 
 
-.page-cp-build-features .form-type-select .form-select {
-    float: left;
-}
+
 
 /** CP TABLE STYLES **/
 #edit-menu-table tr,
@@ -211,6 +209,10 @@ form#spaces-features-form td.actions a {
     padding: 2px 0 5px 22px;
     width: 100px;
     margin-left: 6px;
+}
+
+#spaces-features-form select {
+    float: left;
 }
 
 

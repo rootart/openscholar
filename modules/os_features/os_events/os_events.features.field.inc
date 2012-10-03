@@ -1,7 +1,4 @@
 <?php
-// $Id$
-
-
 /**
  * @file
  * os_events.features.field.inc
@@ -13,7 +10,7 @@
 function os_events_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'node-event-body'
+  // Exported field: 'node-event-body'.
   $fields['node-event-body'] = array(
     'field_config' => array(
       'active' => '1',
@@ -36,6 +33,7 @@ function os_events_field_default_fields() {
           0 => 'format',
         ),
       ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(),
       'translatable' => '0',
@@ -69,7 +67,7 @@ function os_events_field_default_fields() {
       'label' => 'Body',
       'required' => FALSE,
       'settings' => array(
-        'display_summary' => TRUE,
+        'display_summary' => 0,
         'text_processing' => 1,
         'user_register_form' => FALSE,
       ),
@@ -85,7 +83,7 @@ function os_events_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-event-field_date'
+  // Exported field: 'node-event-field_date'.
   $fields['node-event-field_date'] = array(
     'field_config' => array(
       'active' => '1',
@@ -95,6 +93,7 @@ function os_events_field_default_fields() {
       'field_name' => 'field_date',
       'foreign keys' => array(),
       'indexes' => array(),
+      'locked' => '0',
       'module' => 'date',
       'settings' => array(
         'cache_count' => '4',
@@ -171,7 +170,7 @@ function os_events_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-event-field_upload'
+  // Exported field: 'node-event-field_upload'.
   $fields['node-event-field_upload'] = array(
     'field_config' => array(
       'active' => '1',
@@ -192,6 +191,7 @@ function os_events_field_default_fields() {
           0 => 'fid',
         ),
       ),
+      'locked' => '0',
       'module' => 'file',
       'settings' => array(
         'display_default' => 0,
@@ -267,7 +267,7 @@ function os_events_field_default_fields() {
           ),
           'browser_plugins' => array(
             'library' => 0,
-            'media_default--media_browser_1' => 0,
+            'media_default--media_browser_1' => 'media_default--media_browser_1',
             'media_embed' => 0,
             'media_internet' => 0,
             'upload' => 'upload',
@@ -288,4 +288,3 @@ function os_events_field_default_fields() {
 
   return $fields;
 }
-

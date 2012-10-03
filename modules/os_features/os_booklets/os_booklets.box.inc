@@ -33,6 +33,19 @@ function os_booklets_default_box() {
   );
   $export['os_booklets_recent_docs'] = $box;
 
+  $box = new stdClass;
+  $box->disabled = FALSE; /* Edit this to true to make a default box disabled initially */
+  $box->api_version = 1;
+  $box->delta = 'os_booktoc';
+  $box->plugin_key = 'os_boxes_booktoc';
+  $box->title = 'Table of Contents';
+  $box->description = 'Active Book\'s TOC';
+  $box->options = array(
+    'visibility' => 'feature',
+    'book_nid' => '-1',
+  );
+  $export['os_booktoc'] = $box;
+
   return $export;
 }
 

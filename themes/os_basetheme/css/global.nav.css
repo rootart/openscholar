@@ -416,22 +416,28 @@ div.contextual-links-wrapper ul.contextual-links {
 }
 
 ul.contextual-links li {
- line-height: 12px;
+ line-height: 12px !important;
  list-style: none !important;
+ clear:both;
+ 
 }
 
 ul.contextual-links li a {
-padding: 0.5em .75em 0.5em 0.75em;
+padding: 0.5em .75em 0.5em 0.75em !important;
 font-family: helvetica;
 font-size: 11px !important;
+font-weight:normal !important;
 text-decoration:none !important;
+text-transform:none !important;
 background: none !important;
-  padding-left: 4px;
-  padding-right: 4px;
   letter-spacing: 0;
   text-transform:none;
+ line-height: 12px !important;
+ height: auto !important;
+ border-bottom:none !important;
+ text-shadow:none !important;
+ border:none !important;
 }
-
 
 ul.contextual-links li a:hover {
 background-color: #52854C !important;

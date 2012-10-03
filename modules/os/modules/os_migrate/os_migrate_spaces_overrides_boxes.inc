@@ -67,63 +67,64 @@ class SpacesOverridesBoxesMigration extends SpacesOverridesTableMigration {
     parent::postImport();
 
 
-    //create new boxes
-    $custom_boxes = array(
-      '1' => array(
-        'kshepsle_custom_box' => array(
-          'region' => 'content_top',
-          'body' => '<img src="/profiles/openscholar/themes/eloquent/flavors/green_modfront/shepsle-front.jpg">',
+    if (parent::is_domain('http://scholar.harvard.edu')) {
+      //create new boxes
+      $custom_boxes = array(
+        '1' => array(
+          'kshepsle_custom_box' => array(
+            'region' => 'content_top',
+            'body' => '<img src="/profiles/openscholar/themes/eloquent/flavors/green_modfront/shepsle-front.jpg">',
+          ),
         ),
-      ),
-      '10057' => array(
-        'agordon_custom_header_box' => array(
-          'region' => 'header_second',
-          'body' => '<img src="/profiles/openscholar/themes/eloquent/flavors/sand_modfront/gordonheader.gif">',
+        '10057' => array(
+          'agordon_custom_header_box' => array(
+            'region' => 'header_second',
+            'body' => '<img src="/profiles/openscholar/themes/eloquent/flavors/sand_modfront/gordonheader.gif">',
+          ),
+          'agordon_custom_menu_box' => array(
+            'region' => 'menu_bar',
+            'body' => '<ul class="os-menu"><li><a href="http://adgordon.net/biocv">Bio &amp; CV</a></li><li><a href="http://adgordon.net/publications">Publications</a></li><li><a href="http://adgordon.net/pages/teaching">Teaching</a></li><li><a href="http://adgordon.net/announcements" title="List of announcements in my site">News</a></li><li><a href="http://adgordon.net/links" title="List of links in my site">Links</a></li></ul>',
+          ),
         ),
-        'agordon_custom_menu_box' => array(
-          'region' => 'menu_bar',
-          'body' => '<ul class="os-menu"><li><a href="http://adgordon.net/biocv">Bio &amp; CV</a></li><li><a href="http://adgordon.net/publications">Publications</a></li><li><a href="http://adgordon.net/pages/teaching">Teaching</a></li><li><a href="http://adgordon.net/announcements" title="List of announcements in my site">News</a></li><li><a href="http://adgordon.net/links" title="List of links in my site">Links</a></li></ul>',
+        '8' => array(
+          'rbates_custom_box' => array(
+            'region' => 'header_second',
+            'body' => '<div class="os-rbates-map"></div>',
+          ),
         ),
-      ),
-      '8' => array(
-        'rbates_custom_box' => array(
-          'region' => 'header_second',
-          'body' => '<div class="os-rbates-map"></div>',
-        ),
-      ),
-    );
+      );
 
-    $new_boxes = array();
-    foreach ($custom_boxes as $site => $boxes) {
-      foreach ($boxes as $id => $box) {
-        $new_box = array(
-          'changed' => NULL,
-          'delta' => $id,
-          'title' => '',
-          'description' => $id,
-          'additional_classes' => '',
-          'plugin_key' => 'os_boxes_html',
-          'options' => array('text' => array('value'=>$box['body'], 'format'=>'filtered_html')),
-          'info' => $id,
-        );
+      $new_boxes = array();
+      foreach ($custom_boxes as $site => $boxes) {
+        foreach ($boxes as $id => $box) {
+          $new_box = array(
+            'changed' => NULL,
+            'delta' => $id,
+            'title' => '',
+            'description' => $id,
+            'additional_classes' => '',
+            'plugin_key' => 'os_boxes_html',
+            'options' => array('text' => array('value'=>$box['body'], 'format'=>'filtered_html')),
+            'info' => $id,
+          );
 
-        $new_boxes[] = array(
-          'type' => 'og',
-          'id' => $site,
-          'object_type' => 'boxes',
-          'object_id' => $id,
-          'value' => serialize((object) $new_box),
-        );
+          $new_boxes[] = array(
+            'type' => 'og',
+            'id' => $site,
+            'object_type' => 'boxes',
+            'object_id' => $id,
+            'value' => serialize((object) $new_box),
+          );
+        }
       }
-    }
 
-    $insert = db_insert('spaces_overrides')
-      ->fields(array_keys($new_boxes[0]));
-    foreach($new_boxes as $box) {
-      $insert->values($box);
+      $insert = db_insert('spaces_overrides')
+        ->fields(array_keys($new_boxes[0]));
+      foreach($new_boxes as $box) {
+        $insert->values($box);
+      }
+      $insert->execute();
     }
-    $insert->execute();
-
 
 
   }
@@ -339,7 +340,9 @@ class BoxPorter {
       return $box;
     }
 
-    return FALSE;
+    //No silent failure, we don't know how to migrate this box
+    throw new MigrateException(t('The specified box [%box] could not be migrated.',
+        array('%box' => print_r($row,TRUE))));
   }
 
 

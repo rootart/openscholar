@@ -54,7 +54,15 @@ function os_booklets_context_default_contexts() {
           'module' => 'boxes',
           'delta' => 'os_booklets_recent_docs',
           'region' => 'sidebar_second',
+          'weight' => '-9',
+        ),
+        'boxes-os_booktoc' => array(
+          'module' => 'boxes',
+          'delta' => 'os_booktoc',
           'weight' => '-8',
+          'region' => 'sidebar_second',
+          'status' => '0',
+          'label' => 'Table of Contents',
         ),
         'boxes-os_addthis' => array(
           'module' => 'boxes',

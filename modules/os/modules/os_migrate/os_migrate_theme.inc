@@ -141,34 +141,78 @@ class ThemeOSMigration extends OSMigration {
 
   function _custom_theme_to_flavor(&$row) {
     //get the new theme
-    switch ($row->value) {
-      case 'rbates':
-        $row->value = 'weft';
-        $flavor = 'w_african_nostrip';
-      break;
 
-      case 'agordon':
-        $row->value = 'eloquent';
-        $flavor = 'eloquent_sand_modfront';
-      break;
+    if (parent::is_domain('http://scholar.harvard.edu')) {
 
-      case 'kshepsle':
-        $row->value = 'eloquent';
-        $flavor = 'eloquent_green_modfront';
-      break;
+      switch ($row->value) {
+        case 'rbates':
+          $row->value = 'weft';
+          $flavor = 'w_african_nostrip';
+        break;
 
-      default:
-        return;
+        case 'agordon':
+          $row->value = 'eloquent';
+          $flavor = 'eloquent_sand_modfront';
+        break;
+
+        case 'kshepsle':
+          $row->value = 'eloquent';
+          $flavor = 'eloquent_green_modfront';
+        break;
+
+        default:
+          return;
+      }
+
+      //set the flavor.
+      $object_id = 'os_appearance_' . $row->value . '_flavor';
+      db_delete('spaces_overrides')
+        ->condition('type', 'og')
+        ->condition('id', $row->id)
+        ->condition('object_type', 'variable')
+        ->condition('object_id', $object_id)
+        ->execute();
+
+      db_insert('spaces_overrides')->fields(array(
+        'type' => 'og',
+        'id' => $row->id,
+        'object_type' => 'variable',
+        'object_id' => $object_id,
+        'value' => serialize($flavor),
+      ))->execute();
     }
 
-    //set the flavor.
-    $object_id = 'os_appearance_' . $row->value . '_flavor';
-    db_insert('spaces_overrides')->fields(array(
-      'type' => 'og',
-      'id' => $row->id,
-      'object_type' => 'variable',
-      'object_id' => $object_id,
-      'value' => serialize($flavor),
-    ))->execute();
+    if (parent::is_domain('http://projects.iq.harvard.edu')) {
+      //arts and humanities
+      if ($row->id == '9015' && $row->value == 'commodore') {
+        $flavor = '3Columns_front';
+      }
+
+      // psr theme is an aglet flavor
+      if ($row->value == 'psr') {
+        $row->value = 'aglet';
+        $flavor = 'black_grey';
+      }
+
+      //set the flavor.
+      if (isset($flavor)) {
+        $object_id = 'os_appearance_' . $row->value . '_flavor';
+        db_delete('spaces_overrides')
+          ->condition('type', 'og')
+          ->condition('id', $row->id)
+          ->condition('object_type', 'variable')
+          ->condition('object_id', $object_id)
+          ->execute();
+
+        db_insert('spaces_overrides')->fields(array(
+          'type' => 'og',
+          'id' => $row->id,
+          'object_type' => 'variable',
+          'object_id' => $object_id,
+          'value' => serialize($flavor),
+        ))->execute();
+      }
+
+    }
   }
 }

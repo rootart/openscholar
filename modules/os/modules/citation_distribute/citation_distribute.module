@@ -56,10 +56,7 @@ function citation_distribute_perm() {
  * Passes theming of metadata plugins to each of those plugins
  */
 function citation_distribute_theme($existing, $type, $theme, $path) {
-  $args_array = array('');
-
-  /* theme the output message that happens after any plugin is used */
-  $theme = array(
+  return array(
     'citation_distribute_form_msg' => array(
       'variables' => array('modules' => NULL),
       'file' => 'citation_distribute.theme.inc',
@@ -111,6 +108,19 @@ function citation_distribute_preprocess_page(&$variables) {
 
 }
 
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * citation_distribute's hook_insert and hook_update must run AFTER biblio
+ */
+function citation_distribute_module_implements_alter(&$implementations, $hook) {
+  if (($hook === 'node_insert' || $hook === 'node_update') && isset($implementations['citation_distribute'])) {
+    $tmp = $implementations['citation_distribute'];
+    unset($implementations['citation_distribute']);
+    $implementations['citation_distribute'] = $tmp;
+  }
+}
 
 /**
  * Implements hook_node_insert().
@@ -165,9 +175,12 @@ function _citation_distribute_node_apply_plugins($node) {
  */
 function citation_distribute_node_validate($node, $form, &$form_state) {
   foreach (_citation_distribute_plugins() as $plugin) {
-    $service = _citation_distribute_load_plugin($plugin);
-    if (method_exists($service, 'validate')) {
-     // $valid = $service->validate($form_state);
+    $name = $plugin['name'];
+    if (isset($form_state['values'][$name]) && $form_state['values'][$name]) {
+      $service = _citation_distribute_load_plugin($plugin);
+      if (method_exists($service, 'validate')) {
+        $valid = $service->validate($form_state);
+      }
     }
   }
 }
@@ -221,10 +234,9 @@ function citation_distribute_flag($event, $flag, $nid, $account) {
         $batch_cmd = 'distribute';                      //assume batch mode
       }
       _citation_distribute_update_db($plugin['name'], $nid, $batch_cmd);
+      $msg = t('Submitted citation to @title', array('@title'=>$plugin['title']));
+      drupal_set_message($msg);
 
-      if ($output = theme('citation_distribute_form_msg', array(array('modules'=>$plugin['name'])))) {
-        drupal_set_message(t($output));
-      }
 
       break;
 
@@ -512,7 +524,7 @@ function _citation_distribute_unlist_db($plugin, $nid, $batch_command = '') {
       'batch_command' => $batch_command,
     ));
   } elseif (strpos($type,'InsertQuery') === 0) {
-    $query->fields('cd', array(
+    $query->fields(array(
       'nid' => $nid,
       'plugin' => $plugin,
       'noauto' => 1,

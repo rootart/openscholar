@@ -51,14 +51,23 @@ class VariableTableMigration extends TableCopyMigration {
   public function __construct() {
     $this->whitelist = array('mollom_private_key', 'mollom_public_key', 'os_mailchimp_api', 'os_mailchimp_list', 'olark_code',
       'apachesolr_host', 'apachesolr_path', 'apachesolr_port', 'iqss_rbuild_default_url', 'site_mail',
-      'site_mission', 'site_name', 'site_offline_message',
+      'site_mission', 'site_name', 'site_offline_message', 'shorten_bitly_login', 'shorten_bitly_key',
     );
 
     $this->whitelist = array_merge($this->whitelist, parent::subfields('citation_distribute', array('dash_password', 'module_mode', 'service_googlescholar_auto_flag', 'service_repec_archive_code', 'service_repec_inst_name', 'service_repec_maintainer_email', 'service_repec_maintainer_name', 'service_repec_provider_homepage', 'service_repec_provider_institution', 'service_repec_title', 'service_repec_archive_path', 'service_repec_archive_url'), '_'));
     $this->whitelist = array_merge($this->whitelist, parent::subfields('iqss_gking', array('alternate_theme_nodes', 'heading_disabled_terms', 'override_child_terms'), '::'));
     $this->whitelist = array_merge($this->whitelist, parent::subfields('pinserver', array('app_name', 'gpg_dir', 'error_log', 'landing_path', 'pin_url'), '_'));
     // the following look like they should be migrated, but I'm not sure
-    //pinserver*, shorten*,
+    //pinserver*,
+
+    //get biblio year vars
+    $biblio_years = parent::d6_db_select('variable', 'v')
+      ->condition('name', 'biblio_year_%', 'LIKE')
+      ->fields('v', array('name'))
+      ->execute()
+      ->fetchCol();
+
+    $this->whitelist = array_merge($this->whitelist, $biblio_years);
 
     $key_schema = array(
       'name' => array(
@@ -76,6 +85,17 @@ class VariableTableMigration extends TableCopyMigration {
     $query = parent::query();
     $query->condition('name', $this->whitelist, 'IN');
     return $query;
+  }
+
+  public function prepareRow($row) {
+    //append biblio year to new array var instead of migrating
+    if (strpos($row->name, 'biblio_year') === 0) {
+      $years = variable_get('biblio_years_text', array(9999 => t('Submitted'), 9998 => t('In Press')));
+      $new = end(explode('_', $row->name));
+      $years[$new] = unserialize($row->value);
+      variable_set('biblio_years_text', $years);
+      return FALSE;
+    }
   }
 
   //clear the menu cache after import.

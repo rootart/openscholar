@@ -145,14 +145,41 @@ function os_files_views_default_views_alter(&$views) {
  * Media Gallery adds some fields to every file bundle. We don't want one of
  * them.
  */
-function os_files_module_installed($modules) {
+function os_files_modules_installed($modules) {
   if (in_array('media_gallery', $modules)) {
     _os_files_clean_up_fields();
   }
 }
 
+/**
+ * Remove field_license because no one will use it
+ * Add title and description to file types media_gallery didn't add them to
+ */
 function _os_files_clean_up_fields() {
   field_delete_field('field_license');
+  if ($title = field_info_field('media_title')) {
+    $descrip = field_info_field('media_description');
+    $file_types = file_info_file_types();
+    foreach ($file_types as $bundle => $info) {
+      if (!field_info_instance('file', 'media_title', $bundle)) {
+        $title_copy = $title;
+        $title_copy += array(
+          'entity_type' => 'file',
+          'bundle' => $bundle,
+        );
+        field_create_instance($title_copy);
+      }
+
+      if (!field_info_instance('file', 'media_description', $bundle)) {
+        $descrip_copy = $descrip;
+        $descrip_copy += array(
+          'entity_type' => 'file',
+          'bundle' => $bundle,
+        );
+        field_create_instance($descrip_copy);
+      }
+    }
+  }
 }
 
 /**

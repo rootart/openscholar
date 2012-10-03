@@ -14,6 +14,14 @@ function os_publications_install() {
       'not null' => FALSE,
       'description' => 'A title to go with the Relevant URL',
     ));
+
+  if ($field = field_info_instance('node', 'body', 'biblio')) {
+    $field['display']['teaser'] = array(
+      'label' => 'hidden',
+      'type' => 'hidden',
+    );
+    field_update_instance($field);
+  }
 }
 
 function os_publications_uninstall() {

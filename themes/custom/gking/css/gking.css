@@ -1327,13 +1327,12 @@ body.front .block-boxes-os_taxonomy_fbt .item-list ul li.term-Applications  {
 
 body.front .block-boxes-os_taxonomy_fbt .item-list ul li.term-Methods {
     text-align: right;
-    float: left;
     width:262px;
     }
 
-body.front .block-boxes-os_taxonomy_fbt ul li.term-Applications {
+body.front .block-boxes-os_taxonomy_fbt  ul li.term-Applications {
     float: right;
-    width: 240px;
+    width: 263px;
     }
 
 body.front .block-boxes-os_taxonomy_fbt .description {
@@ -1384,12 +1383,11 @@ body.front .block-boxes-os_taxonomy_fbt li.term-Methods.last {
   }
 
 
-body.front .block-boxes-os_taxonomy_fbt .item-list li.term-Applications.first a {
-     left: 0; 
-     padding-left: 59px;
+body.front .block-boxes-os_taxonomy_fbt li.term-Applications .term-head a,
+body.front .block-boxes-os_taxonomy_fbt li.term-Applications.last {
+     padding-left: 31px;
   
 }
-
 
 
 body.front ul.term-Methods,
@@ -1405,15 +1403,18 @@ body.front .block-boxes-os_taxonomy_fbt li.term-Applications .term-head {
 
   }
 
-body.front .block-boxes-os_taxonomy_fbt a.active,
-body.front .block-boxes-os_taxonomy_fbt a.line
+body.front .block-boxes-os_taxonomy_fbt li.active
   {
-  background: url('../images/line.png') no-repeat 130px 50% #3b4e4e;
+  background: url('../images/line.png') no-repeat 120px 50% #3b4e4e;
   }
 
 body.front .block-boxes-os_taxonomy_fbt ul li.term-Methods ul li {
   background-position: center right;
   }
+  
+body.front .block-boxes-os_taxonomy_fbt ul li.term-Applications ul li {
+  background-position: center left;
+  }  
 
 body.front #block-iqss_gking-areas_of_research dt.active span {
   background: #3b4e4e;

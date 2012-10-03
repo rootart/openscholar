@@ -6,10 +6,13 @@ class EntityReferencePrepopulateInstanceBehavior extends EntityReference_Behavio
    * Generate a settings form for this handler.
    */
   public function settingsForm($field, $instance) {
+    $field_name = $field['field_name'];
+
     $form['action'] = array(
       '#type' => 'select',
       '#title' => t('Action'),
       '#options' => array(
+        'none' => t('Do nothing'),
         'hide' => t('Hide field'),
         'disable' => t('Disable field'),
       ),
@@ -29,12 +32,13 @@ class EntityReferencePrepopulateInstanceBehavior extends EntityReference_Behavio
 
     // Get list of permissions.
     $perms = array();
+    $perms[0] = t('- None -');
     foreach (module_list(FALSE, FALSE, TRUE) as $module) {
       // By keeping them keyed by module we can use optgroups with the
       // 'select' type.
       if ($permissions = module_invoke($module, 'permission')) {
         foreach ($permissions as $id => $permission) {
-          $perms[$module][$id] = $permission['title'];
+          $perms[$module][$id] = strip_tags($permission['title']);
         }
       }
     }
@@ -44,6 +48,19 @@ class EntityReferencePrepopulateInstanceBehavior extends EntityReference_Behavio
       '#title' => t('Skip access permission'),
       '#description' => t('Set a permission that will not be affected by the fallback behavior.'),
       '#options' => $perms,
+    );
+
+    $description = t('Determine if values that should be prepopulated should "listen" to the OG-context.');
+
+    if ($disabled = !module_exists('og_context') || !og_is_group_audience_field($field_name)) {
+      $description .= '<br / >' . t('Organic groups integration: Enable OG-context and set "Entity selection mode" to "Organic groups" to enable this selection.');
+    }
+
+    $form['og_context'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('OG context'),
+      '#description' => $description,
+      '#disabled' => $disabled,
     );
     return $form;
   }

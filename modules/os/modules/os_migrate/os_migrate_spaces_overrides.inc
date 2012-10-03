@@ -104,6 +104,8 @@
   public function _update_module($module) {
     $module_map = array(
       'vsite_menus' => 'os',
+      'scholar_dvn' => 'os_dataverse',
+      'scholar_book' => 'os_booklets',
     );
 
     if (isset($module_map[$module])) {
