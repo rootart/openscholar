@@ -229,6 +229,7 @@ function og_vocab_og_fields_info() {
           'target_bundles' => array(),
           'behaviors' => array(
             'og_vocab' => array('status' => TRUE),
+            'taxonomy-index' => array('status' => TRUE),
           ),
         ),
       ),
@@ -354,7 +355,6 @@ function _og_vocab_autocomplete_tags_validate($element, &$form_state, $form) {
     }
   }
 
-  // Update the value of this element so the field can validate the product IDs.
   form_set_value($element, $value, $form_state);
 }
 
@@ -1134,6 +1134,15 @@ function og_vocab_is_group_admin_context() {
   $item = menu_get_item();
   if (strpos($item['path'], 'group/') === 0 && !empty($item['map'][2])) {
     return array('group_type' => $item['map'][1], 'gid' => $item['map'][2]);
+  }
+
+  // Iterate over modules implementing context, and return early once
+  // a context was found.
+  foreach (module_implements('og_vocab_is_admin_context') as $module) {
+    $function = $module . 'og_vocab_is_admin_context';
+    if ($function() === TRUE) {
+      return TRUE;
+    }
   }
 }
 

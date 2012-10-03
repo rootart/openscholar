@@ -64,42 +64,28 @@ class OgVocab extends Entity {
     $new_element = ctools_field_invoke_field($field_instance, 'form', $entity_type, $dummy_entity, $form, $form_state, $options);
     $element = $new_element[OG_VOCAB_FIELD][LANGUAGE_NONE];
 
-    if (in_array($this->settings['widget_type'], array('entityreference_autocomplete', 'entityreference_autocomplete_tags'))) {
+    if ($this->settings['widget_type'] ==  'entityreference_autocomplete') {
       $element['#vid'] = $vid;
 
       // Change the "Add more" button name so it adds only the needed
       // element.
       $element['add_more']['#name'] .= '__' . $vid;
+
       foreach (array_keys($element) as $delta) {
         if (!is_numeric($delta)) {
           continue;
         }
 
         $sub_element = &$element[$delta]['target_id'];
-
-        // Rebuild the autocomplete path.
-        $path = explode('/', $sub_element['#autocomplete_path']);
-        $sub_element['#autocomplete_path'] = 'og-vocab/autocomplete';
-
-        // Add autocomplete type
-        $sub_element['#autocomplete_path'] .= "/$path[2]";
-
-        // Add the OG-vocab entity ID.
-        $sub_element['#autocomplete_path'] .= "/$this->id";
-
-        // Add the entity ID.
-        $sub_element['#autocomplete_path'] .= "/$path[6]";
-        if (!empty($path[7])) {
-          // Add the text.
-          $sub_element['#autocomplete_path'] .= "/$path[7]";
-        }
-
-        if ($this->settings['widget_type'] == 'entityreference_autocomplete_tags') {
-          // Add own validate handler, that will be able to add "autocreate"
-          // values.
-          $element['#element_validate'] = array('_og_vocab_autocomplete_tags_validate');
-        }
+        $this->prepareAutoComplete($sub_element);
       }
+    }
+    elseif ($this->settings['widget_type'] == 'entityreference_autocomplete_tags') {
+      $element['#vid'] = $vid;
+      $this->prepareAutoComplete($element);
+      // Add own validate handler, that will be able to add "autocreate"
+      // values.
+      $element['#element_validate'] = array('_og_vocab_autocomplete_tags_validate');
     }
 
     form_load_include($form_state, 'inc', 'og_vocab', '/includes/og_vocab.og_vocab');
@@ -153,6 +139,31 @@ class OgVocab extends Entity {
 
     return array('field' => $field, 'instance' => $instance);
   }
+
+  /**
+   * Helper function; Re-create the autocomplete path.
+   *
+   * @param $sub_element
+   *   The element that should be changed, passed by reference.
+   */
+  public function prepareAutoComplete(&$sub_element) {
+    // Rebuild the autocomplete path.
+    $path = explode('/', $sub_element['#autocomplete_path']);
+    $sub_element['#autocomplete_path'] = 'og-vocab/autocomplete';
+
+    // Add autocomplete type
+    $sub_element['#autocomplete_path'] .= "/$path[2]";
+
+    // Add the OG-vocab entity ID.
+    $sub_element['#autocomplete_path'] .= "/$this->id";
+
+    // Add the entity ID.
+    $sub_element['#autocomplete_path'] .= "/$path[6]";
+    if (!empty($path[7])) {
+      // Add the text.
+      $sub_element['#autocomplete_path'] .= "/$path[7]";
+    }
+  }
 }
 
 /**
@@ -187,6 +198,7 @@ function og_vocab_element_validate($form, &$form_state) {
     }
     foreach ($values as $key => &$value) {
       if (!is_numeric($key)) {
+        // "_weight" field.
         continue;
       }
 
@@ -194,8 +206,7 @@ function og_vocab_element_validate($form, &$form_state) {
         // Empty field.
         continue;
       }
-
-      $ids[] = array('target_id' => $value['target_id']);
+      $ids[] = $value;
     }
   }
   form_set_value($form[OG_VOCAB_FIELD][LANGUAGE_NONE], $ids, $form_state);
