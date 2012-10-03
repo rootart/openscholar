@@ -719,6 +719,7 @@ function og_vocab_query_taxonomy_vocabulary_load_multiple_alter(QueryAlterableIn
     ->condition('ogr.gid', $gid);
 }
 
+
 /**
  * Implements hook_form_FORM-ID_alter().
  *
@@ -1139,9 +1140,9 @@ function og_vocab_is_group_admin_context() {
   // Iterate over modules implementing context, and return early once
   // a context was found.
   foreach (module_implements('og_vocab_is_admin_context') as $module) {
-    $function = $module . 'og_vocab_is_admin_context';
-    if ($function() === TRUE) {
-      return TRUE;
+    $function = $module . '_og_vocab_is_admin_context';
+    if ($context = $function()) {
+      return $context;
     }
   }
 }

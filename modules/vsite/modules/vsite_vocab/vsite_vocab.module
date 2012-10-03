@@ -45,3 +45,14 @@ function vsite_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
     }
   }
 }
+
+/**
+ * Implements hook_og_vocab_is_admin_context().
+ */
+function vsite_vocab_og_vocab_is_admin_context() {
+  $item = menu_get_item();
+  if (strpos($item['path'], 'cp/build/taxonomy') === 0) {
+    $space = spaces_get_space();
+    return array('group_type' => 'node', 'gid' => $space->id);
+  }
+}
