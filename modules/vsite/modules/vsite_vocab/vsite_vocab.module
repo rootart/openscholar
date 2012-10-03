@@ -15,11 +15,6 @@ function vsite_vocab_field_create_instance($instance) {
     return;
   }
   $field_instance = og_fields_info(OG_VOCAB_FIELD);
-  $field_instance['instance']['settings'] = array(
-    'behaviors' => array('prepopulate' => array('action' => 'hide', 'fallback' => 'none', 'skip_perm' => 'administer nodes', 'status' => 0)),
-    'user_register_form' => FALSE,
-  );
-
   og_create_field(OG_VOCAB_FIELD, $instance['entity_type'], $instance['bundle'], $field_instance);
 }
 
