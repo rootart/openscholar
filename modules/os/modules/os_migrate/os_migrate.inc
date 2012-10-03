@@ -263,6 +263,26 @@ abstract class OSMigration extends Migration {
   }
 
   /*
+   * @function is_domain
+   *
+   * Checks if we're using a certain domain.  Uses purl_base_domain by default, but
+   * this can be overridden with a dev var.
+   *
+   * Function exists for edge and special cases that may vary between installations.
+   */
+  function is_domain($domain) {
+    if ($domain == variable_get('os_migrate_use_domain')) {
+      return TRUE;
+    }
+
+    if ($domain == self::d6_variable_get('purl_base_domain')) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /*
    * Check that a file exists before letting migrate try to copy it.
    * Inline images and files have been looping when a file isn't available.
    * This helper function processes the path in the same way before trying to

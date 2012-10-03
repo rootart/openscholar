@@ -234,15 +234,16 @@ function os_publications_settings() {
   );
 
   //Should urls in citations be shortened?
-  /*$form['scholar_publications'] = array(
+/*  $form['scholar_publications'] = array(
   '#type' => 'fieldset',
   );
-
-  $form['scholar_publications']['scholar_publications_shorten_citations'] = array(
-   '#type' => 'checkbox',
-   '#title' => t('When this is checked, a shortened URL will be included in the citation.'),
-   '#default_value' => variable_get('scholar_publications_shorten_citations', 0),
-  );*/
+*/
+  $form['right']['os_publications_shorten_citations'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Short URLs in citations'),
+    '#description' => t('When this is checked, a shortened URL will be included in the citation.'),
+    '#default_value' => variable_get('os_publications_shorten_citations'),
+  );
 
 
 

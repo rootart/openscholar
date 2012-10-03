@@ -70,18 +70,18 @@ class citation_distribute_service_repec extends citation_distribute_service {
 
 		//get node's URL
   	$path = 'node/'. $nid;  //using $node->nid notation here because pathauto changes URL when title changes
-	  if (module_exists('vsite') && (count($node->og_groups) == 1)){
-	    $vsite = spaces_load('og', key($node->og_groups));
+	  if (module_exists('vsite') && (count($node->og_group_ref) == 1)){
+	    $vsite = spaces_load('og', key($node->og_group_ref));
 	    $file_url = $vsite->get_absolute_url() . $path;
 	  }
-	  elseif(module_exists('vsite') && (count($node->og_groups) > 1)){
+	  elseif(module_exists('vsite') && (count($node->og_group_ref) > 1)){
 	    //this should not happen
 	    error_log("Alert: citation_distribute_service_repec has detected that node {$node->nid} belongs to multiple groups");
 	    $vsite = vsite_get_vsite();
 	    $file_url = ( $vsite ) ? $vsite->get_absolute_url() . $path : '';
 	  }
 	  else{
-	    $file_url = BASE_URL . '/' . $path;
+	    $file_url = variable_get('purl_base_domain') . '/' . $path;
 	  }
 	  $out['File-URL'] = $file_url;
 
@@ -98,10 +98,8 @@ class citation_distribute_service_repec extends citation_distribute_service {
 
 						case 'biblio_contributors':
 							$out[$biblio] = array();
-							foreach($node->{$biblio} as $delta) {
-								foreach($delta as $contributor) {
-		  						$out[$repec][] = $contributor['name'];
-								}
+							foreach($node->{$biblio} as $contributor) {
+	  						$out[$repec][] = $contributor['name'];
 		  				}
 						break;
 
@@ -269,8 +267,8 @@ class citation_distribute_service_repec extends citation_distribute_service {
 
 	  //get the vars we're checking by any means
 	  if (is_array($a3)) {
-	    $tid = $a3['biblio_type']['#value'];
-	    $contributors = $a3['#post']['biblio_contributors'];
+	    $tid = $a3['values']['biblio_type'];
+	    $contributors = $a3['values']['biblio_contributors'];
 	  } elseif (is_int($a3)) {
 	    //not really $a3 anymore, just a nid
 	    if ($node = node_load($a3)) {
@@ -282,7 +280,8 @@ class citation_distribute_service_repec extends citation_distribute_service {
 	  }
 
 	  /* ensure we're submitting a working paper */
-		$type = db_result(db_query('SELECT name FROM {biblio_types} WHERE tid = %d ', $tid));
+		//$type = db_result(db_query('SELECT name FROM {biblio_types} WHERE tid = %d ', $tid));
+		$type = db_select('biblio_types', 'bt')->condition('tid', $tid)->fields('bt', array('name'))->execute()->fetchColumn();
 		if ($this->_map_biblio_type($type) != 'wpaper') {
 			form_set_error('biblio_type', 'The Publication Type of submissions to ' . $this->title . ' must be working paper.');
 			$return = false;
@@ -325,8 +324,14 @@ class citation_distribute_service_repec extends citation_distribute_service {
 	 * shortcut function for deriving a repec type from a nid
 	 */
 	public function _nid_to_type($nid) {
-		$query =  'SELECT type.name FROM {biblio} bib INNER JOIN {biblio_types} type ON bib.biblio_type = type.tid WHERE nid = %d ';
-		$bib_type = db_result(db_query($query, $nid));
+// 		$query =  'SELECT type.name FROM {biblio} bib INNER JOIN {biblio_types} type ON bib.biblio_type = type.tid WHERE nid = %d ';
+// 		$bib_type = db_result(db_query($query, $nid));
+		$query = db_select('biblio', 'b')
+		  ->condition('nid', $nid);
+		$query->join('biblio_types', 'bt', 'b.biblio_type = bt.tid');
+		$query->fields('bt', array('name'));
+		$bib_type = $query->execute()->fetchColumn();
+
 		return $this->_map_biblio_type($bib_type);
 	}
 

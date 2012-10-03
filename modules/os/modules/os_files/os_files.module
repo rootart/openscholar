@@ -34,9 +34,34 @@ function os_files_menu_alter(&$callbacks) {
 }
 
 /**
+ * Implements hook_file_insert().
+ */
+function os_files_file_insert($file) {
+  if ($context = og_context()) {
+    $file->skip_og_membership = TRUE;
+
+    // Skip altering the load file query, so the file is properly saved.
+    $skip = &drupal_static('os_files_query_file_load_multiple_alter');
+    $skip = TRUE;
+    og_group('node', $context['gid'], array('entity_type' => 'file', 'entity' => $file));
+  }
+}
+
+/**
  * Implements hook_query_QUERY_ID_alter().
+ *
+ * Make sure to show only the files a user belongs to in a space.
+ * It is possible to skip this, by settings the static varaible to TRUE.
+ * This is done as we cannot rely on menu_get_item() which will cause a
+ * recurssion while a file is saved.
+ *
+ * @see os_files_file_insert()
  */
 function os_files_query_file_load_multiple_alter(&$query) {
+  if ($skip = &drupal_static(__FUNCTION__, FALSE)) {
+    return;
+  }
+
   if (!$space = spaces_get_space()) {
     return;
   }
@@ -57,8 +82,8 @@ function os_files_og_permissions() {
 }
 
 /**
- * Access callback function - return true/false if the user can manage the files
- * for the virtual site.
+ * Access callback;Determine if the user can manage the files entity for
+ * a VSite.
  */
 function os_files_file_list() {
   if (!$space = spaces_get_space()) {
@@ -223,14 +248,41 @@ function os_files_views_default_views_alter(&$views) {
  * Media Gallery adds some fields to every file bundle. We don't want one of
  * them.
  */
-function os_files_module_installed($modules) {
+function os_files_modules_installed($modules) {
   if (in_array('media_gallery', $modules)) {
     _os_files_clean_up_fields();
   }
 }
 
+/**
+ * Remove field_license because no one will use it
+ * Add title and description to file types media_gallery didn't add them to
+ */
 function _os_files_clean_up_fields() {
   field_delete_field('field_license');
+  if ($title = field_info_field('media_title')) {
+    $descrip = field_info_field('media_description');
+    $file_types = file_info_file_types();
+    foreach ($file_types as $bundle => $info) {
+      if (!field_info_instance('file', 'media_title', $bundle)) {
+        $title_copy = $title;
+        $title_copy += array(
+          'entity_type' => 'file',
+          'bundle' => $bundle,
+        );
+        field_create_instance($title_copy);
+      }
+
+      if (!field_info_instance('file', 'media_description', $bundle)) {
+        $descrip_copy = $descrip;
+        $descrip_copy += array(
+          'entity_type' => 'file',
+          'bundle' => $bundle,
+        );
+        field_create_instance($descrip_copy);
+      }
+    }
+  }
 }
 
 /**

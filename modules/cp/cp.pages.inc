@@ -39,6 +39,11 @@ function cp_feature_customize($js, $feature_name) {
  */
 function cp_feature_customize_form($form, $form_state, $feature) {
   $item = menu_get_item('features/'. $feature);
+  $form['#attributes'] = array(
+    'class' => array(
+      $feature.'-customize-form',
+    )
+  );
   if ($item['path'] == 'features/'.$feature) {
     $form_id = array_shift($item['page_arguments']);
     if ($file = $item['include_file']) {

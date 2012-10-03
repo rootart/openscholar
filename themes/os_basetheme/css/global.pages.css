@@ -358,6 +358,9 @@ ul.links li {
 
 .views-row {margin-bottom:1.5em;}
 
+
+.block-boxes-os_sv_list_box .item-list ul li {margin-bottom:1em;}
+
 /*
  * First sidebar (on left in LTR languages, on right in RTL)
  *

@@ -1,7 +1,4 @@
 <?php
-// $Id$
-
-
 /**
  * @file
  * os_software.features.field.inc
@@ -70,7 +67,7 @@ function os_software_field_default_fields() {
       'label' => 'Description',
       'required' => 0,
       'settings' => array(
-        'display_summary' => 1,
+        'display_summary' => 0,
         'text_processing' => '1',
         'user_register_form' => FALSE,
       ),
@@ -247,7 +244,7 @@ function os_software_field_default_fields() {
           ),
           'browser_plugins' => array(
             'library' => 0,
-            'media_default--media_browser_1' => 0,
+            'media_default--media_browser_1' => 'media_default--media_browser_1',
             'media_embed' => 0,
             'media_internet' => 0,
             'upload' => 'upload',
@@ -317,7 +314,7 @@ function os_software_field_default_fields() {
       'label' => 'Notes',
       'required' => 0,
       'settings' => array(
-        'display_summary' => 1,
+        'display_summary' => 0,
         'text_processing' => '1',
         'user_register_form' => FALSE,
       ),
@@ -667,4 +664,3 @@ function os_software_field_default_fields() {
 
   return $fields;
 }
-
