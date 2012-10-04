@@ -26,6 +26,17 @@ function os_files_menu() {
 }
 
 /**
+ * Implements hook_menu_alter().
+ */
+function os_files_menu_alter(&$callbacks) {
+  $callbacks['file-list'] = $callbacks['admin/content/file'];
+  $callbacks['file-list']['access callback'] = 'os_files_file_list';
+  $callbacks['file-list']['page callback'] = 'views_embed_view';
+  $callbacks['file-list']['page arguments'] = array('cp_files', 'default');
+}
+
+
+/**
  * Return a "Coppy to clip-board" link using clippy library.
  *
  *  @param $url_file
