@@ -80,9 +80,9 @@ function os_files_form_media_add_upload_alter($form, &$form_state) {
   $form_state['build_info']['args'][0]['uri_scheme'] = 'private';
 }
 /**
- * Implements hook_og_permissions().
+ * Implements hook_og_permission().
  */
-function os_files_og_permissions() {
+function os_files_og_permission() {
   return array(
     'administer files' => array(
       'title' => t('Manage site files'),
