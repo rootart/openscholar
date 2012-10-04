@@ -6,3 +6,5 @@ dependencies[] = features
 features[features_api][] = api:1
 features[variable][] = media__file_extensions
 files[] = plugins/os_public_stream_wrapper.inc
+files[] = includes/views/os_files.views.inc
+files[] = includes/views/handler/os_files_handler_field_file_uri_copy.inc

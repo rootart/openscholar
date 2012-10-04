@@ -26,6 +26,62 @@ function os_files_menu() {
 }
 
 /**
+ * Return a "Coppy to clip-board" link using clippy library.
+ *
+ *  @param $url_file
+ *    The url the user will coppy.
+ *
+ *  @param $options
+ *    array of options for styling the button
+ *      - bgcolor: Background color.
+ *      - width: The width of the wrapper for the button and the text.
+ *      - height: The height of the wrapper for the button and the text.
+ */
+function os_files_clippy($url_file, $options = array()) {
+  global $base_url;
+
+  // Default values of the button style.
+  $options += array(
+    'bgcolor' => '',
+    'height' => 20,
+    'width' => 110,
+  );
+
+  // Location of the flash file.
+  $library = libraries_get_path('clippy');
+  $path = $base_url . '/' . $library . '/build/clippy.swf';
+
+  // Print out the copy button.
+  $html = '
+    <object
+      classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+      width="' . $options['height'] . '"
+      height="'. $options['width'] .'"
+      id="clippy">
+        <param name="movie" value="' . $path . '"/>
+        <param name="allowScriptAccess" value="always" />
+        <param name="quality" value="high" />
+        <param name="scale" value="noscale" />
+        <param NAME="FlashVars" value="text=' . $url_file . '">
+        <param name="bgcolor" value=" ' . $options['bgcolor'] . '">
+        <embed
+          src="'. $path . '"
+          width="' . $options['width'] . '"
+          height="' . $options['height'] . '"
+          name="clippy"
+          quality="high"
+          allowScriptAccess="always"
+          type="application/x-shockwave-flash"
+          pluginspage="http://www.macromedia.com/go/getflashplayer"
+          FlashVars="text=' . $url_file . '"
+          bgcolor="' . $options['bgcolor'] . '"
+        />
+    </object>
+  ';
+  return $html;
+}
+
+/**
  * Implements hook_os_add_new_links_alter().
  *
  * Adds a page contextual link for importing biblio nodes.
@@ -45,13 +101,22 @@ function os_files_os_add_new_links_alter(&$links) {
 }
 
 /**
- * Implements hook_menu_alter().
+ * Submit handler - the module media has it's own redirect path in his submit
+ * handler. This submit handler will be called after the media module handler
+ * and change the redirect path.
  */
-function os_files_menu_alter(&$callbacks) {
-  $callbacks['file-list'] = $callbacks['admin/content/file'];
-  $callbacks['file-list']['access callback'] = 'os_files_file_list';
-  $callbacks['file-list']['page callback'] = 'views_embed_view';
-  $callbacks['file-list']['page arguments'] = array('cp_files');
+function os_files_redirect_after_upload($form, &$form_state) {
+  $form_state['redirect'] = 'file-list';
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function os_files_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'os_files') . '/includes/views',
+  );
 }
 
 /**
@@ -78,15 +143,18 @@ function os_files_form_media_add_upload_alter($form, &$form_state) {
     return;
   }
   $form_state['build_info']['args'][0]['uri_scheme'] = 'private';
+
+  $form['#submit'][] = 'os_files_redirect_after_upload';
 }
+
 /**
- * Implements hook_og_permissions().
+ * Implements hook_og_permission().
  */
-function os_files_og_permissions() {
+function os_files_og_permission() {
   return array(
-    'administer files' => array(
+    'administer site files' => array(
       'title' => t('Manage site files'),
-      'description' => t('Manage the files for the virtual site.'),
+      'description' => t('Manage the files for the site.'),
     ),
   );
 }
