@@ -264,6 +264,10 @@ function os_files_file_download($uri) {
       }
 
       if (!og_is_member('node', $gid[0])) {
+        if (function_exists('pinserver_check_status') && !pinserver_check_status()) {
+          // Maybe user is site owner,  but has not logged in locally or via the pinserver, so send to pinserver.
+          return pinserver_redirect();
+        }
         return -1;
       }
     }
