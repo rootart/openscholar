@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Install file for the OS files private module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function os_files_private_requirements($phase) {
+  $status = REQUIREMENT_OK;
+  $description = t('The private files directory is defined properly.');
+
+  if (!$private_directory = variable_get('file_private_path')) {
+    $status = REQUIREMENT_ERROR;
+    $description = t('The private files directory is undefined.');
+  }
+
+  return array(
+    'os_files_private' => array(
+      'title' => t('Open Scholar files private'),
+      'severity' => $status,
+      'description' => $description,
+      'value' => $private_directory,
+    ),
+  );
+}

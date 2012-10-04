@@ -1,0 +1,117 @@
+<?php
+
+/**
+ * @files
+ * OpenScholar files private module file.
+ */
+
+/**
+ * Implements hook_menu_alter().
+ */
+function os_files_private_menu_alter(&$callbacks) {
+  $callbacks['file-list'] = $callbacks['admin/content/file'];
+  $callbacks['file-list']['access callback'] = 'os_files_private_file_list';
+  $callbacks['file-list']['page callback'] = 'views_embed_view';
+  $callbacks['file-list']['page arguments'] = array('cp_files', 'default');
+}
+
+/**
+ * Access callback - Determine if the user can manage the files entity for
+ * a VSite.
+ */
+function os_files_private_file_list() {
+  if (!$space = spaces_get_space()) {
+    return;
+  }
+
+  return og_user_access('node', $space->id, 'administer files');
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Set the URI schema to private when adding a new file via file/add.
+ *
+ * @see media_add_upload_submit()
+ */
+function os_files_private_form_media_add_upload_alter(&$form, &$form_state) {
+  $item = menu_get_item();
+  if ($item['path'] != 'file/add') {
+    return;
+  }
+  $form_state['build_info']['args'][0]['uri_scheme'] = 'private';
+
+  $form['#submit'][] = 'os_files_private_redirect_after_upload';
+}
+
+/**
+ * Implements hook_os_add_new_links_alter().
+ *
+ * Adds a page contextual link for importing biblio nodes.
+ */
+function os_files_private_os_add_new_links_alter(&$links) {
+  $item = menu_get_item();
+
+  if (!in_array($item['path'], array('file-list', 'file/%', 'file/%/edit'))) {
+    return;
+  }
+
+  $links['add_new_file'] = array(
+    'title' => t('Add file'),
+    'href' => 'file/add',
+    'html' => TRUE,
+  );
+}
+
+/**
+ * Submit handler - the module media has it's own redirect path in his submit
+ * handler. This submit handler will be called after the media module handler
+ * and change the redirect path.
+ */
+function os_files_private_redirect_after_upload($form, &$form_state) {
+  $form_state['redirect'] = 'file-list';
+}
+
+/**
+ * Implements hook_og_permission().
+ */
+function os_files_private_og_permission() {
+  return array(
+    'administer site files' => array(
+      'title' => t('Manage site files'),
+      'description' => t('Manage the files for the site.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_file_download().
+ *
+ * Serve public files from a vsite directory.
+ */
+function os_files_private_file_download($uri) {
+  global $user;
+  $path = file_uri_target($uri);
+  $scheme = file_uri_scheme($uri);
+
+  if ($scheme != 'public' || !module_exists('vsite')) {
+    return NULL;
+  }
+
+  if ($files = file_load_multiple(array(), array('uri' => $uri))) {
+    foreach ($files as $file) {
+      $wrapper = entity_metadata_wrapper('file', $file);
+      if (!isset($wrapper->{OG_AUDIENCE_FIELD}) || !$gid = $wrapper->{OG_AUDIENCE_FIELD}->value(array('identifier' => TRUE))) {
+        continue;
+      }
+
+      if (!og_is_member('node', $gid[0])) {
+        if (function_exists('pinserver_check_status') && !pinserver_check_status()) {
+          // Maybe user is site owner,  but has not logged in locally or via the pinserver, so send to pinserver.
+          return pinserver_redirect();
+        }
+        return -1;
+      }
+    }
+  }
+}
