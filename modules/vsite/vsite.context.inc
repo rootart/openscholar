@@ -67,6 +67,12 @@ function vsite_context_default_contexts() {
           'region' => 'footer',
           'weight' => '-10',
         ),
+        'views-os_activity-block_1' => array(
+          'module' => 'views',
+          'delta' => 'os_activity-block_1',
+          'region' => 'footer',
+          'weight' => '-30',
+        ),
       ),
     ),
   );
@@ -77,7 +83,7 @@ function vsite_context_default_contexts() {
   t('Active on the frontpage in multi-tenant installs');
   t('OpenScholar');
   $export['os_sitewide_front'] = $context;
-  
+
   $context = new stdClass();
   $context->disabled = FALSE; /*
                                * Edit this to true to make a default context
@@ -115,7 +121,7 @@ function vsite_context_default_contexts() {
   t('Context that is active when in a user area of an Openscholar site, like user profile or log in screen');
   t('OpenScholar');
   $export['os_users'] = $context;
-  
+
 
   return $export;
 }
