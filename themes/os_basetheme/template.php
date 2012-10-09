@@ -55,7 +55,11 @@ function os_basetheme_preprocess_page(&$vars) {
     $vars['primary_local_tasks'] = $vars['title'] = false;
   }
 
-  $vars['rolling_activity'] = !og_context() && drupal_is_front_page() ? views_embed_view('os_activity', 'block_1') : '';
+  $vars['rolling_activity'] = array();
+  if (!og_context() && drupal_is_front_page()) {
+    $vars['rolling_activity']['title'] = t('Current Activity') . ' ' . l(t('More'), 'activity');
+    $vars['rolling_activity']['output'] = views_embed_view('os_activity', 'block_1');
+  }
 }
 
 /**

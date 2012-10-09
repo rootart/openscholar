@@ -189,10 +189,14 @@
   <?php if ($page['footer']): ?>
     <footer id="footer" class="clearfix" role="contentinfo"><?php print render($page['footer']); ?></footer>
   <?php endif; ?>
-  <?php if ($rolling_activity):
-      print $rolling_activity;
-    endif;
-  ?>
+  <?php if ($rolling_activity): ?>
+    <div class='current-activity'>
+      <span class='title'><?php print $rolling_activity['title']; ?></span>
+      <div class='activity'>
+        <?php print $rolling_activity['output']; ?>
+      </div>
+    </div>
+  <?php endif; ?>
 </div></div><!--page area ends-->
  <div id="extradiv"></div>
  
