@@ -54,6 +54,8 @@ function os_basetheme_preprocess_page(&$vars) {
     // overlay does this, but adaptive theme renders them in a different way that overlay doesn't expect
     $vars['primary_local_tasks'] = $vars['title'] = false;
   }
+
+  $vars['rolling_activity'] = !og_context() && drupal_is_front_page() ? views_embed_view('os_activity', 'block_1') : '';
 }
 
 /**

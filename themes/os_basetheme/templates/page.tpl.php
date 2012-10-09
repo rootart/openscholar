@@ -189,8 +189,8 @@
   <?php if ($page['footer']): ?>
     <footer id="footer" class="clearfix" role="contentinfo"><?php print render($page['footer']); ?></footer>
   <?php endif; ?>
-  <?php if (!og_context()):
-      print views_embed_view('os_activity', 'block_1');
+  <?php if ($rolling_activity):
+      print $rolling_activity;
     endif;
   ?>
 </div></div><!--page area ends-->
