@@ -25,9 +25,6 @@ function cp_user_menu(){
     'description' => 'Find and manage site members.',
     'page callback' => 'cp_user_admin',
     'access callback' => 'cp_user_admin_access',
-    //'file' => 'cp_user.form.inc',
-    //'type' => MENU_DEFAULT_LOCAL_TASK,
-    //'weight' => 20,
   );
 
   $items['cp/users/add'] = array(
@@ -99,10 +96,10 @@ function cp_user_admin_access() {
  */
 function cp_user_admin_paths() {
   $paths = array(
-	'cp/users/create_admin/*' => TRUE,
-	'cp/users/remove_admin/*' => TRUE,
-	'cp/users/delete_membership/*' => TRUE,
-	'cp/users/new_list/add' => TRUE,
+    'cp/users/create_admin/*' => TRUE,
+    'cp/users/remove_admin/*' => TRUE,
+    'cp/users/delete_membership/*' => TRUE,
+    'cp/users/new_list/add' => TRUE,
   );
 
   return $paths;
@@ -117,7 +114,7 @@ function cp_user_admin_paths() {
 function cp_user_admin($op = 'members') {
   $vsite = spaces_get_space();
   switch ($op) {
-  	case 'new_list':
+    case 'new_list':
       $build = cp_user_user_management_page($vsite->id);
       break;
     case 'add':
@@ -167,17 +164,14 @@ function cp_user_form_og_ui_add_users_alter(&$form, $form_state) {
     '#value' => 'og_user_node',
   );
 
-  // Remove the "Last Message" form element that gets hooked into the og_ui_add_users form.
-  if(isset($form['membership_fields']) && isset($form['membership_fields']['field_message'])) {
-  	$form['membership_fields']['field_message']['#access'] = FALSE;
-  }
-
-  // Add a secondary submit function that redirects the users out of the admin overlay
+  // Add a secondary submit function that redirects the users out of the
+  // admin overlay
   $form['#submit'][] = 'cp_user_og_ui_add_users_submit';
 }
 
 /**
- * Function to redirect the user back to the /cp/users/new_list page after submitting the add user.
+ * Submit handler; redirect the user back to the /cp/users/new_list page
+ * after submitting the add user.
  */
 function cp_user_og_ui_add_users_submit(&$form, &$form_state){
   $form_state['redirect'] = 'cp/users/new_list';
@@ -187,23 +181,28 @@ function cp_user_og_ui_add_users_submit(&$form, &$form_state){
  * Implements hook_field_access().
  */
 function cp_user_field_access($op, $field, $entity_type, $entity, $account) {
-  if ($op == 'edit' &&  $field['field_name'] == OG_MEMBERSHIP_REQUEST_FIELD) {
+  $field_names = array(
+    OG_MEMBERSHIP_REQUEST_FIELD,
+    'field_message',
+  );
+
+  if ($op == 'edit' && in_array($field['field_name'], $field_names)) {
     return FALSE;
   }
 }
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
  * Altering the user_register_form to add a secondary submit function
  * that will also add a user to the site
  */
 function cp_user_form_user_register_form_alter(&$form, &$form_state, $form_id) {
   // The only time we want to alter this form is when the user is in their "cp",
   // other than that the form should not get altered.
-  $path = request_path();
-  $path = explode('/', $path);
+  $item = menu_get_item();
 
-  if(in_array('cp', $path)) {
+  if (strpos($item['path'], 'cp') === 0) {
     // Create a hidden field to control our JS
     $form['switch'] = array(
       '#title' => t('switch'),
@@ -212,34 +211,26 @@ function cp_user_form_user_register_form_alter(&$form, &$form_state, $form_id) {
       '#attributes' => array('id'=>'switch'),
     );
 
-	// Add a secondary submit function that also submits the user add function
+    // Add a secondary submit function that also submits the user add
+    // function.
     $form['#submit'][] = 'cp_user_user_register_submit';
     // Remove the 'status' and 'role' elements from the form.
     $form['account']['status']['#access'] = FALSE;
     $form['account']['roles']['#access'] = FALSE;
-    // Change the submit button text to let the user know they will also be adding to their site
-    // as well as creating the user, in one step.
-    $form['actions']['submit']['#value'] = 'Create and Add User';
+    // Change the submit button text to let the user know they will also
+    // be adding to their site as well as creating the user, in one step.
+    $form['actions']['submit']['#value'] = t('Create and Add User');
   }
 }
 
 /**
- * Function for the secondary user_registration_form submit function
- * that will add the newly created user to the current site.
+ * Submit handler; Add the newly created user to the current site.
  */
 function cp_user_user_register_submit($form, &$form_state) {
-  $og_context = spaces_get_space();
-  // Grab the newly created username
-  if(!empty($form_state['values']['name'])) {
-    $user_name = $form_state['values']['name'];
+  $space = spaces_get_space();
+  if(!empty($form_state['user']->uid)) {
+    og_group('node', $space->id, array('entity' => $form_state['user']->uid));
 
-    // Recreate the add users form
-    $pass_form_state = array();
-    $pass_form_state['values']['name'] = $user_name;
-    $pass_form_state['values']['state'] = OG_STATE_ACTIVE;
-    $pass_form_state['build_info']['args'] = array('group_type'=>$og_context->group_type,'gid'=>$og_context->id);
-	// Submit the og_ui_add_users form
-    drupal_form_submit('og_ui_add_users',$pass_form_state);
     // Redirect the user after they add/create someone.
     $form_state['redirect'] = 'cp/users/new_list';
   }
@@ -247,13 +238,11 @@ function cp_user_user_register_submit($form, &$form_state) {
 
 /**
  * Implements hook_load().
+ *
+ * Return the loaded user from the passed user ID, or FALSE if no user
+ * exists.
  */
 function user_id_load($user_id) {
-  $user_load = user_load($user_id);
-  // Return the user_load of the passed user_id, return FALSE if no user exists
-  if(!empty($user_load)) {
-  	return $user_load;
-  }else {
-    return FALSE;
-  }
+  $account = user_load($user_id);
+  return $account ? $account : FALSE;
 }
