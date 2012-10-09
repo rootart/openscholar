@@ -295,9 +295,11 @@ function os_publications_biblio_entry_alter(&$entry, $node) {
 }
 
 function os_publications_preprocess_node(&$vars) {
-  if ($vars['type'] == 'biblio' && $vars['teaser']) {
+  if ($vars['type'] == 'biblio') {
     $vars['display_submitted'] = false;
-    $vars['title'] = false;
+    if ($vars['teaser']) {
+      $vars['title'] = false;
+    }
   }
 }
 

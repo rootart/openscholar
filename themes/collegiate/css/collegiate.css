@@ -11,7 +11,7 @@ background: url('../images/bodyBg.png') repeat-x scroll 0px 30px #EFEFEF;
  }    
 
 /* TYPOGRAPHY*/
-
+.biblio-title a, .biblio-title-chicago a,
 #content a, #content a:visited {
     color:#a61d31;
     text-decoration: underline;
@@ -84,12 +84,6 @@ p.copy {
     font-weight: normal !important;
 }
 
-.node, .biblio-entry {
-    clear: both;
- padding: 0.5em 0.188em;
-    position: relative;
-}
-
 .field-content a {color:#555;text-decoration:underline;}
 .field-content a:hover {text-decoration:none;}
 
@@ -137,10 +131,10 @@ body.front #content-top #block-boxes-scholar_presentations_recent h2.block-title
 body.front #content-bottom #block-boxes-scholar_presentations_recent h2.block-title
 {background:url('../images/presentationsIcon.png') no-repeat;padding-left:28px;margin-bottom:8px;}
 
-body.front #content-left #block-boxes-scholar_announcements_latest h2.block-title,
-body.front #content-right #block-boxes-scholar_announcements_latest h2.block-title,
-body.front #content-top #block-boxes-scholar_announcements_latest h2.block-title,
-body.front #content-bottom #block-boxes-scholar_announcements_latest h2.block-title
+body.front #content-left #block-boxes-os-announcements-latest h2.block-title,
+body.front #content-right #block-boxes-os-announcements-latest h2.block-title,
+body.front #content-top #block-boxes-os-announcements-latest h2.block-title,
+body.front #content-bottom #block-boxes-os-announcements-latest h2.block-title
 {background:url('../images/announcementIcon.png') no-repeat;padding-left:28px;margin-bottom:8px;}
 
 

@@ -3,6 +3,6 @@ description = Provides Raw HTML support to the Media module.
 package = "Media"
 core = 7.x
 files[] = includes/MediaEmbedStreamWrapper.inc
-files[] = includes/MediaBrowserHTML.inc
+files[] = includes/MediaInternetEmbedHandler.inc
 files[] = media_embed.test
 dependencies[] = media

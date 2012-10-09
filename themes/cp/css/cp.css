@@ -1,4 +1,7 @@
-
+h1#page-title {
+	color:#8996A0;
+	font-size:2em;
+}
 
 #overlay-content #content-column .content-inner {
     margin-left: 0;
@@ -96,9 +99,6 @@ a.advanced-help-link {
 .advanced-help-link:hover {
     background: url("../../../themes/os_basetheme/images/scholarbase-sprite.png") no-repeat 0 -170px;
 }
-
-
-
 
 /** CP TABLE STYLES **/
 #edit-menu-table tr,

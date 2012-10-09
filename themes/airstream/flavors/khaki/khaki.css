@@ -9,6 +9,7 @@ body.navbar-on #wrapper {
   background-image: url(images/body-bg-horiz-khaki.png);
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   color: #7F6910;
   }

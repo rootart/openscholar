@@ -20,6 +20,7 @@ body {
   background: #888;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited, a:hover {
   color: #FFF;
   }

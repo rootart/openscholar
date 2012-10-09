@@ -133,3 +133,36 @@ function os_comments_comment_save_vsite($comment_node_types) {
     );
   }
 }
+
+/**
+ * Implements hook_cp_settings().
+ * Hook into the cp/settings form to add the shortname field for disqus.
+ */
+function os_comments_cp_settings(){
+  $a_settings = array();
+  // Check to make sure disqus is enabled.
+  if(module_exists('disqus')) {
+    $vsite = vsite_get_vsite();
+    if($vsite) {
+      $disqus_shortname = $vsite->controllers->variable->get('disqus_domain', 'space');
+    } else {
+      $disqus_shortname = variable_get('disqus_domain', '');
+    }
+
+    $a_settings['disqus_domain'] = array(
+      'group' => array(
+        '#id' => 'social',
+        '#title' => t('Social'),
+        '#weight' => 0,
+    ),
+      'form' => array(
+        '#type' => 'textfield',
+        '#title' => t('Disqus Shortname'),
+        '#default_value' => $disqus_shortname,
+        '#description' => t('The website shortname that you registered Disqus with. If you registered http://example.disqus.com, you would enter "example" here. It is called "shortname" on the disqus site. You can <a href="http://disqus.com/" title="Disqus Signup">signup here</a> for a disqus account if you do not have one.'),
+      )
+    );
+  }
+
+  return $a_settings;
+}

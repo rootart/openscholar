@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /**
  * @file
  * os_biocv.features.field.inc
@@ -12,7 +10,7 @@
 function os_biocv_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'node-bio-body'
+  // Exported field: 'node-bio-body'.
   $fields['node-bio-body'] = array(
     'field_config' => array(
       'active' => '1',
@@ -35,6 +33,7 @@ function os_biocv_field_default_fields() {
           0 => 'format',
         ),
       ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(),
       'translatable' => '0',
@@ -68,7 +67,7 @@ function os_biocv_field_default_fields() {
       'label' => 'Body',
       'required' => FALSE,
       'settings' => array(
-        'display_summary' => 0,
+        'display_summary' => TRUE,
         'text_processing' => 1,
         'user_register_form' => FALSE,
       ),
@@ -84,7 +83,7 @@ function os_biocv_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-cv-body'
+  // Exported field: 'node-cv-body'.
   $fields['node-cv-body'] = array(
     'field_config' => array(
       'active' => '1',
@@ -107,6 +106,7 @@ function os_biocv_field_default_fields() {
           0 => 'format',
         ),
       ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(),
       'translatable' => '0',
@@ -140,7 +140,7 @@ function os_biocv_field_default_fields() {
       'label' => 'Body',
       'required' => FALSE,
       'settings' => array(
-        'display_summary' => 0,
+        'display_summary' => TRUE,
         'text_processing' => 1,
         'user_register_form' => FALSE,
       ),
@@ -156,7 +156,7 @@ function os_biocv_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-cv-field_biocv_pdf_upload'
+  // Exported field: 'node-cv-field_biocv_pdf_upload'.
   $fields['node-cv-field_biocv_pdf_upload'] = array(
     'field_config' => array(
       'active' => '1',
@@ -177,6 +177,7 @@ function os_biocv_field_default_fields() {
           0 => 'fid',
         ),
       ),
+      'locked' => '0',
       'module' => 'file',
       'settings' => array(
         'display_default' => 0,
@@ -236,85 +237,31 @@ function os_biocv_field_default_fields() {
       ),
       'widget' => array(
         'active' => 1,
-        'module' => 'file',
+        'module' => 'media',
         'settings' => array(
+          'allowed_schemes' => array(
+            'embed' => 0,
+            'oembed' => 0,
+            'public' => 'public',
+          ),
+          'allowed_types' => array(
+            'audio' => 0,
+            'default' => 0,
+            'html' => 0,
+            'image' => 'image',
+            'video' => 0,
+          ),
+          'browser_plugins' => array(
+            'library' => 0,
+            'media_default--media_browser_1' => 'media_default--media_browser_1',
+            'media_embed' => 0,
+            'media_internet' => 'media_internet',
+            'upload' => 'upload',
+          ),
           'progress_indicator' => 'throbber',
         ),
-        'type' => 'file_generic',
+        'type' => 'media_generic',
         'weight' => '31',
-      ),
-    ),
-  );
-
-  // Exported field: 'node-cv-og_vocabulary'
-  $fields['node-cv-og_vocabulary'] = array(
-    'field_config' => array(
-      'active' => '1',
-      'cardinality' => '-1',
-      'deleted' => '0',
-      'entity_types' => array(),
-      'field_name' => 'og_vocabulary',
-      'foreign keys' => array(
-        'taxonomy_term_data' => array(
-          'columns' => array(
-            'target_id' => 'tid',
-          ),
-          'table' => 'taxonomy_term_data',
-        ),
-      ),
-      'indexes' => array(
-        'target_id' => array(
-          0 => 'target_id',
-        ),
-      ),
-      'module' => 'entityreference',
-      'settings' => array(
-        'handler' => 'base',
-        'handler_settings' => array(
-          'behaviors' => array(
-            'og_vocab' => array(
-              'status' => TRUE,
-            ),
-          ),
-          'target_bundles' => array(),
-        ),
-        'target_type' => 'taxonomy_term',
-      ),
-      'translatable' => '0',
-      'type' => 'entityreference',
-    ),
-    'field_instance' => array(
-      'bundle' => 'cv',
-      'default_value' => NULL,
-      'deleted' => '0',
-      'description' => '',
-      'display' => array(
-        'default' => array(
-          'label' => 'above',
-          'module' => 'og_vocab',
-          'settings' => array(),
-          'type' => 'og_vocab',
-          'weight' => 2,
-        ),
-        'teaser' => array(
-          'label' => 'above',
-          'settings' => array(),
-          'type' => 'hidden',
-          'weight' => 0,
-        ),
-      ),
-      'entity_type' => 'node',
-      'field_name' => 'og_vocabulary',
-      'label' => 'OG vocabulary',
-      'required' => FALSE,
-      'settings' => array(
-        'user_register_form' => FALSE,
-      ),
-      'widget' => array(
-        'module' => 'og_vocab',
-        'settings' => array(),
-        'type' => 'og_vocab_complex',
-        'weight' => 32,
       ),
     ),
   );
@@ -322,10 +269,7 @@ function os_biocv_field_default_fields() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Body');
-  t('Groups audience');
-  t('OG vocabulary');
   t('PDF Upload');
 
   return $fields;
 }
-

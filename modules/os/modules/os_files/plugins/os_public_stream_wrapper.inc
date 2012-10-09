@@ -22,6 +22,12 @@ class OSPublicStreamWrapper extends DrupalPublicStreamWrapper {
       if ($pieces[0] == $prefix) {
         // Remove vsite component.
         array_shift($pieces);
+
+        if($pieces[0] == 'files'){
+          //Remove files if it exists
+          array_shift($pieces);
+        }
+
         // Use Vsite files menu entry (url will automatically prefix with purl).
         return url('files/' . implode("/", $pieces), array('absolute' => TRUE));
       }

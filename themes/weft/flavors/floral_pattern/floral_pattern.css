@@ -10,6 +10,7 @@ body {
   background: url('images/menu-strip-floral-pattern.png') #8B3015;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   color:#8B0D09;
   }

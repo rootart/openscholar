@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /**
  * @file
  * os_classes.features.inc
@@ -51,4 +49,3 @@ function os_classes_node_info() {
   );
   return $items;
 }
-

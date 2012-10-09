@@ -1,6 +1,6 @@
 <?php
-    require('../../service/swordapp-php-library-1.0/packager_mets_swap.php');
-	
+    require('packager_mets_swap.php');
+
 	// The location of the files (wihtout final directory)
     $test_rootin = 'test-files';
 
@@ -27,7 +27,7 @@
 
     // Citation
 	$test_citation = 'Allinson, J., Francois, S., Lewis, S. SWORD: Simple Web-service Offering Repository Deposit, Ariadne, Issue 54, January 2008. Online at http://www.ariadne.ac.uk/issue54/';
-	
+
 	// Identifier
     $test_identifier = 'http://www.ariadne.ac.uk/issue54/allinson-et-al/';
 
@@ -48,7 +48,7 @@
 
 	// MIME type of file
 	$test_mimetype = 'application/pdf';
-	
+
 	$test_packager = new PackagerMetsSwap($test_rootin, $test_dirin, $test_rootout, $test_fileout);
 	$test_packager->setCustodian($test_custodian);
 	$test_packager->setType($test_type);

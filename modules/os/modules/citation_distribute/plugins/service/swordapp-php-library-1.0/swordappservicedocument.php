@@ -1,18 +1,18 @@
 <?php
 
-require_once('../../service/swordapp-php-library-1.0/workspace.php');
+require_once('workspace.php');
 
 class SWORDAPPServiceDocument {
 
 	// The URL of this Service Document
 	public $sac_url;
-	
+
 	// The HTTP status code returned
 	public $sac_status;
-	
+
 	// The XML of the service doucment
 	public $sac_xml;
-	
+
 	// The human readable status code
 	public $sac_statusmessage;
 
@@ -27,7 +27,7 @@ class SWORDAPPServiceDocument {
 
 	// The max upload size of deposits
 	public $sac_maxuploadsize;
-	
+
 	// Workspaces in the servicedocument
 	public $sac_workspaces;
 
@@ -35,10 +35,10 @@ class SWORDAPPServiceDocument {
 	function __construct($sac_theurl, $sac_newstatus, $sac_thexml = '') {
 		// Store the URL
 		$this->sac_url = $sac_theurl;
-		
+
 		// Store the status
 		$this->sac_status = $sac_newstatus;
-		
+
 		// Store the raw xml
 		$this->sac_xml = $sac_thexml;
 
@@ -57,7 +57,7 @@ class SWORDAPPServiceDocument {
 				$this->sac_statusmessage = "Unknown erorr (status code " . $this->sac_status . ")";
 				break;
 		}
-		
+
 		// Parse the xml if there is some
 		if ($sac_thexml != '') {
 			$sac_xml = @new SimpleXMLElement($sac_thexml);
@@ -66,7 +66,7 @@ class SWORDAPPServiceDocument {
 	                $this->sac_verbose = $sac_xml->children($sac_ns['sword'])->verbose;
         	        $this->sac_noop = $sac_xml->children($sac_ns['sword'])->noOp;
                 	$this->sac_maxuploadsize = $sac_xml->children($sac_ns['sword'])->maxUploadSize;
-				
+
 			// Build the workspaces
 			$sac_ws = @$sac_xml->children($sac_ns['app']);
 			foreach ($sac_ws as $sac_workspace) {

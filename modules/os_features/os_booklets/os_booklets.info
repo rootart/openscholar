@@ -7,6 +7,7 @@ version = 7.x-1.0
 project = os_booklets
 dependencies[] = book
 dependencies[] = boxes
+dependencies[] = context
 dependencies[] = ctools
 dependencies[] = entityreference
 dependencies[] = features

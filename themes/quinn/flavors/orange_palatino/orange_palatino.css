@@ -10,6 +10,7 @@ h1#page-title {
   padding-left: .9em;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a,
 a:visited {
   color:#A45614;

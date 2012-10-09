@@ -193,14 +193,14 @@ padding: 3px 3px 0 0;
    } 
    
    
-   #block-boxes-scholar_announcements_latest h2.block-title:nth-child(1) {
+   #block-boxes-os-announcements-latest h2.block-title:nth-child(1) {
   background: url('../images/announcementsIcon.png') no-repeat;
   margin-left:8px;
   padding-left: 39px;
    } 
 
-#block-boxes-scholar_announcements_latest .node-type-announcement.node-teaser {margin-bottom:25px;}
-#block-boxes-scholar_announcements_latest .submitted {margin-top:-8px;}
+#block-boxes-os-announcements-latest .node-type-announcement.node-teaser {margin-bottom:25px;}
+#block-boxes-os-announcements-latest .submitted {margin-top:-8px;}
 
     #boxes-box-scholar_announcements_latest .boxes-box-content h3 {
   text-transform: none;

@@ -41,6 +41,7 @@ dependencies[] = advanced_help
 
 ; media / files / wysiwyg
 dependencies[] = imagefield_crop
+dependencies[] = jcarousel
 dependencies[] = media
 dependencies[] = oembed
 dependencies[] = file_entity
@@ -65,6 +66,7 @@ dependencies[] = os_search_db
 dependencies[] = os_shields
 dependencies[] = os_comments
 dependencies[] = os_taxonomy
+dependencies[] = os_ga
 
 ; Control Panel
 dependencies[] = cp

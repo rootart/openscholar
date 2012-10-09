@@ -8,7 +8,7 @@ body {
   }
 
 /*TYPOGRAPHY*/
-
+.biblio-title a, .biblio-title-chicago a,
 a,
 a:visited {
   color: #006e97;
@@ -72,6 +72,7 @@ a:hover {
   background: rgba(0,0,0,0.4);
   margin: 10px auto;
   padding: 21px 23px;
+  
   }
 
 #header-container {

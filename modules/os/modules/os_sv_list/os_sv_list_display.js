@@ -12,7 +12,7 @@
         // get the delta of the box and the page, and store them that way
         var page_elem = $(this).find('[data-page]'),
           page = page_elem.attr('data-page'),
-          delta = get_delta(this);
+          delta = page_elem.attr('data-delta');
         
         data[delta] = {};
         data[delta][page] = page_elem.parent().html();
@@ -20,13 +20,13 @@
       
       function click_handler(e) {
         // do nothing if this isn't a pager link
-        if ($(e.target).parents('.pager').length == 0) return;
+        if ($(e.target).parents('.pager').length == 0 || e.target.nodeName != 'A') return;
         e.stopPropagation();
         e.preventDefault();
         
-        // get the requested page from the query args
+        // get the requested page and delta from the query args
         var args = query_args(e.target.href),
-          delta = get_delta(e.currentTarget);
+            delta = args.sv_list_box_delta;
         
         // if there's no page set in the query, assume its the first page
         if (typeof args.page == 'undefined') {
@@ -40,18 +40,30 @@
         }
         // if it doesn't exist, we have to ask the server for it
         else {
-          var s = Drupal.settings;
+          var s = Drupal.settings, 
+            page = decodeURIComponent(args.page).split(',');
+            page = page[args.pager_id];
           $.ajax({
             url: s.basePath + (typeof s.pathPrefix != 'undefined'?s.pathPrefix:'') + 'os_sv_list/page/'+delta,
             data: {
-              page: args.page
+              page: page
             },
             beforeSend: function (xhr, settings) {
               $(e.currentTarget).append('<div class="ajax-progress ajax-progress-throbber"><div class="throbber">&nbsp;</div></div>')
             },
             success: function (commands, status, xhr) {
-              var html = commands[1].data,
-                parent = $(e.currentTarget).find('.boxes-box-content');
+              var html, i,
+              parent = $(e.currentTarget).find('.boxes-box-content');
+              
+              for (i in commands) {
+                if (commands[i].command == 'insert' 
+                  && commands[i].method == null 
+                  && commands[i].selector == null 
+                  && commands[i].data != "") {
+                    html = commands[i].data;
+                    break;
+                }
+              }
               // replace the existing page with the new one
               parent.html(html);
               Drupal.attachBehaviors(parent);

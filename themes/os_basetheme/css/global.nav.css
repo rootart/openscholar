@@ -437,6 +437,8 @@ background: none !important;
  border-bottom:none !important;
  text-shadow:none !important;
  border:none !important;
+ margin-left: 0;
+
 }
 
 ul.contextual-links li a:hover {

@@ -11,6 +11,7 @@
 function openscholar_install() {
   // enable the following themes
   $enable = array(
+  'adaptivetheme',
   'aberdeen',
   'aglet',
   'airstream',

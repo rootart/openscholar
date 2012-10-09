@@ -3,6 +3,7 @@ body {
 	background: #909d9c;
 	}
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
 	color:#0C54B3;
 	}

@@ -27,6 +27,15 @@ class os_boxes_html extends os_boxes_default {
     return $form;
   }
 
+  public function options_submit($form, $form_state) {
+    if (module_exists('vsite') && $space = spaces_get_space()) {
+      // construct a fake node so we can pass it into os_wysiwyg's helper function
+      $space->group->body[LANGUAGE_NONE][0]['value'] = $this->options['text']['value'];
+
+      os_wysiwyg_update_files($space->group);
+    }
+  }
+
   public function render() {
     $block = parent::render();
     $block['content'] = check_markup($this->options['text']['value'], $this->options['text']['format']);

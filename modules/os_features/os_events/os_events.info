@@ -16,6 +16,7 @@ dependencies[] = date_repeat
 dependencies[] = date_repeat_field
 dependencies[] = date_views
 dependencies[] = features
+dependencies[] = file
 dependencies[] = filefield_paths
 dependencies[] = media
 dependencies[] = os

@@ -12,6 +12,7 @@ body.navbar-off #page {
   background-image: url('images/nav-strawberry.png');
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   color: #892322;
   }

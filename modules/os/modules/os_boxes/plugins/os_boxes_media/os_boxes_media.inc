@@ -27,11 +27,32 @@ class os_boxes_media extends os_boxes_default {
     return $form;
   }
 
+  public function options_submit($form, &$form_state) {
+    $old = $form['options']['fid']['#default_value']['fid'];
+
+    if ($old != $this->options['fid']) {
+
+      if (module_exists('vsite') && $space = spaces_get_space()) {
+        $id = $space->group->nid;
+      }
+
+      if ($file = file_load($this->options['fid'])){
+        file_usage_add($file, 'os_boxes', 'node', $id, 1);
+      }
+
+      if ($old && $old_file = file_load($old)) {
+        file_usage_delete($old_file, 'os_boxes', 'node', $id, 1);
+        file_delete($old_file);
+      }
+    }
+  }
+
   public function render() {
     $block = parent::render();
 
     if ($file = file_load($this->options['fid'])) {
-      $block['content'] = drupal_render(file_view($file));
+      $render = file_view($file, 'media_large');
+      $block['content'] = drupal_render($render);
     }
     else {
       $block['content'] = t('No media given.');

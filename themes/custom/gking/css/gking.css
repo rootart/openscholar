@@ -159,6 +159,7 @@ h1#page-title,
   font-size: 1.2em;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a {
   text-decoration: none;
   }
@@ -504,12 +505,8 @@ padding:0 32px 0 0;
   padding: 0;
 }*/
 
-#content-column .node,
-#content-column .views-row,
-.taxonomy-term-description {
-  padding-top: 0;
-  padding-bottom:0;
-  margin-bottom: .75em;
+#content-column .node {
+ margin-bottom: 1.5em;
   }
 
 #content-column .ui-tabs-panel div.node {
@@ -1105,10 +1102,6 @@ margin-top:5px;
   font-size: 25px;
   }
 
-.biblio-title a, .biblio-title a:visited {
-  color: #000;
-  }
-
 .biblio-annotation, .biblio-annotation p {
   margin: 0;
   }
@@ -1152,9 +1145,14 @@ body.section-category .taxonomy-term-description {
   padding-left: 2em;
   }
 
-body.section-category .no-indent .node-teaser {
+body.section-category .node-teaser {
   padding-left: 0;
   }
+  
+body.section-category .gking-child-indent .node-teaser {
+  padding-left: 2em;
+  }
+  
 
 .taxonomy-term-child .node-inner .flL {
   display:none;
@@ -1200,19 +1198,19 @@ body.front .region-content-top .node.node-bio {
 
 /* Alt Branding */
 
-body.gking-alt #wrapper {
+body.gkplus-minitheme #wrapper {
   background: transparent;
   }
 
-body.gking-alt #header-container {
+body.gkplus-minitheme #header-container {
   min-height: 10px;
   }
 
-body.gking-alt #block-os-primary-menu {
+body.gkplus-minitheme #block-os-primary-menu {
   display:none;
   }
 
-body.gking-alt #menu-bar {
+body.gkplus-minitheme #menu-bar {
   background: transparent;
   position: fixed;
   top: auto;
@@ -1222,13 +1220,13 @@ body.gking-alt #menu-bar {
   height: 30px;
   }
 
-body.gking-alt .block-boxes-os_boxes_site_info h1,
-body.gking-alt .block-boxes-os_boxes_site_info h1 a {
+body.gkplus-minitheme .block-boxes-os_boxes_site_info h1,
+body.gkplus-minitheme .block-boxes-os_boxes_site_info h1 a {
   height:30px;
   line-height: 30px;
   }
 
-body.gking-alt #footer {
+body.gkplus-minitheme #footer {
   left: 173px;
   }
 

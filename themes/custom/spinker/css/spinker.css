@@ -21,6 +21,7 @@ body,
   color: #ddd;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   color:#FFFFFF;
   text-decoration: none;
@@ -88,7 +89,7 @@ p.copy {
   }
 
 
-.region-sidebar-second .views-field-title, .region-sidebar-first .views-field-title {
+.region-sidebar-second .block-boxes-os_sv_list_box li, .region-sidebar-first .block-boxes-os_sv_list_box li {
 	background: url('../images/blueBullet.gif') no-repeat;
 	padding-left:12px;
 	background-position:left top; 
@@ -222,6 +223,10 @@ body.header-main-right .region-header-second {
     text-decoration: none;
     }
 
+ul.primary li a {
+color: #444;
+}
+
 #menu-bar {
   width: auto;
   background: #F26C4F;
@@ -336,4 +341,8 @@ div.messages,
 
 .biblio-separator-bar {
 	color: #ccffcc;
+}
+
+#block-os-powered-by span a, .os-powered-link a.os-poweredby {
+background-position: 0 -27px;
 }

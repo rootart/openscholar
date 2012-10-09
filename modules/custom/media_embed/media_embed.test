@@ -65,72 +65,12 @@ class MediaEmbedTest extends OpenscholarWebTestCase {
   }
 
   /**
-   * Test that a file entity can be created from our form
-   */
-  public function testFileEntityCreation() {
-    $form_state = array(
-      'submitted' => true,
-      'programmed' => true,
-      'input' => array(
-        'field_html_code' => array(
-          'und' => array(
-            array(
-              'value' => '<iframe width="420" height="315" src="http://test.com/embed/bD0vcmhmaCY" frameborder="0" allowfullscreen></iframe>',
-            )
-          ),
-        ),
-        'field_html_title' => array(
-          'und' => array(
-            array(
-              'value' => 'Imported iframe code',
-            )
-          )
-        ),
-      ),
-    );
-
-    $form = drupal_build_form('media_embed_add', $form_state);
-
-    // get the final file entity
-    // if it has an fid, submission succeeded
-    $file = file_uri_to_object($form_state['file']->uri);
-    if (isset($file->fid)) {
-      $this->pass('File Entity Created');
-    } else {
-      $this->fail('File Entity Created');
-    }
-  }
-
-  /**
    * Tests that our file entity can return the right text when being called through the filter
    */
   function testFilterOutput() {
-    $form_state = array(
-      'submitted' => true,
-      'programmed' => true,
-      'input' => array(
-        'field_html_code' => array(
-          'und' => array(
-            array(
-              'value' => '<iframe width="420" height="315" src="http://test.com/embed/bD0vcmhmaCY" frameborder="0" allowfullscreen></iframe>',
-            )
-          ),
-        ),
-        'field_html_title' => array(
-          'und' => array(
-            array(
-              'value' => 'Imported iframe code',
-            )
-          )
-        ),
-      ),
-    );
-
-    $form = drupal_build_form('media_embed_add', $form_state);
-
-    // get the final file entity
-    // if it has an fid, submission succeeded
-    $file = file_uri_to_object($form_state['file']->uri);
+    $code = '<iframe width="420" height="315" src="http://test.com/embed/bD0vcmhmaCY" frameborder="0" allowfullscreen></iframe>';
+    $handler = new MediaInternetEmbedHandler($code);
+    $file = $handler->save();
 
     $tag = array(
       'type' => 'media',

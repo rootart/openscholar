@@ -229,6 +229,7 @@ function og_vocab_og_fields_info() {
           'target_bundles' => array(),
           'behaviors' => array(
             'og_vocab' => array('status' => TRUE),
+            'taxonomy-index' => array('status' => TRUE),
           ),
         ),
       ),
@@ -354,7 +355,6 @@ function _og_vocab_autocomplete_tags_validate($element, &$form_state, $form) {
     }
   }
 
-  // Update the value of this element so the field can validate the product IDs.
   form_set_value($element, $value, $form_state);
 }
 
@@ -697,9 +697,19 @@ function og_vocab_ctools_plugin_directory($module, $plugin) {
 
 /**
  * Implements hook_query_TAG_alter().
+ *
+ * Alter loading vocabularies. If the static variable is set to "skip",
+ * no altering will occour.
+ *
+ * @see og_vocab_machine_name_validate()
  */
 function og_vocab_query_taxonomy_vocabulary_load_multiple_alter(QueryAlterableInterface $query) {
   $cache = &drupal_static(__FUNCTION__, FALSE);
+
+  if ($cache == 'skip') {
+    return;
+  }
+
   if ($cache) {
     // Prevent recursion.
     return;
@@ -748,16 +758,62 @@ function og_vocab_form_taxonomy_overview_vocabularies_alter(&$form, $form_state)
 }
 
 /**
- * Preprocess table; Change the "Empty" link to redirect to correct page.
+ * Implements hook_theme_registry_alter().
+ *
+ * @see theme_og_vocab_taxonomy_overview_vocabularies()
  */
-function og_vocab_preprocess_table(&$variables) {
+function og_vocab_theme_registry_alter(&$theme_registry) {
+  $theme_registry['taxonomy_overview_vocabularies']['function'] = 'theme_og_vocab_taxonomy_overview_vocabularies';
+}
+
+/**
+ * Override theme_taxonomy_overview_vocabularies() to make it group aware.
+ *
+ * The empty text (i.e. when there are no vocabularies) will redirect to
+ * the correct path.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - form: A render element representing the form.
+ *
+ * @see theme_taxonomy_overview_vocabularies()
+ */
+function theme_og_vocab_taxonomy_overview_vocabularies($variables) {
   if (!$context = og_vocab_is_group_admin_context()) {
-    return;
+    return theme_taxonomy_overview_vocabularies($variables);
   }
 
   $item = menu_get_item();
+  $empty = t('No vocabularies available. <a href="@link">Add vocabulary</a>.', array('@link' => url($item['href'] . '/add')));
 
-  $variables['empty'] = t('No vocabularies available. <a href="@link">Add vocabulary</a>.', array('@link' => url($item['href'] . '/add')));
+  $form = $variables['form'];
+
+  $rows = array();
+
+  foreach (element_children($form) as $key) {
+    if (isset($form[$key]['name'])) {
+      $vocabulary = &$form[$key];
+
+      $row = array();
+      $row[] = drupal_render($vocabulary['name']);
+      if (isset($vocabulary['weight'])) {
+        $vocabulary['weight']['#attributes']['class'] = array('vocabulary-weight');
+        $row[] = drupal_render($vocabulary['weight']);
+      }
+      $row[] = drupal_render($vocabulary['edit']);
+      $row[] = drupal_render($vocabulary['list']);
+      $row[] = drupal_render($vocabulary['add']);
+      $rows[] = array('data' => $row, 'class' => array('draggable'));
+    }
+  }
+
+  $header = array(t('Vocabulary name'));
+  if (isset($form['actions'])) {
+    $header[] = t('Weight');
+    drupal_add_tabledrag('taxonomy', 'order', 'sibling', 'vocabulary-weight');
+  }
+  $header[] = array('data' => t('Operations'), 'colspan' => '3');
+  return theme('table', array('header' => $header, 'rows' => $rows, 'empty' => $empty, 'attributes' => array('id' => 'taxonomy'))) . drupal_render_children($form);
 }
 
 
@@ -784,6 +840,8 @@ function og_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
 
   $group = entity_load_single($group_type, $gid);
   list(,, $group_bundle) = entity_extract_ids($group_type, $group);
+
+  $form['machine_name']['#element_validate'][] = 'og_vocab_machine_name_validate';
 
   $form['og_vocab_relation'] = array(
     '#type' => 'value',
@@ -853,7 +911,7 @@ function og_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
 
       module_load_include('inc', 'field_ui', 'field_ui.admin');
       $widget_types = field_ui_widget_type_options('entityreference');
-      unset($widget_types['og_vocab_complex']);
+      unset($widget_types['og_vocab_complex'], $widget_types['og_complex']);
 
       $element_name = "og_vocab[$entity_type:$bundle][status]";
       $states = array(
@@ -889,6 +947,36 @@ function og_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
     }
   }
   $form['#submit'][] = 'og_vocab_form_taxonomy_form_vocabulary_submit';
+}
+
+/**
+ * Element validate; Auto-set a new machine name if vocabulary already
+ * exists.
+ */
+function og_vocab_machine_name_validate($element, &$form_state) {
+  if (empty($form_state['values']['machine_name'])) {
+    return;
+  }
+
+  $machine_name = $form_state['values']['machine_name'];
+
+  // Set the static variable to "skip" to prevent altering while we verify
+  // the machine name doesn't exist yet.
+  $cache = &drupal_static('og_vocab_query_taxonomy_vocabulary_load_multiple_alter', FALSE);
+  $cache = 'skip';
+
+  if (!taxonomy_vocabulary_machine_name_load($machine_name)) {
+    return;
+  }
+
+  // Start iterating over machine names until we hit one that doesn't
+  // exist yet.
+  $i = 1;
+  while (taxonomy_vocabulary_machine_name_load($machine_name)) {
+    $machine_name = substr($machine_name, 0, 32 - strlen($i)) . $i;
+    ++$i;
+  }
+  form_set_value($element, $machine_name, $form_state);
 }
 
 /**
@@ -1089,8 +1177,14 @@ function og_vocab_is_group_admin_context() {
   if (strpos($item['path'], 'group/') === 0 && !empty($item['map'][2])) {
     return array('group_type' => $item['map'][1], 'gid' => $item['map'][2]);
   }
-  if (module_exists('og_context') && $context = og_context()) {
-    return $context;
+
+  // Iterate over modules implementing context, and return early once
+  // a context was found.
+  foreach (module_implements('og_vocab_is_admin_context') as $module) {
+    $function = $module . '_og_vocab_is_admin_context';
+    if ($context = $function()) {
+      return $context;
+    }
   }
 }
 

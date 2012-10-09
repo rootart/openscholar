@@ -18,6 +18,7 @@
   color: #293352;
  } 
  
+.biblio-title a, .biblio-title-chicago a,
 p a,
 p a:visited,
 #content-column li a {color:#4E84C4;}

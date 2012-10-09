@@ -158,6 +158,7 @@ h4 a {
     font-size: 1.3em;
 }
 
+.field-type-file img,
 img,
 a img {
   border: 0;

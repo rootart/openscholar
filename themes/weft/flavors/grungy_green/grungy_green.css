@@ -9,7 +9,8 @@ body {
 #menu-bar {
   background: url('images/menu-strip-grungy-green.png') #868C5F;
   }
-
+  
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   color: #898F47;
   }

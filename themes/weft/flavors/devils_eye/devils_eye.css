@@ -10,6 +10,7 @@ body {
   background: url('images/menu-strip-devil-eye.png') #D9523C;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   color:#833426;
   }

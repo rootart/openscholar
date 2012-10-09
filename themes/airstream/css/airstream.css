@@ -13,6 +13,7 @@ body.navbar-off {
   margin-top: 38px;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   color:#306696;
   font-style: italic;

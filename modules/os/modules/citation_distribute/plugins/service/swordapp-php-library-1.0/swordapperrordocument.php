@@ -1,7 +1,7 @@
 <?php
 
-require_once("../../service/swordapp-php-library-1.0/swordappentry.php");
-require_once("../../service/swordapp-php-library-1.0/utils.php");
+require_once("swordappentry.php");
+require_once("utils.php");
 
 class SWORDAPPErrorDocument extends SWORDAPPEntry {
 

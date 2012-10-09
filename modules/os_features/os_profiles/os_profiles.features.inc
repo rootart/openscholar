@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /**
  * @file
  * os_profiles.features.inc
@@ -33,7 +31,7 @@ function os_profiles_views_api() {
 function os_profiles_image_default_styles() {
   $styles = array();
 
-  // Exported image style: profile_full
+  // Exported image style: profile_full.
   $styles['profile_full'] = array(
     'name' => 'profile_full',
     'effects' => array(
@@ -55,7 +53,7 @@ function os_profiles_image_default_styles() {
     ),
   );
 
-  // Exported image style: profile_thumbnail
+  // Exported image style: profile_thumbnail.
   $styles['profile_thumbnail'] = array(
     'name' => 'profile_thumbnail',
     'effects' => array(
@@ -96,4 +94,3 @@ function os_profiles_node_info() {
   );
   return $items;
 }
-

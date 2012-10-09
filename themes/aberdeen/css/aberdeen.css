@@ -43,7 +43,7 @@ padding-bottom: 2000px;
 .region-header-third {text-align: right;}
 
 /* TYPOGRAPHY*/ 
- 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {color:#293352;text-decoration:none;}
 a:hover {text-decoration:underline;}
 

@@ -373,7 +373,7 @@ function os_theme() {
     ),
     'openscholar_login' => array(
       'variables' => array(
-        'link_text' => 'Login',
+        'link_text' => 'Admin Login',
         'attributes' => array(
           'class' => 'footer-login',
         ),
@@ -948,13 +948,13 @@ function os_views_pre_build(&$view) {
   }
 }
 
-function os_admin_paths_alter(&$paths) {
-  foreach ($paths as $k => $p) {
-    if (strpos($k, 'node/*/edit') !== FALSE/* || strpos($k, 'node/add') !== FALSE*/) {
-      unset($paths[$k]);
-    }
-  }
-}
+//function os_admin_paths_alter(&$paths) {
+//  foreach ($paths as $k => $p) {
+//    if (strpos($k, 'node/*/edit') !== FALSE/* || strpos($k, 'node/add') !== FALSE*/) {
+//      unset($paths[$k]);
+//    }
+//  }
+//}
 
 /**
  * Implements hook_node_view_alter().

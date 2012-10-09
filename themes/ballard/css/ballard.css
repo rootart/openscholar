@@ -56,7 +56,7 @@ p.copy a.poweredby {
 
 
 /* TYPOGRAPHY*/ 
- 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {color:#293352;text-decoration:none;}
 a:hover {text-decoration:underline;}
 

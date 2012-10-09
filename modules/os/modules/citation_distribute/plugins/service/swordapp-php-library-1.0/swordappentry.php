@@ -1,12 +1,12 @@
 <?php
 
-require_once("../../service/swordapp-php-library-1.0/utils.php");
+require_once("utils.php");
 
 class SWORDAPPEntry {
 
 	// The HTTP status code returned
 	public $sac_status;
-	
+
 	// The XML returned by the deposit
 	public $sac_xml;
 
@@ -19,7 +19,7 @@ class SWORDAPPEntry {
 	// The atom:content value
 	public $sac_content_src;
 	public $sac_content_type;
-	
+
 	// The authors
 	public $sac_authors;
 
@@ -100,10 +100,10 @@ class SWORDAPPEntry {
 	function buildhierarchy($sac_dr, $sac_ns) {
 		// Set the default namespace
 		$sac_dr->registerXPathNamespace('atom', 'http://www.w3.org/2005/Atom');
-		
+
 		// Parse the results
 		$this->sac_id = $sac_dr->children($sac_ns['atom'])->id;
-		$sac_contentbits = $sac_dr->xpath("atom:content"); 
+		$sac_contentbits = $sac_dr->xpath("atom:content");
 		if (!empty($sac_contentbits)) {
 			$this->sac_content_src = $sac_contentbits[0]['src'];
 			$this->sac_content_type = $sac_contentbits[0]['type'];
@@ -114,13 +114,13 @@ class SWORDAPPEntry {
 			$sac_theauthor = $sac_author->children($sac_ns['atom'])->name . "";
 			$this->sac_authors[] = $sac_theauthor;
 		}
-		
+
 		// Store the contributors
 		foreach ($sac_dr->children($sac_ns['atom'])->contributor as $sac_contributor) {
 			$sac_thecontributor = $sac_contributor->children($sac_ns['atom'])->name . "";
 			$this->sac_contributors[] = $sac_thecontributor;
 		}
-		
+
 		// Store the links
 		foreach ($sac_dr->xpath("atom:link") as $sac_link) {
 			$this->sac_links[] = sac_clean($sac_link[0]['href']);

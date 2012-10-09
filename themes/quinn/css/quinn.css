@@ -7,7 +7,7 @@ html, body {
 
   }
 
-
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   text-decoration: none;
   padding: 0 2px 0 2px;
@@ -271,7 +271,6 @@ ul.nice-menu-right li.menuparent a:hover {
 .region-sidebar-second a:visited,
 .term-head {
   padding-top: 7px;
-  padding-bottom: 7px;
   color: #666;
   display:block;
   font-weight: bold;
@@ -282,11 +281,11 @@ ul.nice-menu-right li.menuparent a:hover {
   background: #bbb;
   color: #000;
   }
-
+/*
 .region-sidebar-first .term-head a,
 .region-sidebar-second .term-head a {
   display:inline !important;
-  }
+  }*/
 
 .region-sidebar-first a.active,
 .region-sidebar-first .active-trail a,
@@ -298,14 +297,14 @@ ul.nice-menu-right li.menuparent a:hover {
   }
 
 /* Nodes */
-
+/*
 #content-column .node,
 body.section-node-edit #content,
 body.section-node-add #content,
 #comments {
   padding: 1.5em;
   padding-top:0;
-  }
+  } */
 
 #content-column .node {
   border-bottom: 1px solid #e5e5e4;

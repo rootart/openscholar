@@ -60,10 +60,11 @@ function os_classes_node_view($node, $view_mode, $langcode) {
     'title' => t("Add class material"),
     'href' => 'node/add/class-material',
     'query' => array('field_class' => $node->nid),
+    'attributes' => array('class' => array('class_material_field_class_anchor')),
   );
   $node->content[$name]['#markup'] = theme('links', array(
       'links' => $links,
-      'attributes' => array('class' => array('node-reference-node')),
+      'attributes' => array('class' => array('node-reference-node', 'class_material_field_class')),
     ));
 }
 

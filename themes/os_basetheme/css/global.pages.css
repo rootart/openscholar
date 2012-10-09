@@ -319,6 +319,20 @@ ul.links li {
     padding-left: 15px;
 }
 
+
+/* ADD CLASS ICON */
+ul.class_material_field_class {
+	list-style:none;
+	margin-left:0;
+    }
+
+ul.class_material_field_class a.class_material_field_class_anchor {
+    background: url("../images/scholarbase-sprite.png") 0 -492px no-repeat;
+    padding-left: 15px;
+
+}
+
+
 /* MEDIA WIDGET ICONS */
 
 .media-widget a {margin-right:10px;}
@@ -349,6 +363,11 @@ ul.links li {
 
 .more-link /* Aggregator, blog, and forum more link */ {
 	float: right;
+}
+
+.block block-os-search-db .block-inner {
+	margin-left: 0;
+    margin-right: 0;
 }
 
 
@@ -616,6 +635,10 @@ div.ctools-modal-content .modal-content .modal-throbber-wrapper img {
 
 /**	 QUICK TABS**/
 	
+.block-boxes-os_boxes_tabs .ui-widget-content {
+    background: none;
+}
+	
 .ui-tabs .ui-tabs-panel {
 /* IE10 Consumer Preview */ 
 background-image: -ms-linear-gradient(top, #F5F2F2 0%, #FFFFFF 100%);
@@ -643,6 +666,46 @@ border-top:1px solid #ccc;
 	border-bottom:none;
 }	
 	
-	
+/* JCAROUSEL OVERRIDE STYLES */
+
+
+.jcarousel-skin-default .jcarousel-container-horizontal {
+    width: 80%;
+    padding: 10px;
+    margin: 0;
+}
+
+.jcarousel-container {
+background:#efefef;
+border:1px solid #CCC;
+}
+
+.jcarousel-container .jcarousel-clip-horizontal {
+  width: auto;
+}
+
+
+.jcarousel-container a.jcarousel-next,
+.jcarousel-container a.jcarousel-next:hover {
+ 			background-image: url('../images/jcarou-next-horizontal.png'); 
+ 			background-color:none;
+ 			right: -14px; 
+ 			top: 46px;
+ 			width:22px;
+ 			height:22px;
+ 			background-position: -3px -3px;
+ 			}
+
+.jcarousel-container a.jcarousel-prev,
+.jcarousel-container a.jcarousel-prev:hover {
+			background-image: url('../images/jcarou-prev-horizontal.png');
+			left: -15px; 
+			top: 46px;
+			width:22px;
+			height:22px;
+			background-position: -1px -3px;
+	       }
+
+
 	
 	

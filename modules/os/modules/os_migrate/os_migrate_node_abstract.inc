@@ -343,9 +343,30 @@ abstract class AbstractNodeOSMigration extends OSMigration {
       $fields = array(
         'description' => 'description',
         'display' => 'list',
-        'filepath' => 'field_upload'
+        'filepath' => 'field_upload',
+        'file_destination' => 'file_destination'
       );
-      parent::os_migrate_prepare_files($files_query->execute(), $row, 'field_upload', $fields);
+
+      $file_destination = "files";
+      if(isset($current_row->group_nid)){
+        $query = self::d6_db_select('purl', 'p')
+          ->fields('p', array('value'))
+          ->condition('p.id', $current_row->group_nid, '=')
+          ->condition('p.provider', 'spaces_og', '=');
+        $purl = $query->execute()->fetchField();
+        if($purl){
+          $file_destination = "{$purl}/files";
+        }
+      }
+
+      $query = $files_query->execute();
+      $files = array();
+      while ($file_row = $query->fetchObject()) {
+        $file_row->file_destination = $file_destination;
+        $files[] = $file_row;
+      }
+
+      parent::os_migrate_prepare_files($files, $row, 'field_upload', $fields);
     }
   }
 
@@ -359,10 +380,11 @@ abstract class AbstractNodeOSMigration extends OSMigration {
       )));
       $this->addFieldMapping('field_upload:destination_file', 'filepath');
       $this->addFieldMapping('field_upload:source_dir')->defaultValue(variable_get('os_migrate_files', FALSE));
+      $this->addFieldMapping('field_upload:destination_dir', 'file_destination');
+
       //good defaults
       $this->addUnmigratedDestinations(parent::subfields('field_upload', array(
         'file_class',
-        'destination_dir',
         'file_replace',
         'preserve_files'
       )));

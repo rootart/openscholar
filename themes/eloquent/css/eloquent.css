@@ -15,6 +15,7 @@ body {
   padding: 0 30px
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
     color:#723319;
     }
@@ -27,8 +28,10 @@ h1, h2, h3, #header-container {
     color:#484b63;
     font-weight: normal;
     }
+    
+    
 
-h2 {
+h2, h1#page-title {
     font-size: 20px;
     }
 
@@ -115,6 +118,10 @@ img {
 #header-container a:hover {
     color:#F9E433;
     }
+
+#menu-bar {
+  padding:5px;
+  }
 
 #menu-bar ul {
   text-align:center;

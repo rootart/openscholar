@@ -19,7 +19,7 @@ function citation_distribute_menu() {
     'page arguments' => array('citation_distribute_admin' ),
     'file' => 'citation_distribute.admin.inc',
     'access arguments' => array('administer citation distribute' ),
-  //	'type' => MENU_CALLBACK,
+  	//'type' => MENU_CALLBACK,
   );
   $items['admin/config/openscholar/citation_distribute/citation_distribute'] = $items['admin/config/openscholar/citation_distribute'];
   $items['admin/config/openscholar/citation_distribute/citation_distribute']['type'] = MENU_DEFAULT_LOCAL_TASK;
@@ -147,6 +147,10 @@ function citation_distribute_node_update($node) {
 function _citation_distribute_node_apply_plugins($node) {
   $distributed = array();
   $autoflags = variable_get('citation_distribute_autoflags', array());
+  $citation_distribute_node_object = &drupal_static('citation_distribute_node_object');
+  if (!isset($citation_distribute_node_object)) {
+    $citation_distribute_node_object = $node;
+  }
 
   foreach( _citation_distribute_plugins() as $plugin ) {
     if (isset($node->{$plugin['name']})) {
@@ -406,6 +410,50 @@ function citation_distribute_ctools_plugin_type() {
 }
 
 /**
+ * Implementats of hook_cron()
+ *
+ * In batch mode, process pending updates during cron jobs
+ * nodes have already been flagged, but not distributed yet
+ * for metadata nodes, this is meaningless, but updates their db status
+ */
+function citation_distribute_cron() {
+  $plugins = _citation_distribute_plugins();
+  $commands = array('distribute', 'remove');
+
+  $plugin_names = array();
+  foreach($plugins as $delta => $plugin) {
+    if (isset($plugin['title'])) {
+      $plugin_names_class[$plugin['name']] = $delta;
+    }
+  }
+
+  $query = db_select('citation_distribute', 'cd')
+    ->condition('batch_command', $commands, 'IN')
+    ->condition('plugin', array_keys($plugin_names_class), 'IN')
+    ->range(0, variable_get('citation_distribute_cron_limit', 10))
+    ->fields('cd', array('nid', 'plugin', 'batch_command'));
+
+//  $query->join('node', 'n', 'n.nid = cd.nid');
+//  $query->condition('n.status', '1');
+  $result = $query->execute();
+
+  while ($row = $result->fetchObject()) {
+    switch ($row->batch_command) {
+      case 'distribute':
+        _citation_distribute_distribute($row->nid, $plugin_names_class[$row->plugin]); //push the content
+        _citation_distribute_update_db($row->plugin, $row->nid);  //clear the cron queue
+        break;
+
+      case 'remove':
+        //hypothetically we could request that a service delete content here.  depends on the service.
+        _citation_distribute_unlist_db($row->plugin, $row->nid);  //clear the cron queue
+        break;
+    }
+  }
+}
+
+
+/**
  * @function _citation_distribute_plugins()
  *
  * @return
@@ -519,7 +567,7 @@ function _citation_distribute_unlist_db($plugin, $nid, $batch_command = '') {
   $query = _citation_distribute_get_query($plugin, $nid);
   $type = get_class($query);
   if (strpos($type, 'UpdateQuery') === 0) {
-    $query->fields('cd', array(
+    $query->fields(array(
       'noauto' => 1,
       'batch_command' => $batch_command,
     ));

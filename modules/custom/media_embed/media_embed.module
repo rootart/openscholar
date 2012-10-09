@@ -42,7 +42,7 @@ function media_embed_ctools_plugin_api($module, $api) {
 
 /**
  * Implements hook_media_browser_plugin_info().
- */
+ *
 function media_embed_media_browser_plugin_info() {
   $plugins = array();
   $plugins['media_embed'] = array(
@@ -71,99 +71,16 @@ function media_embed_permission() {
   );
 }
 
-function media_embed_add($form, &$form_state = array(), $types = NULL) {
-  $file = file_uri_to_object("", FALSE);
-  $file->type = 'html';
-  $form['#file'] = $file;
-  $form_state['file'] = $file;
-
-  $old = $form;
-
-  field_attach_form('file', $file, $form, $form_state);
-
-  $diff = array_diff_key($form, $old);
-
-  // remove unnecessary fields
-  $whitelist = array(
-    'field_html_title',
-    'field_html_code',
-    'og_group_ref',
+function media_embed_media_internet_providers() {
+  return array(
+    'MediaInternetEmbedHandler' => array(
+      'title' => 'HTML',
+    ),
   );
-  foreach ($diff as $key => $value) {
-    if (strpos($key, '#' === 0) || in_array($key, $whitelist)) {
-      $old[$key] = $value;
-    }
-  }
-
-  $form = $old;
-
-  $white = media_embed_get_whitelist();
-  if (count($white)) {
-    $form['whitelist'] = array(
-      '#markup' => t('You can add html with iframe, object, embed and script tags from the following sites:').'<br>'.implode(', ', $white),
-    );
-  }
-  else {
-    $form['whitelist'] = array(
-      '#markup' => t('You may not add html with iframe, object, embed or script tags. Ask your site administrator to remedy this.'),
-    );
-  }
-  $form['whitelist']['#weight'] = 4;
-
-  $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-  );
-  return $form;
 }
 
-/**
- * Implements hook_validate.
- * Ensures the HTML code given doesn't have any links to dangerous URLs
- * @param unknown_type $form
- * @param unknown_type $form_state
- */
-function media_embed_add_validate($form, &$form_state) {
-  // Fields validation
-  field_attach_form_validate('file', $form_state['file'], $form, $form_state);
-
-  $html = field_get_items('file', $form_state['file'], 'field_html_code');
-  $html = trim($html[0]['value']);
-
-  if (!media_embed_check_src($html)) {
-    form_set_error('embed_code', 'This html contains an iframe, object, embed or script tag from an untrusted domain. If you believe this domain is safe, contact your site administrator.');
-  }
-}
-
-function media_embed_add_submit($form, &$form_state) {
-  $html = field_get_items('file', $form_state['file'], 'field_html_code');
-  $html = trim($html[0]['value']);
-
-  // create the new file entity
-  $uri = 'embed://'.md5($html);
-  $file = file_uri_to_object($uri);
-  $titles = field_get_items('file', $form_state['file'], 'field_html_title');
-  $file->filename = trim($titles[0]['value']);
-  $file->type = 'html';
-
-  // save the fields and entity
-  field_attach_submit('file', $file, $form, $form_state);
-  $file = file_save($file);
-  $form_state['file'] = $file;
-
-  // Redirect to the file edit page after submission.
-  if (media_access('edit')) {
-    $destination = array('destination' => 'admin/content/file');
-    if (isset($_GET['destination'])) {
-      $destination = drupal_get_destination();
-      unset($_GET['destination']);
-    }
-    $form_state['redirect'] = array('file/' . $file->fid . '/edit', array('query' => $destination + drupal_get_query_parameters()));
-  }
-  else {
-    $form_state['redirect'] = 'admin/content/file';
-  }
+function media_embed_form_media_internet_add_alter(&$form, &$form_state) {
+  $form['embed_code']['#type'] = 'textarea';
 }
 
 /**
@@ -313,21 +230,19 @@ function media_embed_file_default_displays() {
   $default_displays = array();
 
   $default_styles = array();
-  foreach(media_type_get_types() as $name => $type) {
     // For default and Large view modes, use the default width and height from
     // hook_file_formatter_info().
-    $default_styles[$name . '__default__media_embed'] = array();
-    $default_styles[$name . '__default__media_embed_thumbnail'] = array();
+  $default_styles['html__default__media_embed'] = array();
+  $default_styles['html__default__media_embed_thumbnail'] = array();
 
-    // For the Preview view mode, match the width and height of the square
-    // thumbnail in media_image_default_styles().
-    $default_styles[$name . '__media_preview__media_embed_thumbnail'] = array('width' => '180', 'height' => '180');
+  // For the Preview view mode, match the width and height of the square
+  // thumbnail in media_image_default_styles().
+  $default_styles['html__media_preview__media_embed_thumbnail'] = array('width' => '180', 'height' => '180');
 
-    // For the Original view mode, set width and height to empty, so that they
-    // use what's returned by the oEmbed response.
-    $default_styles[$name . '__media_original__media_embed'] = array('width' => '', 'height' => '');
-    $default_styles[$name . '__media_original__media_embed_thumbnail'] = array('width' => '', 'height' => '');
-  }
+  // For the Original view mode, set width and height to empty, so that they
+  // use what's returned by the oEmbed response.
+  $default_styles['html__media_original__media_embed'] = array('width' => '', 'height' => '');
+  $default_styles['html__media_original__media_embed_thumbnail'] = array('width' => '', 'height' => '');
 
   foreach ($default_styles as $display_name => $settings) {
     $default_displays[$display_name] = (object) array(
@@ -364,4 +279,8 @@ function media_embed_file_formatter_media_embed_view($file, $display, $langcode)
       //return array();
     }
   }
+}
+
+function media_embed_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  unset($form['media_title']);
 }

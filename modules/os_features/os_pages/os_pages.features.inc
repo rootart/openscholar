@@ -1,7 +1,4 @@
 <?php
-// $Id$
-
-
 /**
  * @file
  * os_pages.features.inc
@@ -33,4 +30,3 @@ function os_pages_node_info() {
   );
   return $items;
 }
-

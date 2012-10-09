@@ -6,6 +6,7 @@ h1#page-title {
   color: #ae3d3d;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a,
 a:visited {
   color:#8d4607;

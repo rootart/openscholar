@@ -32,6 +32,10 @@ class os_sv_list_box extends os_boxes_default {
       'all' => t('All')
     ) + os_get_bundles(1);
 
+    if (isset($content_types['media_gallery'])) {
+      $content_types['image'] = t('Images');
+    }
+
     $form['#submit'] = array(
       'os_sv_list_form_submit'
     );
@@ -124,7 +128,7 @@ class os_sv_list_box extends os_boxes_default {
     $block = parent::render();
     $efq = $this->get_default_query();
     $options = $this->options;
-    $page_num = isset($_GET['page'])?$_GET['page']:0;
+    $page_num = isset($_GET['page']) ? $_GET['page'] : 0;
 
     //exceptions
     switch ($options['content_type']) {
@@ -155,7 +159,6 @@ class os_sv_list_box extends os_boxes_default {
         }
         break;
 
-
       case 'biblio':
         $page = 0; //add pager properly later
         $items = $options['number_of_items'];
@@ -175,6 +178,27 @@ class os_sv_list_box extends os_boxes_default {
 
         $biblio_nids = $query->execute()->fetchCol();
         break;
+
+      case 'image':
+        $image_query = new EntityFieldQuery();
+        $image_query->entityCondition('entity_type', 'file');
+        if ($space = spaces_get_space()) {
+          $image_query->entityCondition(OG_AUDIENCE_FIELD, 'target_id', $space->id);
+        }
+
+        $sorts = array(
+          'sort_newest' => array('timestamp', 'DESC'),
+          'sort_oldest' => array('timestamp', 'ASC'),
+          'sort_alpha' => array('filename', 'ASC'),
+        );
+        $sort = (isset($sorts[$options['sort_by']])) ? $sorts[$options['sort_by']] : $sorts['sort_newest'];
+        $image_query->propertyOrderBy($sort[0], $sort[1]);
+
+        if ($options['pager']) {
+          $image_query->pager($options['number_of_items']);
+          $image_page = $image_query->pager['element'];
+        }
+        break;
     }
 
     // content type
@@ -193,11 +217,21 @@ class os_sv_list_box extends os_boxes_default {
     $this->$sort_func($efq);
 
     // display
-    if ($options['content_type'] != 'biblio') {
-      $result = $efq->execute();
-      $nids = isset($result['node']) ? array_keys($result['node']) : array();
-    } else {
-      $nids = $biblio_nids;
+    switch ($options['content_type']) {
+      case 'biblio':
+        $nids = $biblio_nids;
+        break;
+
+      case 'image':
+        $result = $image_query->execute();
+        $nids = isset($result['file']) ? array_keys($result['file']) : array();
+        $page = (isset($image_page)) ? $image_page : NULL;
+        break;
+
+      default:
+        $result = $efq->execute();
+        $nids = isset($result['node']) ? array_keys($result['node']) : array();
+        break;
     }
 
     $more_link = FALSE;
@@ -210,31 +244,44 @@ class os_sv_list_box extends os_boxes_default {
 
       $display_func = (method_exists($this, $options['display'])) ? $options['display'] : 'display_title';
       $nodes = node_load_multiple($nids);
+
+      if ($options['content_type'] == 'image') {
+        $display_func = 'display_image';
+        $nodes = file_load_multiple($nids);
+      }
+
       $block['content'] = $this->$display_func($nodes);
     }
 
     // pager widget
     $pager = '';
-    if ($options['pager']) {
+    if ($options['pager'] && $block['content']) {
       // theme_pager();
       $parameters = array(
-        'sv_list_box_delta' => $this->delta
+        'sv_list_box_delta' => $this->delta,
+        'pager_id' => $page,
       );
       $pager = theme('views_mini_pager', array(
         'parameters' => $parameters,
         'element' => $page,
+        'quantity' => $options['number_of_items'],
       ));
     }
 
     // more link
-    if ($options['more'] && $more_link) {
+    if ($options['more'] && $more_link && $block['content']) {
       $block['content'] .= l($options['more_text'], $options['more_link'], array('attributes' => array('class' => array('more-link'))));
     }
 
     drupal_add_library('system', 'drupal.ajax');
     drupal_add_js(drupal_get_path('module', 'os_sv_list'). '/os_sv_list_display.js');
-    $block['content'] = '<div id="box-' . $this->delta . '-page" data-page="'.$page_num.'">' . $block['content'] . '</div>' . $pager;
-    return $block;
+
+    if ($block['content']) {
+      $block['content'] = '<div id="box-' . $this->delta . '-page" data-page="'.$page_num.'" data-delta="'.$this->delta.'">' . $block['content'] . '</div>' . $pager;
+      return $block;
+    } else {
+      return array();
+    }
   }
 
   // get_default_query_query - humble beginnings of the EFQ
@@ -296,6 +343,18 @@ class os_sv_list_box extends os_boxes_default {
       'items' => $items,
       'type' => 'ul'
     ));
+  }
+
+  function display_image($files) {
+    $html = '';
+    foreach ($files as $image) {
+      $variables = array(
+        'path' => $image->uri,
+        'attributes' => array(),
+      );
+      $html .= theme('image', $variables);
+    }
+    return $html;
   }
 
 }

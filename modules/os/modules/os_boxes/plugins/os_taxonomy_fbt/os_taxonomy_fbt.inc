@@ -148,7 +148,7 @@ class os_taxonomy_fbt extends os_boxes_default {
       $this->options['bundles'] = array();
     }
 
-    $block['content'] = theme('volcabulary_term_list', array(
+    $block['content'] = theme('os_taxonomy_vocabulary_item_list', array(
       'vid' => $this->options['vocabulary'],
       'options' => $this->options,
     ));

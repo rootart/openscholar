@@ -199,43 +199,11 @@ function _os_wysiwyg_get_theme_css($theme){
 }
 
 /**
- * Implements hook_media_browser_plugins_alter.
- * Removes the default library from the Media browser. A View has replaced it.
- */
-function os_wysiwyg_media_browser_plugins_alter(&$plugins){
-  unset($plugins['library']);
-}
-
-/**
  * Adds the pdw plugin to the wysiwyg
  */
 function os_wysiwyg_wysiwyg_include_directory($type){
   if ($type == 'plugins') {
     return $type;
-  }
-}
-
-function os_wysiwyg_media_wysiwyg_allowed_view_modes_alter(&$view_modes, $file) {
-  $scheme = file_uri_scheme($file->uri);
-  switch ($scheme) {
-    case 'oembed':
-      $temp['media_original'] = $view_modes['media_original'];
-      $view_modes = $temp;
-    break;
-    case 'public':
-      $mime = explode('/', $file->filemime);
-      $type = $mime[0];  // I do this to get the type in case bundles for files are ever expanded out of just mime type
-      if ($type == 'image') {
-        $temp['media_original'] = $view_modes['media_original'];
-        $temp['media_small'] = $view_modes['media_small'];
-        $temp['media_large'] = $view_modes['media_large'];
-        $temp['media_link'] = $view_modes['media_link'];
-      }
-      else {  // until there is support for the audio or video tags, this is the best we can do for that kind of file.
-        $temp['media_link'] = $view_modes['media_link'];
-      }
-      $view_modes = $temp;
-    break;
   }
 }
 

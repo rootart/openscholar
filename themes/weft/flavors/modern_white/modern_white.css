@@ -10,6 +10,7 @@ body {
   background: url('images/menu-strip-modern-white.png') #FFFFFF;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   color: #57737F;
   }

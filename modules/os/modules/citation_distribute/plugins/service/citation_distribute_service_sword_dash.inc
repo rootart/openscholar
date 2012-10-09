@@ -18,13 +18,21 @@ class citation_distribute_service_sword_dash extends citation_distribute_service
 	public $name = 			'dash';
 	public $title = 		'DASH';
 	public $location = 	'http://dash.harvard.edu';
-	public $username = 	'swap@lists.iq.harvard.edu';
-	public $password =  'citation_distribute_dash_password';    //variable to fetch for this password
+	public $username;
+	public $password;
+	//public $username = 	'swap@lists.iq.harvard.edu';
+	//public $password =  'citation_distribute_dash_password';    //variable to fetch for this password
 	public $root_in  =  '/tmp/sword';
 	public $subdir_in = 'dash';
 	public $root_out =  '/tmp/sword';
 	public $file_out =  'dash_files.zip';
 	public $obo  	   =  '';
+
+	public function __construct() {
+	  parent::__construct();
+	  $this->username = variable_get('citation_distribute_service_dash_username');
+	  $this->password = variable_get('citation_distribute_service_dash_password');
+	}
 
 	//variable or function for determining school.
 
@@ -34,9 +42,14 @@ class citation_distribute_service_sword_dash extends citation_distribute_service
 	public function validate($a3) {
 
 	  if (is_array($a3)) {
-	    $files = $a3['#post']['files'];
+	    $files = $a3['values']['field_upload'];
 	  } elseif (is_int($a3) && $node = node_load($a3)) {
-	    $files = $node->files;
+	    $files = $node->field_upload;
+	    if (empty($files)) {
+	      //during node insert, files may not be availabe.  if so, use staticly cached node object.
+  	    $citation_distribute_node_object = &drupal_static('citation_distribute_node_object');
+  	    $files = $citation_distribute_node_object->field_upload;
+	    }
 	  } else {
 	    //not sure what a3 is anymore, so bail.
 	    return FALSE;
@@ -45,13 +58,39 @@ class citation_distribute_service_sword_dash extends citation_distribute_service
 		if (count($files) > 0) { // or body-> full text?
 			return TRUE;
 		} else {
-			form_set_error('files', $this->title . ' requires the full text document be attached.');
+			form_set_error('files', $this->title . ' requires the full text document be uploaded as an attachment.');
 			return FALSE;
 
 			//TODO: check if a user has set his affiliation.  if not, send them to where that setting can be adjusted.
 			//TODO: add a harvard affiliation setting.  can plugins modify admin pages I wonder?
 		}
 
+	}
+
+	//if present, this form will be used as an admin menu for CD:repec
+	public function admin_form() {
+	  $form = array();
+	  $form['dash'] = array(
+	    '#type' => 'fieldset',
+	    '#title' => t('Configure DASH'),
+	    '#collapsible' => FALSE,
+	    '#collapsed' => FALSE,
+	  );
+
+	  $form['dash']['citation_distribute_service_dash_username'] = array(
+	    '#type' => 'textfield',
+	    '#title' => 'DASH username',
+	    '#description' => 'Desposits to DASH will be made via this user account.',
+      '#default_value' => variable_get('citation_distribute_service_dash_username'),
+    );
+
+	  $form['dash']['citation_distribute_service_dash_password'] = array(
+	    '#type' => 'textfield',
+	    '#title' => 'DASH password',
+	    '#default_value' => variable_get('citation_distribute_service_dash_password'),
+	  );
+
+	  return $form;
 	}
 
   /*
@@ -61,15 +100,16 @@ class citation_distribute_service_sword_dash extends citation_distribute_service
 	 */
 	public function get_deposit_url($workspaces, $nid) {
 		//get email address
-		$query = 'SELECT u.mail FROM {node} n INNER JOIN {users} u ON n.uid=u.uid WHERE n.nid = "%d" LIMIT 1';
-		$email = db_result(db_query($query, $nid));
+		$query = db_select('users', 'u');
+		$query->join('node', 'n', 'n.uid = u.uid');
+		$query->condition('n.nid', $nid);
+		$query->fields('u', array('mail'));
+		$email = $query->execute()->fetchColumn();
+		//$email = db_result(db_query($query, $nid));
 
 		//get department of email domain
-		$department = $this->department_domains[ array_pop(explode('@', $email)) ];
-		if (!$department) {
-			//maybe check for any harvard style domain before defaulting...
-			$department = $this->department_domains['harvard.edu'];
-		}
+		$domain = end(explode('@', $email));
+		$department = (isset($this->department_domains[$domain])) ? $this->department_domains[$domain] : $this->department_domains['harvard.edu'];
 
 		//
 		foreach ($workspaces as $workspace) {

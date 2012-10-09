@@ -1,7 +1,4 @@
 <?php
-// $Id$
-
-
 /**
  * @file
  * os_events.features.inc
@@ -44,4 +41,3 @@ function os_events_node_info() {
   );
   return $items;
 }
-

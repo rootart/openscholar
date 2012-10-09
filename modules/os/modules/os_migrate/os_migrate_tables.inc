@@ -52,6 +52,7 @@ class VariableTableMigration extends TableCopyMigration {
     $this->whitelist = array('mollom_private_key', 'mollom_public_key', 'os_mailchimp_api', 'os_mailchimp_list', 'olark_code',
       'apachesolr_host', 'apachesolr_path', 'apachesolr_port', 'iqss_rbuild_default_url', 'site_mail',
       'site_mission', 'site_name', 'site_offline_message', 'shorten_bitly_login', 'shorten_bitly_key',
+      'iqss_gking::alternate_theme_nodes', 'iqss_gking::override_child_terms', 'iqss_gking::heading_disabled_terms',
     );
 
     $this->whitelist = array_merge($this->whitelist, parent::subfields('citation_distribute', array('dash_password', 'module_mode', 'service_googlescholar_auto_flag', 'service_repec_archive_code', 'service_repec_inst_name', 'service_repec_maintainer_email', 'service_repec_maintainer_name', 'service_repec_provider_homepage', 'service_repec_provider_institution', 'service_repec_title', 'service_repec_archive_path', 'service_repec_archive_url'), '_'));
@@ -96,6 +97,19 @@ class VariableTableMigration extends TableCopyMigration {
       variable_set('biblio_years_text', $years);
       return FALSE;
     }
+
+    //rename variables
+    $rename = array(
+      'iqss_gking::alternate_theme_nodes'  => 'gkplus_minitheme_nodes',
+      'iqss_gking::override_child_terms'   => 'gkplus_child_indent_terms',
+      'iqss_gking::heading_disabled_terms' => 'gkplus_hidden_heading_terms',
+    );
+
+    if (isset($rename[$row->name])) {
+      $row->name = $rename[$row->name];
+    }
+
+
   }
 
   //clear the menu cache after import.

@@ -10,6 +10,7 @@ body {
   background: url('images/menu-strip-asian-leaves.png') #9D7D2E;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
   color:#C74235;
   }

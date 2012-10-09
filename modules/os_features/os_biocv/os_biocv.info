@@ -9,6 +9,7 @@ dependencies[] = ctools
 dependencies[] = features
 dependencies[] = file
 dependencies[] = filefield_paths
+dependencies[] = media
 dependencies[] = og_ui
 dependencies[] = og_vocab
 dependencies[] = strongarm

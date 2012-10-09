@@ -269,7 +269,7 @@ function os_events_field_default_fields() {
             'library' => 0,
             'media_default--media_browser_1' => 'media_default--media_browser_1',
             'media_embed' => 0,
-            'media_internet' => 0,
+            'media_internet' => 'media_internet',
             'upload' => 'upload',
           ),
           'progress_indicator' => 'throbber',

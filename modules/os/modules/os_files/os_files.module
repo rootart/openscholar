@@ -9,6 +9,17 @@ define('OS_FILE_FILEPATH_MULTITENANT', '[vsite:site-purl]/files');
 define('OS_FILE_FILEPATH_SINGLETENANT', 'share');
 
 /**
+ * Implements hook_ctools_plugin_api().
+ */
+function os_files_ctools_plugin_api($module, $api) {
+  if ($module == 'file_entity' && $api == 'file_default_displays') {
+    return array(
+      'version' => 1,
+    );
+  }
+}
+
+/**
  * Implements hook_menu().
  */
 function os_files_menu() {
@@ -109,6 +120,10 @@ function os_files_download() {
   $args = func_get_args();
 
   if (module_exists('vsite')) {
+
+    // Add the menu entry as an arg.
+    array_unshift($args, 'files');
+
     $prefix = vsite_get_purl();
     if ($prefix) {
       // Add the prefix as an arg.
@@ -122,6 +137,136 @@ function os_files_download() {
   // Serve the file via the standard download handler.
   call_user_func_array('file_download',$args);
 }
+
+function os_files_entity_info_alter(&$info) {
+  $info['file']['view modes'] += array(
+    'os_files_large' => array(
+      'label' => t('Large Image (600px)'),
+      'custom settings' => TRUE,
+    ),
+    'os_files_med' => array(
+      'label' => t('Medium Image (400px)'),
+      'custom settings' => TRUE,
+    ),
+    'os_files_small' => array(
+      'label' => t('Small Image (200px)'),
+      'custom settings' => TRUE,
+    ),
+    'os_files_link' => array(
+      'label' => t('Link with icon'),
+      'custom settings' => TRUE,
+    ),
+  );
+}
+
+function os_files_image_default_styles() {
+  $styles = array(
+    'os_files_large' => array(
+      'effects' => array(
+        array(
+          'name' => 'image_scale',
+          'data' => array('width' => 600, 'height' => 600, 'upscale' => 0)
+        )
+      ),
+    ),
+    'os_files_medium' => array(
+      'effects' => array(
+        array(
+          'name' => 'image_scale',
+          'data' => array('width' => 400, 'height' => 400, 'upscale' => 0)
+        )
+      ),
+    ),
+    'os_files_small' => array(
+      'effects' => array(
+        array(
+          'name' => 'image_scale',
+          'data' => array('width' => 200, 'height' => 200, 'upscale' => 0)
+        )
+      ),
+    ),
+  );
+
+  return $styles;
+}
+
+function os_files_file_default_displays() {
+  $keys = array(
+    'image__os_files_large__file_image' => array('image_style' => 'os_files_large'),
+    'image__os_files_med__file_image' => array('image_style' => 'os_files_medium'),
+    'image__os_files_small__file_image' => array('image_style' => 'os_files_small'),
+  );
+
+  foreach (file_info_file_types()+array('default' => array()) as $type => $info) {
+    $keys["{$type}__os_files_link__os_link"] = array();
+  }
+
+  $displays = array();
+  foreach ($keys as $k => $settings) {
+    $displays[$k] = (object)array(
+      'api_version' => 1,
+      'name' => $k,
+      'status' => 1,
+      'weight' => 0,
+      'settings' => $settings,
+    );
+  }
+
+  return $displays;
+}
+
+/**
+ * File displays are {file_type}__{view_mode}__{formatter}
+ * Why they have to be called something different, I don't know
+ */
+function os_files_file_formatter_info() {
+  $formatters = array();
+
+  $formatters['os_link'] = array(
+    'label' => t('Link To File'),
+    'default settings' => array('download' => TRUE),
+    'view callback' => 'os_files_file_formatter_file_link',
+    'settings callback' => 'os_files_file_formatter_file_link_settings',
+  );
+
+  return $formatters;
+}
+
+/**
+ * Generates a link to the file
+ * This will either be a link to the direct download of a file
+ * or to the file's view path (file/$id). Direct download is the default
+ */
+function os_files_file_formatter_file_link($file, $display, $langcode) {
+  $title = field_get_items('file', $file, 'media_title', $langcode);
+  $title = isset($title[0])?$title[0]['value']:$file->uri;
+
+  $path = $display['settings']['download']?file_create_url($file->uri):file_entity_uri($file);
+
+
+  if (empty($file->override['wysiwyg'])) {
+    return array(
+      '#type' => 'container',
+      'icon' => array(
+        '#theme' => 'file_icon',
+        '#file' => $file,
+      ),
+      'link' => array(
+        '#theme' => 'link',
+        '#href' => $path,
+        '#text' => $title,
+        '#options' => array(
+          'html' => false,
+          'attributes' => array(),
+        ),
+      )
+    );
+  }
+  else {
+    // generate an image to use in the wysiwyg. The wysiwyg only accepts images, currently
+  }
+}
+
 
 /**
  * File Settings.
@@ -145,6 +290,39 @@ function os_files_media_browser_params_alter(&$media_params) {
       // Set the default file path.
       $media_params['file_directory'] = $filepath;
     }
+  }
+}
+
+/**
+ * Alters the titles of the Media Browser tabs to more friendly terms
+ */
+function os_files_media_browser_plugins_alter(&$output) {
+  unset($output['library']);
+  $output['upload']['#title'] = t('My Computer');
+  $output['media_default--media_browser_1']['#title'] = t('My Library');
+}
+
+function os_files_media_wysiwyg_allowed_view_modes_alter(&$view_modes, $file) {
+  $scheme = file_uri_scheme($file->uri);
+  switch ($scheme) {
+    case 'oembed':
+      $temp['media_original'] = $view_modes['media_original'];
+      $view_modes = $temp;
+    break;
+    case 'public':
+      $mime = explode('/', $file->filemime);
+      $type = $mime[0];  // I do this to get the type in case bundles for files are ever expanded out of just mime type
+      if ($type == 'image') {
+        $temp['os_files_large'] = $view_modes['os_files_large'];
+        $temp['os_files_med'] = $view_modes['os_files_med'];
+        $temp['os_files_small'] = $view_modes['os_files_small'];
+        $temp['os_files_link'] = $view_modes['os_files_link'];
+      }
+      else {  // until there is support for the audio or video tags, this is the best we can do for that kind of file.
+        $temp['os_files_link'] = $view_modes['os_files_link'];
+      }
+      $view_modes = $temp;
+    break;
   }
 }
 
@@ -234,25 +412,21 @@ function os_files_modules_installed($modules) {
  */
 function _os_files_clean_up_fields() {
   field_delete_field('field_license');
-  if ($title = field_info_field('media_title')) {
-    $descrip = field_info_field('media_description');
+  if ($title = field_info_instance('file', 'media_title', 'image')) {
+    $descrip = field_info_instance('file', 'media_description', 'image');
     $file_types = file_info_file_types();
     foreach ($file_types as $bundle => $info) {
       if (!field_info_instance('file', 'media_title', $bundle)) {
         $title_copy = $title;
-        $title_copy += array(
-          'entity_type' => 'file',
-          'bundle' => $bundle,
-        );
+        $title_copy['entity_type'] = 'file';
+        $title_copy['bundle'] = $bundle;
         field_create_instance($title_copy);
       }
 
       if (!field_info_instance('file', 'media_description', $bundle)) {
         $descrip_copy = $descrip;
-        $descrip_copy += array(
-          'entity_type' => 'file',
-          'bundle' => $bundle,
-        );
+        $descrip_copy['entity_type'] = 'file';
+        $descrip_copy['bundle'] = $bundle;
         field_create_instance($descrip_copy);
       }
     }
@@ -314,6 +488,11 @@ function os_files_field_formatter_view($entity_type, $entity, $field, $instance,
               'height' => $image_info['height'],
             )),
             'html' => TRUE,
+            'attributes' => array(
+              'class' => array(
+                'colorbox'
+              ),
+            ),
           );
         }
         else {

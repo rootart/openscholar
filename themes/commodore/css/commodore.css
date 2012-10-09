@@ -54,6 +54,7 @@ html, body {
 }
 
 /** TYPOGRAPHY **/
+.biblio-title a, .biblio-title-chicago a,
 a, a:visited {
      color: #4E84C4;
      text-decoration: none;

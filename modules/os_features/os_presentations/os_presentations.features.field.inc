@@ -1,7 +1,4 @@
 <?php
-// $Id$
-
-
 /**
  * @file
  * os_presentations.features.field.inc
@@ -13,7 +10,7 @@
 function os_presentations_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'node-presentation-body'
+  // Exported field: 'node-presentation-body'.
   $fields['node-presentation-body'] = array(
     'field_config' => array(
       'active' => '1',
@@ -36,6 +33,7 @@ function os_presentations_field_default_fields() {
           0 => 'format',
         ),
       ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(),
       'translatable' => '0',
@@ -85,7 +83,7 @@ function os_presentations_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-presentation-field_presentation_date'
+  // Exported field: 'node-presentation-field_presentation_date'.
   $fields['node-presentation-field_presentation_date'] = array(
     'field_config' => array(
       'active' => '1',
@@ -95,6 +93,7 @@ function os_presentations_field_default_fields() {
       'field_name' => 'field_presentation_date',
       'foreign keys' => array(),
       'indexes' => array(),
+      'locked' => '0',
       'module' => 'date',
       'settings' => array(
         'cache_count' => '4',
@@ -179,7 +178,7 @@ function os_presentations_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-presentation-field_presentation_file'
+  // Exported field: 'node-presentation-field_presentation_file'.
   $fields['node-presentation-field_presentation_file'] = array(
     'field_config' => array(
       'active' => '1',
@@ -200,6 +199,7 @@ function os_presentations_field_default_fields() {
           0 => 'fid',
         ),
       ),
+      'locked' => '0',
       'module' => 'file',
       'settings' => array(
         'display_default' => 0,
@@ -251,7 +251,7 @@ function os_presentations_field_default_fields() {
               'pathauto' => 0,
               'transliterate' => 0,
             ),
-            'value' => 'files',
+            'value' => '',
           ),
           'retroactive_update' => 0,
         ),
@@ -260,17 +260,36 @@ function os_presentations_field_default_fields() {
       ),
       'widget' => array(
         'active' => 1,
-        'module' => 'file',
+        'module' => 'media',
         'settings' => array(
+          'allowed_schemes' => array(
+            'embed' => 0,
+            'oembed' => 0,
+            'public' => 'public',
+          ),
+          'allowed_types' => array(
+            'audio' => 0,
+            'default' => 0,
+            'html' => 0,
+            'image' => 'image',
+            'video' => 0,
+          ),
+          'browser_plugins' => array(
+            'library' => 0,
+            'media_default--media_browser_1' => 'media_default--media_browser_1',
+            'media_embed' => 0,
+            'media_internet' => 'media_internet',
+            'upload' => 'upload',
+          ),
           'progress_indicator' => 'throbber',
         ),
-        'type' => 'file_generic',
+        'type' => 'media_generic',
         'weight' => '34',
       ),
     ),
   );
 
-  // Exported field: 'node-presentation-field_presentation_location'
+  // Exported field: 'node-presentation-field_presentation_location'.
   $fields['node-presentation-field_presentation_location'] = array(
     'field_config' => array(
       'active' => '1',
@@ -291,6 +310,7 @@ function os_presentations_field_default_fields() {
           0 => 'format',
         ),
       ),
+      'locked' => '0',
       'module' => 'text',
       'settings' => array(
         'max_length' => '255',
@@ -339,7 +359,7 @@ function os_presentations_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-presentation-field_upload'
+  // Exported field: 'node-presentation-field_upload'.
   $fields['node-presentation-field_upload'] = array(
     'field_config' => array(
       'active' => '1',
@@ -360,6 +380,7 @@ function os_presentations_field_default_fields() {
           0 => 'fid',
         ),
       ),
+      'locked' => '0',
       'module' => 'file',
       'settings' => array(
         'display_default' => 0,
@@ -435,9 +456,9 @@ function os_presentations_field_default_fields() {
           ),
           'browser_plugins' => array(
             'library' => 0,
-            'media_default--media_browser_1' => 0,
+            'media_default--media_browser_1' => 'media_default--media_browser_1',
             'media_embed' => 0,
-            'media_internet' => 0,
+            'media_internet' => 'media_internet',
             'upload' => 'upload',
           ),
           'progress_indicator' => 'throbber',
@@ -450,13 +471,12 @@ function os_presentations_field_default_fields() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Attach Files');
   t('Body');
   t('Location');
   t('Presentation Date');
   t('Presentation Files');
   t('Upload the file(s) for this presentation.');
-  t('upload');
 
   return $fields;
 }
-

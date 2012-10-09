@@ -25,6 +25,7 @@ body.navbar-off #page {
   margin: 0 auto;
   }
 
+.biblio-title a, .biblio-title-chicago a,
 a,
 a:visited {
   color:#b54f26;

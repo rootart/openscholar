@@ -110,7 +110,9 @@ dl.bibliomultiselect .form-item {
   font-style: normal !important;
   line-height: normal;
   text-align: left;
+  font-family: inherit;
   }
+  
 
 .biblio-authors a {
   font-weight: normal;

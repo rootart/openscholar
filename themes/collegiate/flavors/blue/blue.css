@@ -4,7 +4,7 @@ background: url('images/bodyBg.png') repeat-x scroll 0px -12px #EFEFEF;
  }    
 
 /* TYPOGRAPHY*/
-
+.biblio-title a, .biblio-title-chicago a,
 #content a, #content a:visited {
     color:#8D3129;
   }
