@@ -1,13 +1,19 @@
 <?php
+
+/**
+ * @file
+ * A virtual-site (VSite) is a node that is a "group".
+ */
+
 include_once ('vsite.features.inc');
 include_once ('includes/vsite.inc');
 
 /**
  * Helper function to return the current vsite
  */
-function vsite_get_vsite($sid = false){
+function vsite_get_vsite($sid = FALSE){
   if ($sid && intval($sid)) {
-    $vsite = spaces_load('og', $sid, false);
+    $vsite = spaces_load('og', $sid, $sid);
   }
   else {
     $vsite = spaces_get_space();
@@ -17,7 +23,7 @@ function vsite_get_vsite($sid = false){
     return $vsite;
   }
 
-  return false;
+  return FALSE;
 }
 
 /**
@@ -25,31 +31,22 @@ function vsite_get_vsite($sid = false){
  *
  * @param vsite $vsite
  */
-function vsite_get_purl($vsite = false){
-  if (! $vsite) {
+function vsite_get_purl($vsite = FALSE){
+  if (!$vsite) {
     $vsite = spaces_get_space();
   }
 
-  if (! $vsite || ! isset($vsite->group)) {
-    return "";
-  }
-
-  return $vsite->group->purl;
+  return !empty($vsite->group) ? $vsite->group->purl : '';
 }
 
 /**
- * Hooks
- */
-
-/**
- * Implements hook_BASE_ID_form_alter().
+ * Implements hook_form_FORM_ID_alter().
  *
- * Runs on every node form
+ * Hide the comment settings form from the VSites.
  */
 function vsite_form_node_form_alter(&$form, &$form_state, $form_id){
   if (og_is_group_type('node', $form['#bundle'])) {
-    // Hide the comment settings form
-    $form['comment_settings']['#access'] = false;
+    $form['comment_settings']['#access'] = FALSE;
     $form['comment_settings']['comment']['#default_value'] = 1;
   }
 }
@@ -79,14 +76,12 @@ function vsite_group_default_homepage_value($entity_type, $entity, $field, $inst
 }
 
 /**
- * Make a decision about the active theme
+ * Implements hook_custom_theme().
  */
 function vsite_custom_theme(){
-
-  // See function description for why this is called here
   _vsite_purl_init();
 
-  if ($space = spaces_get_space() && (! module_exists('cp') || ! cp_use_cp_theme())) {
+  if ($space = spaces_get_space() && (!module_exists('cp') || ! cp_use_cp_theme())) {
     ctools_include('themes', 'os');
     $theme = os_theme_get();
     return $theme;
@@ -94,9 +89,9 @@ function vsite_custom_theme(){
 }
 
 /**
- * Alter the space presets to add vsite specific information
+ * Implements hook_spaces_presets_alter().
  *
- * @param (array) $presets
+ * Alter the space presets to add vsite specific information.
  */
 function vsite_spaces_presets_alter(&$presets){
   ctools_include('path', 'vsite');
@@ -112,19 +107,9 @@ function vsite_spaces_presets_alter(&$presets){
 }
 
 /**
- * Alter export to not include fields added through code
+ * Implements of hook_spaces_plugins().
  */
-function vsite_features_export_alter(&$export, $module_name){
-  if ($module_name == 'vsite') {
-    // I don't know why this is being add as a dependency
-    unset($export['dependencies']['os_publications']);
-  }
-}
-
-/**
- * Implementation of hook spaces_plugins
- */
-function vsite_spaces_plugins(){
+function vsite_spaces_plugins() {
   $plugins = array();
   $plugins['vsite'] = array(
     'handler' => array(
@@ -136,13 +121,12 @@ function vsite_spaces_plugins(){
 }
 
 /**
- * Implementation of hook registry_alter
+ * Implements hook_registry_alter().
+ *
  * Alter the registry to tell spaces_og groups to use the vsite plugin by
- * default
+ * default.
  */
 function vsite_spaces_registry_alter(&$registry){
-
-  // use the vsite plugin by default
   if (isset($registry['types']['og'])) {
     $registry['types']['og']['plugin'] = 'vsite';
   }
@@ -152,23 +136,24 @@ function vsite_spaces_registry_alter(&$registry){
  * Handles access rules for when site owner is attempting to create a another
  * site
  *
- * @return boolean
+ * @return
  */
 function vsite_vsite_exists_access($vsites = array()) {
   global $user;
 
   // load user's vsites. anon (uid 0) has no vsites
-  if (! $vsites && $user->uid) {
+  if (!$vsites && $user->uid) {
     ctools_include('vsite', 'vsite');
     $vsites = vsite_get_vsite_by_owner($user->uid);
   }
 
   // Does user have permission to create vsites?
-  if (! user_access('create vsite content on behalf') && ! user_access('create vsite content')) {
+  if ( user_access('create vsite content on behalf') && !user_access('create vsite content')) {
     if(current_path() == 'site/register') {
       // Set error message when appropriate.
       global $base_url;
-      drupal_get_messages();  // Clear message queue.
+      // Clear message queue.
+      drupal_get_messages();
       drupal_set_message(t('You do not have permission to create new OpenScholar sites. !link',
         array('!link' => l(t('Return home.'), $base_url))
       ), 'error');
@@ -178,7 +163,7 @@ function vsite_vsite_exists_access($vsites = array()) {
   }
 
   // Can user create more vsites?
-  if (! (count($vsites) < variable_get('os_vsites_per_user') || user_access('create vsite on behalf'))) {
+  if (!(count($vsites) < variable_get('os_vsites_per_user') || user_access('create vsite on behalf'))) {
     if(current_path() == 'site/register') {
       // Set error message when appropriate.
       drupal_get_messages();  // Clear message queue.
@@ -196,6 +181,10 @@ function vsite_vsite_exists_access($vsites = array()) {
   return TRUE;
 }
 
+
+/**
+ * Implements hook_permission().
+ */
 function vsite_permission(){
   return array(
     'create vsite content on behalf' => array(
@@ -205,13 +194,16 @@ function vsite_permission(){
 }
 
 /**
+ *
+ * Implements hook_admin_paths_alter().
+ *
  * Any path in spaces is immediately disqualified from being in an overlay
  * because none
  * of them start with a wildcard.
  * They expect something like node/5/edit, when they get
  * site01/node/5/edit and fail.
- * This is rectified by putting a wildcard at the beginning to catch the space
- * modifier.
+ * This is rectified by putting a wildcard at the beginning to catch the
+ * space modifier.
  */
 function vsite_admin_paths_alter(&$paths){
   $new_paths = array();
@@ -263,12 +255,11 @@ function vsite_get_type_from_bundle($bundle = NULL){
 function vsite_field_attach_create_bundle($entity_type, $bundle){
   switch ($entity_type) {
     case 'file' :
-      // every file is group content
-      drupal_set_message('Adding og_group_ref field to file type ' . $bundle . ' in create_bundle');
+      // Every file is group content.
       vsite_attach_fields_to_group_content('file', $bundle);
       break;
     case 'node' :
-      if (! $type = vsite_get_type_from_bundle($bundle)) {
+      if (!$type = vsite_get_type_from_bundle($bundle)) {
         return;
       }
 
@@ -323,7 +314,7 @@ function vsite_attach_fields_to_group($bundle){
   og_create_field(OG_GROUP_FIELD, 'node', $bundle);
   og_create_field(OG_ACCESS_FIELD, 'node', $bundle);
 
-  if (! field_info_field('field_site_address')) {
+  if (!field_info_field('field_site_address')) {
     // field_site_address.
     $field = array(
       'active' => '1',
@@ -354,7 +345,7 @@ function vsite_attach_fields_to_group($bundle){
     $field = field_create_field($field);
   }
 
-  if (! field_info_instance('node', 'field_site_address', $bundle)) {
+  if (!field_info_instance('node', 'field_site_address', $bundle)) {
     $instance = array(
       'bundle' => $bundle,
       'deleted' => '0',
@@ -395,7 +386,7 @@ function vsite_attach_fields_to_group($bundle){
     field_create_instance($instance);
   }
 
-  if (! field_info_field('field_site_description')) {
+  if (!field_info_field('field_site_description')) {
     // field_site_description.
     $field = array(
       'active' => '1',
@@ -426,7 +417,7 @@ function vsite_attach_fields_to_group($bundle){
     $field = field_create_field($field);
   }
 
-  if (! field_info_instance('node', 'field_site_description', $bundle)) {
+  if (!field_info_instance('node', 'field_site_description', $bundle)) {
     $instance = array(
       'bundle' => $bundle,
       'deleted' => '0',
@@ -466,7 +457,7 @@ function vsite_attach_fields_to_group($bundle){
     field_create_instance($instance);
   }
 
-  if (! field_info_field('field_site_logo')) {
+  if (!field_info_field('field_site_logo')) {
     // field_site_logo.
     $field = array(
       'active' => '1',
@@ -498,7 +489,7 @@ function vsite_attach_fields_to_group($bundle){
     $field = field_create_field($field);
   }
 
-  if (! field_info_instance('node', 'field_site_logo', $bundle)) {
+  if (!field_info_instance('node', 'field_site_logo', $bundle)) {
     $instance = array(
       'bundle' => $bundle,
       'deleted' => '0',
@@ -557,7 +548,7 @@ function vsite_attach_fields_to_group($bundle){
     field_create_instance($instance);
   }
 
-  if (! field_info_field('field_group_path')) {
+  if (!field_info_field('field_group_path')) {
     // field_group_path.
     $field = array(
       'active' => '1',
@@ -589,7 +580,7 @@ function vsite_attach_fields_to_group($bundle){
     $field = field_create_field($field);
   }
 
-  if (! field_info_instance('node', 'field_group_path', $bundle)) {
+  if (!field_info_instance('node', 'field_group_path', $bundle)) {
     $instance = array(
       'bundle' => $bundle,
       'default_value' => NULL,
@@ -647,9 +638,7 @@ function vsite_attach_fields_to_group($bundle){
 }
 
 /**
- * @function _vsite_purl_init()
- *
- * Calls purl_init. This is used during hook_custom_theme, so that we can
+ * This is used during hook_custom_theme(), so that we can
  * get the space earlier.
  *
  * Following a cache clear, the spaces presets need rebuilding. At some
@@ -663,6 +652,8 @@ function vsite_attach_fields_to_group($bundle){
  *
  * This fixes the theme problem after a cache clear. May have other unforseen
  * consequences.
+ *
+ * @see purl_init()
  */
 function _vsite_purl_init(){
   // hack alert!
@@ -681,29 +672,9 @@ function _vsite_purl_init(){
 }
 
 /**
- * Implements hook_field_attach_form().
- */
-function vsite_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode){
-  list($id, , $bundle) = entity_extract_ids($entity_type, $entity);
-  $vsite = vsite_get_vsite();
-
-  if (!$vsite || ! og_is_group_content_type($entity_type, $bundle)) {
-    //We can't determine the site, or this isn't group content.
-    return;
-  }
-
-  $field_names = og_get_group_audience_fields($entity_type, $bundle);
-  foreach ( $field_names as $field_name => $label ) {
-    // We don't hide the field via hook_field_access(), as the
-    // default value won't be set.
-    $form[$field_name]['#access'] = FALSE;
-  }
-}
-
-/**
  * Implements hook_menu_alter().
- * Using this function to remove the "Groups" link
- * from the users 'edit' form.
+ *
+ * Remove the "Groups" link from the users 'edit' form.
  */
 function vsite_menu_alter(&$items){
   $items['user/%user/edit/groups']['access callback'] = false;
@@ -947,26 +918,27 @@ function vsite_redirect_reset_submit($form, &$form_state) {
   if (is_array($form_state['values'])
   && array_key_exists('redirect_from_reset', $form_state['values'])
   && $form_state['values']['redirect_from_reset']) {
-  	$vsites = vsite_get_vsite_by_owner($form['#user']->uid);
-  	if(count($vsites) == 1 && is_object($vsites[0])){
-  	  drupal_goto( $vsites[0]->get_absolute_url() );
-  	}else{
-  	  drupal_goto('user/'.$form['#user']->uid);
-  	}
+    $vsites = vsite_get_vsite_by_owner($form['#user']->uid);
+    if(count($vsites) == 1 && is_object($vsites[0])){
+      drupal_goto( $vsites[0]->get_absolute_url() );
+    }else{
+      drupal_goto('user/'.$form['#user']->uid);
+    }
   }
 }
 
 /**
  * Implements hook_cp_settings().
- * Hook into the cp_settings form to add the vsite_privacy form element.
+ *
+ * Add the vsite privacy form element to CP settings.
  */
 function vsite_cp_settings(){
-  $a_settings = array();
+  $form = array();
   $space = spaces_get_space();
   if(!empty($space)) {
     $node = node_load($space->group->nid);
 
-    $a_settings['vsite_private'] = array(
+    $form['vsite_private'] = array(
       'group' => array(
         '#id' => 'privacy',
         '#title' => t('Privacy'),
@@ -981,7 +953,7 @@ function vsite_cp_settings(){
       'submit' => array('vsite_cp_settings_node_submit'),
     );
   }
-  return $a_settings;
+  return $form;
 }
 
 /**
@@ -995,9 +967,9 @@ function vsite_cp_settings_node_submit($form, &$form_state) {
   $node = node_load($space->group->nid);
   // Get the vsite_privacy value.
   if(isset($form_state['values']['vsite_private']) && module_exists('vsite_access')) {
-  	// Set the new group_access for the node.
-  	$node->group_access[LANGUAGE_NONE][0]['value'] = $form_state['values']['vsite_private'];
-  	// Resave the node.
-  	node_save($node);
+    // Set the new group_access for the node.
+    $node->group_access[LANGUAGE_NONE][0]['value'] = $form_state['values']['vsite_private'];
+    // Resave the node.
+    node_save($node);
   }
 }

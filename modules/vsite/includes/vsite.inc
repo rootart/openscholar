@@ -2,9 +2,7 @@
 
 /**
  * @file
- * Provide CRUD for virtual-site (VSite).
- *
- * A VSite is a node that is a "group".
+ * Provide API function to add and remove entities from virtual-sites.
  */
 
 /**
