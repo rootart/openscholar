@@ -1,62 +1,52 @@
 <?php
-/**
- * Provides and CRUD functions relating to the vsite group.
- *
- * @file vsite.inc
- *
- * Provides vsite management and crud functions
- *
- * vsite_add_entity
- *   Generic function to add a passed entity to a vsite.
- *
- * vsite_create_vsite
- *   Creates a new vsite group.
- *
- * vsite_get_vsite_by_owner
- *   Gets all of the groups owned by a user.
- *
- */
 
+/**
+ * @file
+ * Provide CRUD for virtual-site (VSite).
+ *
+ * A VSite is a node that is a "group".
+ */
 
 /**
  * Add the passed entity to a vsite.
  *
- *  The entity that you wish to add to the vsite.
- *  @param entity $entity
+ * The entity that you wish to add to the vsite.
+ * @param $entity
+ *   The entity object.
+ * @param $entity_type
+ *   The type of entity you are passing. Defaults to "node".
+ * @param space $vsite
+ *   Optional; The vsite object to add the entity to.
  *
- *  The type of entity you are passing (default node)
- *  @param string $entity_type
- *
- *  The vsite object to add the entity to
- *  @param space $vsite
+ * @return
+ *   The newly created OG-membership or NULL if not valid.
  */
-function vsite_add_entity($entity, $entity_type = 'node', $vsite = false){
+function vsite_add_entity($entity, $entity_type = 'node', $vsite = FALSE){
 
   //Make sure the entity is valid
   list($id) = entity_extract_ids($entity_type, $entity);
-
-  //Get the active space
-  if(!$vsite){
-    $vsite = spaces_get_space();
+  if (!$id) {
+    return;
   }
 
-  if($id && $vsite){
-
-    $values = array(
-        'entity_type' => $entity_type,
-        'entity' => $entity,
-    );
-
-    //Add this entity to the active group
-    $subscription = og_group($vsite->group_type, $vsite->id, $values);
-
-    //Tell OG to ignore the existing field settings on this entity
-    $entity->skip_og_membership = TRUE;
-
-    return $subscription;
+  // Get the active space.
+  $vsite = $vsite ? $vsite : spaces_get_space();
+  if (!$vsite) {
+    return;
   }
 
-  return false;
+  $values = array(
+      'entity_type' => $entity_type,
+      'entity' => $entity,
+  );
+
+  //Add this entity to the active group.
+  $og_membership = og_group($vsite->group_type, $vsite->id, $values);
+
+  // Tell OG to ignore the existing field settings on this entity.
+  $entity->skip_og_membership = TRUE;
+
+  return $og_membership;
 }
 
 /**
