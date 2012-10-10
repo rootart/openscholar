@@ -33,6 +33,9 @@ function cp_layout_full_form($form, $form_state, $ctx){
       '#type' => 'markup',
       '#markup' => ctools_modal_text_button(t('Change Layout'), 'cp/build/layout/nojs/select', t('Change your layout'), 'cp-layout-change')
     );
+
+    $path_to_at_core = drupal_get_path('theme', 'adaptivetheme');
+    include_once($path_to_at_core . '/inc/get.inc');
     $layout_css = drupal_get_path('module', 'cp_layout') . '/theme/layouts/' . at_get_setting('bigscreen_layout', os_theme_get()) . '.css';
   }
 
