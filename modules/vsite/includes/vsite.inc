@@ -123,7 +123,7 @@ function vsite_create_vsite($name, $domain, $uid, $preset = FALSE) {
  *   The user ID of the user to lookup. Defaults to current user.
  *
  * @return
- *   Array with VSite objects if found, or NULL.
+ *   Array with VSite objects if found, or empty array.
  */
 function vsite_get_vsite_by_owner($uid = NULL) {
   if (!$uid) {
@@ -134,7 +134,7 @@ function vsite_get_vsite_by_owner($uid = NULL) {
   $group_bundles = og_get_all_group_bundle();
   if (empty($group_bundles['node'])){
     //can't determine group content types
-    return;
+    return array();
   }
   $bundles = array_keys($group_bundles['node']);
 
@@ -145,7 +145,7 @@ function vsite_get_vsite_by_owner($uid = NULL) {
     ->execute();
 
   if (empty($result['node'])) {
-    return;
+    return array();
   }
 
   foreach(array_keys($result['node']) as $id) {
@@ -171,7 +171,7 @@ function vsite_get_user_vsites($uid = NULL) {
   $groups = og_get_entity_groups('user', $uid);
 
   if (empty($groups['node'])) {
-    return;
+    return array();
   }
 
   $vsites = array();

@@ -688,7 +688,6 @@ function vsite_load_user_sites($user_id){
   $sites_array = array();
   // Grab their sites.
 
-
   $vsites_owner = vsite_get_vsite_by_owner($user_id);
   // Create each site as a link.
   foreach ( $vsites_owner as $site ) {
