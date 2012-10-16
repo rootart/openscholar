@@ -443,8 +443,41 @@ function og_vocab_field_formatter_info() {
     'og_vocab' => array(
       'label' => t('OG vocabulary'),
       'field types' => array('entityreference'),
+      'settings' => array(
+        'concatenate' => FALSE,
+      ),
     ),
   );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function og_vocab_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $element['concatenate'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Concatenate'),
+    '#description' => t('Show concatenated terms, separeated by comma. If disalbed, show list of terms, grouped by vocabulary.'),
+    '#default_value' => $settings['concatenate'],
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function og_vocab_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = array();
+
+  $summary[] = $settings['concatenate'] ? t('Show concatenated terms') : t('Show list of terms, grouped by vocabulary');
+  return implode('<br />', $summary);
 }
 
 /**
@@ -471,7 +504,20 @@ function og_vocab_field_formatter_view($entity_type, $entity, $field, $instance,
 
   $terms = taxonomy_term_load_multiple($tids);
 
-  // Iterate over each term and group by vocabylary.
+  $settings = $display['settings'];
+
+  if ($settings['concatenate']) {
+    $values = array();
+    foreach ($terms as $term) {
+      $url = entity_uri('taxonomy_term', $term);
+      $values[] = l($term->name, $url['path']);
+    }
+
+    $element[0] = array('#markup' => implode(', ', $values));
+    return $element;
+  }
+
+  // Iterate over each term and group by vocabulary.
   $data = array();
   foreach ($terms as $term) {
     if (empty($data['vocabylary'][$term->vid])) {
@@ -486,7 +532,6 @@ function og_vocab_field_formatter_view($entity_type, $entity, $field, $instance,
   foreach ($data['term'] as $vid => $values) {
     $element[0][$vid] = array('#theme' => 'item_list', '#items' => $values, '#title' => $data['vocabylary'][$vid]);
   }
-
 
   return $element;
 }

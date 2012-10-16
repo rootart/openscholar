@@ -15,9 +15,11 @@ function vsite_vocab_install(){
 
   $bundles = og_get_all_group_content_bundle();
   if (isset($bundles['node']) && is_array($bundles['node'])) {
-    foreach ( $bundles['node'] as $bundle => $name ) {
+    $og_field = og_fields_info(OG_VOCAB_FIELD);
+    $og_field['instance']['display']['default']['settings']['concatenate'] = TRUE;
+    foreach ($bundles['node'] as $bundle => $name) {
       // Group content.
-      og_create_field(OG_VOCAB_FIELD, 'node', $bundle);
+      og_create_field(OG_VOCAB_FIELD, 'node', $bundle, $og_field);
     }
   }
 }

@@ -14,7 +14,9 @@ function vsite_vocab_field_create_instance($instance) {
   if (!og_is_group_audience_field($instance['field_name'])) {
     return;
   }
-  og_create_field(OG_VOCAB_FIELD, $instance['entity_type'], $instance['bundle']);
+  $og_field = og_fields_info(OG_VOCAB_FIELD);
+  $og_field['instance']['display']['default']['settings']['concatenate'] = TRUE;
+  og_create_field(OG_VOCAB_FIELD, $instance['entity_type'], $instance['bundle'], $og_field);
 }
 
 /**
@@ -38,6 +40,17 @@ function vsite_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
       }
     }
   }
+}
+
+/**
+ * Implements hook_field_attach_view_alter().
+ */
+function vsite_vocab_field_attach_view_alter(&$output, $context) {
+  if (empty($output[OG_VOCAB_FIELD][0])) {
+    return;
+  }
+  $original = $output[OG_VOCAB_FIELD][0]['#markup'];
+  $output[OG_VOCAB_FIELD][0]['#markup'] = t('In !terms', array('!terms' => $original));
 }
 
 /**
