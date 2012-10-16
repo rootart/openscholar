@@ -18,34 +18,33 @@
  *   active space.
  *
  * @return
- *   The newly created OG-membership or NULL if not valid.
+ *   The newly created OG-membership or FALSE if not valid.
  */
 function vsite_add_entity($entity, $entity_type = 'node', $vsite = FALSE){
-
-  //Make sure the entity is valid
+  // Make sure the entity is valid.
   list($id) = entity_extract_ids($entity_type, $entity);
-  if (!$id) {
-    return;
-  }
 
   // Get the active space.
-  $vsite = $vsite ? $vsite : spaces_get_space();
-  if (!$vsite) {
-    return;
+  if(!$vsite){
+    $vsite = spaces_get_space();
   }
 
-  $values = array(
-    'entity_type' => $entity_type,
-    'entity' => $entity,
-  );
+  if ($id && $vsite){
+    $values = array(
+        'entity_type' => $entity_type,
+        'entity' => $entity,
+    );
 
-  //Add this entity to the active group.
-  $og_membership = og_group($vsite->group_type, $vsite->id, $values);
+    // Add this entity to the active group.
+    $og_membership = og_group($vsite->group_type, $vsite->id, $values);
 
-  // Tell OG to ignore the existing field settings on this entity.
-  $entity->skip_og_membership = TRUE;
+    // Tell OG to ignore the existing field settings on this entity.
+    $entity->skip_og_membership = TRUE;
 
-  return $og_membership;
+    return $og_membership;
+  }
+
+  return FALSE;
 }
 
 /**
