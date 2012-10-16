@@ -11,8 +11,8 @@
 
 ;----------// Stylesheets
 
-  stylesheets[screen][] = css/cp.responsive.layout.css
-  stylesheets[screen][] = css/cp.css
+  stylesheets[screen][] = css/cp_theme.responsive.layout.css
+  stylesheets[screen][] = css/cp_theme.css
     
 
   

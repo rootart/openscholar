@@ -6,7 +6,7 @@ class SpacesOverridesMenuMigration extends SpacesOverridesTableMigration {
     $this->dependencies = array('SpacesOverridesVariable'); //preset needs to be migrated before menus will work
     $this->source_object ='vsite_menu';
     $this->dest_object = 'menus';
-    parent::__construct();
+    parent::__construct(array('term', 'taxonomy'));
   }
 
   public function query() {

@@ -91,14 +91,12 @@ function os_context_default_contexts(){
                   'region' => 'sidebar_second',
                   'weight' => '-10',
               ),
-//               'os-get-started' => array(
-//                   'module' => 'os',
-//                   'delta' => 'get-started',
-//                   'weight' => -1,
-//                   'region' => 'sidebar_second',
-//                   'status' => '0',
-//                   'label' => 'Get Started (admin-only)',
-//               ),
+              'boxes-bio_teaser' => array(
+                'module' => 'boxes',
+                'delta' => 'bio_teaser',
+                'region' => 'content_top',
+                'weight' => '-10'
+              )
           )
       )
   );

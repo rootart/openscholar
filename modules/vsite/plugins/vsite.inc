@@ -103,12 +103,15 @@ class vsite extends space_og {
       case 'init' :
 	    // Additional check for private sites.
         if ($this->active && module_exists('vsite_access') && !vsite_access_user_access($this->group, $user)) {
-          purl_goto("private_site", array(
-              'purl' => array(
-                  'provider' => $this->purl_provider,
-                  'id' => $this->id
-              )
-          ));
+          $provider = array('provider' => $this->purl_provider, 'id' => $this->id);
+          purl_goto('private_site', array(
+            'purl' => $provider,
+            'query' => array(
+              'destination' =>url('home', array(
+                'purl'=>$provider
+               ))
+             ))
+           );
         }
         break;
     }

@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_announcements.features.user_permission.inc
@@ -47,3 +50,4 @@ function os_announcements_user_default_permissions() {
 
   return $permissions;
 }
+

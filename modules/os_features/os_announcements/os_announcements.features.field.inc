@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_announcements.features.field.inc
@@ -54,12 +57,9 @@ function os_announcements_field_default_fields() {
         ),
         'teaser' => array(
           'label' => 'hidden',
-          'module' => 'text',
-          'settings' => array(
-            'trim_length' => 600,
-          ),
-          'type' => 'text_summary_or_trimmed',
-          'weight' => 0,
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '1',
         ),
       ),
       'entity_type' => 'node',
@@ -129,10 +129,14 @@ function os_announcements_field_default_fields() {
           'weight' => '1',
         ),
         'teaser' => array(
-          'label' => 'above',
-          'settings' => array(),
-          'type' => 'hidden',
-          'weight' => 0,
+          'label' => 'hidden',
+          'module' => 'image',
+          'settings' => array(
+            'image_link' => 'content',
+            'image_style' => 'os_square_50_50',
+          ),
+          'type' => 'image',
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -246,7 +250,7 @@ function os_announcements_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '2',
         ),
       ),
       'entity_type' => 'node',
@@ -317,3 +321,4 @@ function os_announcements_field_default_fields() {
 
   return $fields;
 }
+

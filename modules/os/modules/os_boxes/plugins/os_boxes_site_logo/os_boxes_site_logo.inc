@@ -105,17 +105,19 @@ class os_boxes_site_logo extends os_boxes_default {
 
       try {
         if (!empty($fid) && $file = file_load($fid)) {
-          $output = file_view($file, 'media_original');
+          $path = $file->uri;
           $block['content'] = l(render($output), '<front>', array('html' => true));
         }
         else {
-          $output = theme('image', array('path' => drupal_get_path('module', 'os_boxes').'/plugins/os_boxes_site_logo/default_logo.jpg'));
-          $block['content'] = l($output, '<front>', array('html' => true));
+          $path = drupal_get_path('module', 'os_boxes').'/plugins/os_boxes_site_logo/default_logo.jpg';
         }
       }
       catch (Exception $e) {
-        return $block;
+        $path = drupal_get_path('module', 'os_boxes').'/plugins/os_boxes_site_logo/default_logo.jpg';
       }
+
+      $output = theme('image', array('path' => $path));
+      $block['content'] = l($output, '<front>', array('html' => true));
 
       return $block;
     }

@@ -27,6 +27,11 @@ function os_migrate_install() {
         ->execute();
     }
   }
+
+  //OS adds it's own file handler that extends the default, so do not use the default
+  $disabled[] = 'MigrateFileFieldHandler';
+  $disabled[] = 'MigrateImageFieldHandler';
+  variable_set('migrate_disabled_handlers', serialize($disabled));
 }
 
 

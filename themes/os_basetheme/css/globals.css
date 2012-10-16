@@ -33,3 +33,5 @@
 /*@import "global.blocks.css";    Block styles, includes all core blocks */
 /*@import "global.views.css";     Starter CSS for styling Views */
 /*@import "global.panels.css";    Starter CSS for styling Panels and panel panes */
+@import "normalize.css";  /* normailze html5 css */
+

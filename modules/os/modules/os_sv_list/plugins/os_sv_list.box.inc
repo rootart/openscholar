@@ -280,7 +280,8 @@ class os_sv_list_box extends os_boxes_default {
       $block['content'] = '<div id="box-' . $this->delta . '-page" data-page="'.$page_num.'" data-delta="'.$this->delta.'">' . $block['content'] . '</div>' . $pager;
       return $block;
     } else {
-      return array();
+      $block['title'] = $block['subject'] = '';
+      return $block;
     }
   }
 

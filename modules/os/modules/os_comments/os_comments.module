@@ -7,59 +7,64 @@ include_once ('os_comments.features.inc');
  */
 
 /**
+ * Implements hook_form_FORM_ID_alter() for cp_feature_customize_form.
+ *
  * Check if this is a feature form and add comment settings if the feature
  * provides a node.
  */
 function os_comments_form_cp_feature_customize_form_alter(&$form, &$form_state, $form_id) {
 
-  // Get the nodes for this feature.
-  $a_info = features_get_features($form['#feature']);
-  $node_types = $a_info->info['features']['node'];
-
-  if (!empty($node_types)) {
-    foreach ($node_types as $key => $type) {
-    	$node_types[$key] = 'comment_sources_' . $type;
-    }
-
-    $form['comment_settings'] = array(
-      '#type' => 'fieldset',
-      '#id' => "comment_settings",
-      '#weight' => 0,
-    );
-
-    // Include the admin form inc file.
-    module_load_include('admin.inc', 'comment_sources');
-    $form["comment_settings"] += drupal_retrieve_form('comment_sources_admin_settings_form', $form_state);
-
-    // Init the actions button container.
-    if (!isset($form['actions'])) {
-      $form['actions'] = array();
-    }
-
-    //Move the system setting form buttons
-    $form['actions'] = array_merge($form["comment_settings"]['actions'], $form['actions']);
-    unset($form["comment_settings"]['actions']);
-
-    foreach (element_children($form["comment_settings"]) as $child) {
-    	if (strpos($child, 'comment_sources_') === 0 && !in_array($child, $node_types)) {
-    	  unset($form["comment_settings"][$child]);
-    	}
-    }
-    // Use a secondary validator.
-    $form['#validate'][] = 'os_comments_cp_feature_customize_form_validate';
-    //Use default comment_sources submit handler
-    $form['#submit'][] = 'comment_sources_save_admin_form';
+  // Get the array of node types for this feature.
+  $info = features_get_features($form['#feature']);
+  // Only continues if this feature provides a node type.
+  if (!isset($info->info['features']['node']) || empty($info->info['features']['node'])) {
+    return;
   }
+  $node_types = $info->info['features']['node'];
+
+  foreach ($node_types as $key => $type) {
+  	$node_types[$key] = 'comment_sources_' . $type;
+  }
+
+  $form['comment_settings'] = array(
+    '#type' => 'fieldset',
+    '#id' => "comment_settings",
+    '#weight' => 0,
+  );
+
+  // Includes the admin form inc file.
+  module_load_include('admin.inc', 'comment_sources');
+  $form["comment_settings"] += drupal_retrieve_form('comment_sources_admin_settings_form', $form_state);
+
+  // Initializes the actions button container.
+  if (!isset($form['actions'])) {
+    $form['actions'] = array();
+  }
+
+  // Moves the system setting form buttons
+  $form['actions'] = array_merge($form["comment_settings"]['actions'], $form['actions']);
+  unset($form["comment_settings"]['actions']);
+
+  foreach (element_children($form["comment_settings"]) as $child) {
+  	if (strpos($child, 'comment_sources_') === 0 && !in_array($child, $node_types)) {
+  	  unset($form["comment_settings"][$child]);
+  	}
+  }
+  // Uses a secondary validator.
+  $form['#validate'][] = 'os_comments_cp_feature_customize_form_validate';
+  // Uses default comment_sources submit handler
+  $form['#submit'][] = 'comment_sources_save_admin_form';
 }
 
 /**
- * Function to add a secondary validate function that informs the user that they
- * need to set their disqus shortname before they can allow disqus comments.
+ * Validation callback; checks that user has disqus shortname if using discus.
+ *
+ * @see os_comments_form_cp_feature_customize_form_alter()
  */
 function os_comments_cp_feature_customize_form_validate($form, &$form_state) {
   // Get the nodes for this feature.
-  $a_info = features_get_features($form['#feature']);
-  $node_types = $a_info->info['features']['node'];
+  $info = features_get_features($form['#feature']);
+  $node_types = $info->info['features']['node'];
 
   if (!empty($node_types)) {
     $vsite = vsite_get_vsite();
@@ -86,7 +91,7 @@ function os_comments_cp_feature_customize_form_validate($form, &$form_state) {
 
 /**
  * Implement hook comment_sources alter
- **/
+ */
 function os_comments_comment_sources_alter(&$sources){
   //Use alternate save functions if we have vsite enabled
   if(module_exists('vsite')){

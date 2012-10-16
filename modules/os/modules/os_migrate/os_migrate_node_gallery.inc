@@ -44,8 +44,11 @@ class GalleryNodeOSMigration extends AbstractNodeOSMigration {
       ->defaultValue(variable_get('os_migrate_files', FALSE)); //adequate or does 2.4 need full path?
 
     $this->addFieldMapping('media_gallery_media:description', 'media_gallery_media_description');
-    $this->addFieldMapping('media_gallery_media:display', 'media_gallery_media_display');
+    $this->addFieldMapping('media_gallery_media:display', 'media_gallery_media_display')->defaultValue(1);
     $this->addFieldMapping('media_gallery_media:language', 'media_gallery_media_language');
+
+    $this->addFieldMapping('media_gallery_media:og_group_ref', 'group_nid');
+
 
     $this->addUnmigratedDestinations(parent::subfields('media_gallery_media', array('file_class', 'destination_dir', 'destination_file', 'file_replace', 'preserve_files')), t('DNM')); //happy with defaults
     $this->addUnmigratedDestinations(array('media_gallery_image_info_where'), t('DNM'));
@@ -56,7 +59,6 @@ class GalleryNodeOSMigration extends AbstractNodeOSMigration {
       ->defaultValue(0); //no title/description in lightbox because no images have them.  no previous setting
 
 
-
   }
 
   public function sourceFields($content_type) {
@@ -65,7 +67,7 @@ class GalleryNodeOSMigration extends AbstractNodeOSMigration {
     $fields +=  array(
     	'media_gallery_media' => t('Images in gallery.'),
     	'media_gallery_media_description' => t('Image\'s text description'),
-    	'media_gallery_media_display' => t('Image\'s listing status'),
+   // 	'media_gallery_media_display' => t('Image\'s listing status'),
       'media_gallery_media_language' => t('Language used in image\'s description'),
 
       'body:format' => t('Provided by node abstract, but ignored here.'),
@@ -129,7 +131,7 @@ class GalleryNodeOSMigration extends AbstractNodeOSMigration {
     $result = $query->execute();
     //$current_row->prepared_files = parent::os_migrate_prepare_files($result);
     //this gets subfields, but media_gallery_media still has nothing
-    $fields = array('language' => 'language', 'description' => 'description', 'list' => 'display');
+    $fields = array('language' => 'language', 'description' => 'description', 'display' => 'list');
     //parent::os_migrate_prepare_files_v24($result, $current_row, 'media_gallery_media', $fields);
     parent::os_migrate_prepare_files($result, $current_row, 'media_gallery_media', $fields);
 
@@ -149,4 +151,5 @@ class GalleryNodeOSMigration extends AbstractNodeOSMigration {
     return parent::prepareRow($current_row); //false -> skip this row
 
   }
+
 }

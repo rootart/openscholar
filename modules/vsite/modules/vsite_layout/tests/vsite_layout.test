@@ -36,7 +36,7 @@ class VsiteLayoutLayout extends OpenscholarWebTestCase {
     //Create A Group Node
     $group1 = array(
         'title' => 'My Test Site',
-        'type' => 'vsite',
+        'type' => 'personal',
         'purl' => 'group1',
         'uid' => $this->user1->uid
     );

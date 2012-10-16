@@ -102,6 +102,8 @@ class SoftwareReleaseNodeOSMigration extends AbstractNodeOSMigration {
     $this->addFieldMapping('field_software_package:destination_file', 'field_software_package:destination_file');
     $this->addFieldMapping('field_software_package:description', 'field_scholar_software_file_data');
     $this->addFieldMapping('field_software_package:display', 'field_scholar_software_file_list');
+    $this->addFieldMapping('field:software_package:og_group_ref', 'group_nid');
+
 
     $this->addUnmigratedDestinations(parent::subfields('field_software_package', array('destination_dir', 'preserve_files', 'file_class', 'file_replace')));
 

@@ -55,6 +55,7 @@ class TermOSMigration extends DynamicMigration {
 
     // Mappings that are straight-forward 1-to-1
     $this->addSimpleMappings(array(
+      'tid',
       'name',
       'description',
       'weight'

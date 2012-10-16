@@ -93,9 +93,8 @@ function vsite_views_default_views() {
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
-  $handler->display->display_options['filters']['type']['value'] = array(
-    'vsite' => 'vsite',
-  );
+  $handler->display->display_options['filters']['type']['value'] = array('personal'=>'personal', 'project'=>'project', 'department'=>'department');
+
   /* Filter criterion: Content: Group visibility (group_access) */
   $handler->display->display_options['filters']['group_access_value']['id'] = 'group_access_value';
   $handler->display->display_options['filters']['group_access_value']['table'] = 'field_data_group_access';

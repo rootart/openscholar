@@ -207,7 +207,7 @@ function cp_custom_theme() {
 
   //Turn the CP theme on
   if (cp_use_cp_theme()) {
-    return variable_get('os_cp_theme', 'cp');
+    return variable_get('os_cp_theme', 'cp_theme');
   }
 }
 
@@ -220,7 +220,7 @@ function cp_use_cp_theme() {
   if ((arg(0) == 'cp') ||
     (arg(0) == 'os') ||
     (arg(0) == 'media') ||
-    (arg(0) == 'node' && (arg(1) == 'add' || arg(2) == 'edit' || arg(2) == 'delete'))
+    ((arg(0) == 'node' || arg(0) == 'file') && (arg(1) == 'add' || arg(2) == 'edit' || arg(2) == 'delete'))
   ) {
     return TRUE;
   }
@@ -228,9 +228,7 @@ function cp_use_cp_theme() {
 }
 
 function cp_admin_paths() {
-  return array(
-    'cp/*' => TRUE,
-  );
+  return array('cp/build/features/*' => TRUE);
 }
 
 /**
@@ -265,10 +263,8 @@ function cp_form_spaces_features_form_alter(&$form, &$form_state, $form_id) {
     // by convention feature settings form is at features/feature_name
     $item = menu_get_item('features/' . $f_name);
 
-    $class = (isset($_GET['open_feature_settings']) && $_GET['open_feature_settings'] == $f_name) ? "modal_click_onload" : "";
-
     //, 'ctools-modal-openscholar-style-default');
-    $link = ctools_modal_text_button('customize', 'cp/build/features/nojs/' . $f_name, 'customize ' . $f_name, $class);
+    $link = l('customize', 'cp/build/features/' . $f_name);
     $form['settings'][$f_name] = array(
       '#type' => 'markup',
       '#markup' => $link,

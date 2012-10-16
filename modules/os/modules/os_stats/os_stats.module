@@ -1,22 +1,22 @@
-<?php 
+<?php
 
-/** 
+/**
  * Implementation of hook_block_info()
- * 
+ *
  */
 function os_stats_block_info() {
 	$blocks['os_stats'] = array(
 		'info' => t('OpenScholar Stats'),
 	);
 	return $blocks;
-}// end function 
+}// end function
 
 /**
  * Implementation of hook_block_view()
- * 
+ *
  */
 function os_stats_block_view($delta='') {
-	$block = array(); 
+	$block = array();
 	switch ($delta) {
 		case 'os_stats':
 			$block['title'] = t('OpenScholar Stats');
@@ -26,9 +26,9 @@ function os_stats_block_view($delta='') {
 	return $block;
 }
 
-/** 
+/**
  * Implementation of hook_block_configure()
- * 
+ *
  */
 function os_stats_block_configure($delta='') {
 	$form = array();
@@ -47,35 +47,35 @@ function os_stats_block_configure($delta='') {
   		);
   		$stats = _os_stats();
   		$enabled = unserialize(variable_get('os_stats_enabled', FALSE));
-  			
+
   		foreach($stats as $stat => $def) {
   			$form['os_stats_select']['os_stat_'.$stat] = array(
   			//$form['os_stats_select']['os_stats_'.$stat] = array(
   				'#type' => 'checkbox',
   				'#title' => $def['description'],
-  				'#default_value' => (isset($enabled[$stat])) ? $enabled[$stat] : TRUE,      
-  			);	
+  				'#default_value' => (isset($enabled[$stat])) ? $enabled[$stat] : TRUE,
+  			);
   		}//end for each
 	}// enf if
-    
+
 	return $form;
-	
+
 }// end function
 
 /**
  * Implementation of hook_block_save()
- * 
+ *
  */
 function os_stats_block_save($delta='',$edit = array()) {
 	if ($delta == 'os_stats') {
   		variable_set('os_stats_cache_expiration', (int)$edit['os_stats_cache_expiration']);
-  			
+
   		$enabled_stats = array();
   		foreach(_os_stats() as $stat => $def) {
   			//variable_set('os_stats_stat_'.$stat, (bool)$edit['os_stats_stat_'.$stat]);
-  			$enabled[$stat] = (bool)$edit['os_stat_' . $stat]; 
+  			$enabled[$stat] = (bool)$edit['os_stat_' . $stat];
   		}// end foreach
-  		
+
   		variable_set('os_stats_enabled', serialize($enabled));
   		cache_clear_all('os_stats_data', 'cache');
 	}// end if
@@ -83,17 +83,17 @@ function os_stats_block_save($delta='',$edit = array()) {
 
 /**
  * Custom HTML Block
- * 
+ *
  */
 function os_stats_content() {
 	$data = array();
-	
+
 	//check cache
 	if ($cache = cache_get('os_stats_data')) {
 	  	if ($cache->expire < time()) {
 	    	cache_clear_all('os_stats_data', 'cache'); //clear the expired data.  still using it for this run though.
 	  	}// end if
-		$data = unserialize($cache->data);		
+		$data = unserialize($cache->data);
 	} else {
   		$stats = _os_stats();
   		function _stats_weight($a, $b) {
@@ -101,7 +101,7 @@ function os_stats_content() {
   		}// end if
   		uasort($stats, '_stats_weight');
   		$enabled = unserialize(variable_get('os_stats_enabled', FALSE));
-  
+
   		foreach($stats as $stat => $def) {
   	  		//$args = (isset($def['query_args']) && is_array($def['query_args'])) ? $def['query_args'] : array();
   			if (!empty($enabled[$stat]) || !isset($enabled[$stat])) {
@@ -119,21 +119,21 @@ function os_stats_content() {
   	  				if (isset($def['callback']) && function_exists($def['callback'])) {
     					$result = $def['callback']($result);
     				}// end if
-    		
+
     				$data[$def['title']] = $result;
   	 		  	}// end if
   	  		}// end if
   		}// end foreach
-  		cache_set('os_stats_data', serialize($data), 'cache', time() + variable_get('os_stats_cache_expiration', 24*3600));	
+  		cache_set('os_stats_data', serialize($data), 'cache', time() + variable_get('os_stats_cache_expiration', 24*3600));
 	}// end if
-		
+
 	return _theme_os_stats_item_dt($data);
 }// end function
 
-/** 
+/**
  * Function to check to make sure the tables exist we
  * want to pull stats from
- * 
+ *
  */
 function os_stats_check_table($table) {
 	if(db_table_exists($table)) {
@@ -145,13 +145,18 @@ function os_stats_check_table($table) {
 
 /**
  * function to list stat, title, description, query, [callback] for stats to display
- * 
+ *
  */
 function _os_stats() {
   	$content_type = variable_get('scholar_content_type', 'vsite');
-	
+  	$group_types = og_get_all_group_bundle();
+  	$group_types = array_keys($group_types['node']);
+  	if (empty($group_types)) {
+  	  $group_types = array('personal');
+  	}
+
   	$statsArray = array();
-	
+
 	if(os_stats_check_table('node')==true) {
 		$statsArray['Publications'] = array(
 			'title' => t('Publications'),
@@ -162,9 +167,10 @@ function _os_stats() {
 		$statsArray['Vsites'] = array(
 			'title' => t('Websites'),
 			'description' => t('Virtual sites in this OS installation'),
-		  	'query' => 'SELECT COUNT(nid) FROM {node} WHERE type = :typeVal ',
-		  	'query_args' => array(variable_get('scholar_content_type', 'vsite')),
-			'query_args_type' => 'typeVal',
+		  	'query' => 'SELECT COUNT(nid) FROM {node} WHERE type IN (:typeVal) ',
+		  	//'query_args' => array(variable_get('scholar_content_type', 'vsite')),
+		    'query_args' => $group_types,
+			'query_args_type' => ':typeVal',
 		  	'weight' => 0
 		);
 		$statsArray['Nodes'] = array(
@@ -202,8 +208,8 @@ function _os_stats() {
 }// end function
 
 /**
- *  function to convert bytes to biggest unit of file types, appends abbreviation 
- *  
+ *  function to convert bytes to biggest unit of file types, appends abbreviation
+ *
  **/
 function _os_stats_file_units($fs) {
 	$units = array('b', 'kb', 'mb' ,'gb', 'tb', 'pb');
@@ -226,6 +232,6 @@ function _theme_os_stats_item_dt($data) {
     	$out .= '    <dd>' . $dd . '</dd>';
   	}// end foreach
   	$out .= '</dl>';
-  
+
   	return $out;
-}// end function 
+}// end function

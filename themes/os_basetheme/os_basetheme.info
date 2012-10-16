@@ -44,7 +44,7 @@
   ;
   ; Follow the syntax:
   ;
-  ; unset_css[path/to/css/file.css] = 1
+   unset_css[profiles/openscholar/modules/contrib/biblio/biblio.css] = 1
   ;
   ; For example to unset foobar_module.css you might use something like this:
   ; unset_css[sites/all/modules/foobar_module/foobar_module.css] = 1

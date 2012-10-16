@@ -433,12 +433,16 @@ function os_preprocess_html(&$variables) {
  */
 function os_process_node(&$vars) {
   // Only proceeds if we have a body and a "Read more" link in the first place.
-  if (!isset($vars['content']['body']['#items'][0]['value']) || !isset($vars['content']['body'][0]['#markup'])) {
-    return;
-  }
   if (!isset($vars['content']['links']['node']['#links']['node-readmore'])) {
     return;
   }
+
+  // Hides the "Read more" link if there is no body.
+  if (!isset($vars['content']['body']['#items'][0]['value']) || !isset($vars['content']['body'][0]['#markup'])) {
+    unset($vars['content']['links']['node']['#links']['node-readmore']);
+    return;
+  }
+
   // Compares what will be displayed to the user against the full body value.
   $body_full      = trim($vars['content']['body']['#items'][0]['value']);
   $body_display   = trim($vars['content']['body'][0]['#markup']);
@@ -517,13 +521,15 @@ function os_preprocess_page(&$variables) {
       ),
     ),
   );
-  $variables['title_suffix']['controls']['add_new'] = array(
-    '#theme' => 'ctools_dropdown',
-    '#links' => $links,
-    '#title' => t('Add New'),
-    '#class' => 'add_new',
-    '#access' => spaces_access_admin(),
-  );
+  if (!empty($links)) {
+    $variables['title_suffix']['controls']['add_new'] = array(
+      '#theme' => 'ctools_dropdown',
+      '#links' => $links,
+      '#title' => t('Add New'),
+      '#class' => 'add_new',
+      '#access' => spaces_access_admin(),
+    );
+  }
   $variables['title_suffix']['controls']['section_links'] = array(
     '#theme' => 'ctools_dropdown',
     '#links' => $section_links,

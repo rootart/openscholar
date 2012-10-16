@@ -43,7 +43,7 @@ class VsiteUser extends OpenscholarWebTestCase {
     //Create A Group Node with user 1 as admin
     $group1 = array(
         'title' => 'My Test Site',
-        'type' => 'vsite',
+        'type' => 'personal',
         'purl' => 'group1',
         'uid' => 1
     );
@@ -52,7 +52,7 @@ class VsiteUser extends OpenscholarWebTestCase {
     //Create A secondary Group Node with user 1 as admin
     $group2 = array(
         'title' => 'My Test Site 2',
-        'type' => 'vsite',
+        'type' => 'personal',
         'purl' => 'group2',
         'uid' => 1
     );
@@ -143,7 +143,7 @@ class VsiteUser extends OpenscholarWebTestCase {
     $test_role = 'vsite user';
 
     //A little sanity checking to make sure that the roles we will be using exist
-    $roles = og_roles($this->group_1->group_type, 'vsite', $this->group_1->id);
+    $roles = og_roles($this->group_1->group_type, 'personal', $this->group_1->id);
     $exists = false;
     foreach ($roles as $rid => $role) {
       if($role == $test_role){

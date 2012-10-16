@@ -6,7 +6,7 @@
  */
 
 /**
- * Test media type creation and management.
+ * Defines media type creation and management test cases.
  */
 class MediaTypeTest extends MediaTestHelper {
 
@@ -15,38 +15,38 @@ class MediaTypeTest extends MediaTestHelper {
       'name' => 'Media types',
       'description' => 'Tests media types',
       'group' => 'Media',
-      'dependencies' => array('file_entity'),
     );
   }
 
   /**
-   * Test creating a new type. Basic CRUD.
+   * Tests creating a new type.
    */
   function testCreate() {
     $type_machine_name = 'foo';
-    $type = $this->createType(array('name' => $type_machine_name, 'label' => 'foobar'));
+    $type = $this->createType(array(
+      'name' => $type_machine_name,
+      'label' => 'foobar',
+    ));
     $loaded_type = media_type_load($type_machine_name);
-    $this->assertEqual($loaded_type->label, 'foobar', "Was able to create a type and retreive it");
+    $this->assertEqual($loaded_type->label, 'foobar', 'Was able to create a type and retreive it.');
   }
 
   /**
-   * Ensures that the weight is respected when types are created.
-   * @return unknown_type
+   * Tests that weight is respected when types are created.
    */
   function testOrder() {
-    $type = $this->createType(array('name' => 'last', 'label' => 'Last', 'weight' => 100));
-    $type = $this->createType(array('name' => 'first', 'label' => 'First'));
+    $type = $this->createType(array(
+      'name' => 'last',
+      'label' => 'Last',
+      'weight' => 100,
+    ));
+    $type = $this->createType(array(
+      'name' => 'first',
+      'label' => 'First',
+    ));
     $types = media_type_get_types();
     $keys = array_keys($types);
-    $this->assertTrue(isset($types['last']) && isset($types['first']), "Both types saved");
-    $this->assertTrue(array_search('last', $keys) > array_search('first', $keys), 'Type which was supposed to be first came first');
+    $this->assertTrue(isset($types['last']) && isset($types['first']), 'Both types were saved.');
+    $this->assertTrue(array_search('last', $keys) > array_search('first', $keys), 'The type which was supposed to come first came first.');
   }
-
-  /**
-   * Test view mode assignment.  Currently fails, don't know why.
-   * @return unknown_type
-   */
-  function testViewModesAssigned() {
-  }
-
 }

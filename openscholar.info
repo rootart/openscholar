@@ -99,6 +99,7 @@ dependencies[] = os_biocv
 dependencies[] = diff
 dependencies[] = twitter_pull
 dependencies[] = nice_menus
+dependencies[] = shorten
 
 files[] = openscholar.profile
 

@@ -83,10 +83,11 @@ function os_image_gallery_form_alter(&$form, &$form_state, $form_id) {
       '#collapsible' => TRUE,
     );
 
-    foreach (array('field_license', 'media_description', 'filename') as $elem) {
-      $form['fieldset'][$elem] = $form[$elem];
-      unset($form[$elem]);
-      //$form[$elem]['#parents'] = array('fieldset');
+    foreach (array('media_description', ) as $elem) {
+      if (isset($form[$elem])) {
+        $form['fieldset'][$elem] = $form[$elem];
+        unset($form[$elem]);
+      }
     }
 
     //make an image instead of a link

@@ -75,7 +75,7 @@
 
 
 html /* Always apply your global font size the the HTML element, not body or #page */ {
-	font-size: 13px;
+	 font-size: 13px;
   line-height: 1.5; /* Unitless line-heights scale */
   height: 100%;
   overflow-y: scroll;
@@ -90,6 +90,7 @@ body {
   font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   margin: 0;
+ 
 }
 
 h1,h2,h3,h4,h5,h6,
@@ -122,6 +123,10 @@ section {
 /* Default font sizes for headings, can be overridden in theme settings or set them here */
 
 h1 {
+}
+
+h1.node-title {
+	font-size:1.15em;
 }
 
 h2 {
@@ -303,17 +308,24 @@ ul ul ul ul {
 .view-os-image-gallery ul li,
 .views-field-media-gallery-media ul {
 	list-style-type: none;
-    display:inline-block;
-    margin: 10px 10px 0 0;
-}
 
+}
+/*
 .view-os-image-gallery ul li.views-row,
 .view-gallery-listing ul,
 .views-field-media-gallery-media ul,
 .view-os-image-gallery ul {
 	display:inline;
    float:none;
+}*/
+
+.view-id-os_image_gallery li.views-row {
+	margin-bottom:15px;
 }
+
+.view-id-os_image_gallery .views-field-title .field-content a {
+	font-weight:bold;
+	}
 
 
 .page-user .profile .item-list li {list-style:none !important;}

@@ -3,7 +3,8 @@
 Drupal.behaviors.media_gallery = {};
 Drupal.behaviors.media_gallery.attach = function (context, settings) {
   // Bind a click handler to the 'add media' link.
-  $('a.media-gallery-add.launcher').once('media-gallery-add-processed').bind('click', Drupal.media_gallery.open_browser);
+  //$('a.media-gallery-add.launcher').once('media-gallery-add-processed').bind('click', Drupal.media_gallery.open_browser);
+  $('.fid').change(Drupal.media_gallery.add_media);
 };
 
 Drupal.media_gallery = {};
@@ -20,7 +21,7 @@ Drupal.media_gallery.add_media = function (mediaFiles) {
   var mediaAdded = function (returnedData, textStatus, XMLHttpRequest) {
     parent.window.location.reload();
   };
-
+  
   var errorCallback = function () {
     //console.warn('Error: Media not added.');
   };
@@ -29,9 +30,7 @@ Drupal.media_gallery.add_media = function (mediaFiles) {
 
   var media = [];
 
-  for(var i = 0; i < mediaFiles.length; i++) {
-    media[i] = mediaFiles[i].fid;
-  }
+  media.push($(this).val());
 
   $.ajax({
     url: src,
@@ -41,6 +40,8 @@ Drupal.media_gallery.add_media = function (mediaFiles) {
     error: errorCallback,
     success: mediaAdded
   });
+  
+  $(this).val(0);
   
   return false;
 }

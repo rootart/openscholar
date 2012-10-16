@@ -1,0 +1,9 @@
+core = 7.x
+package = "OpenScholar vsite"
+dependencies[] = "contact"
+dependencies[] = "features"
+dependencies[] = "vsite"
+dependencies[] = "os_help"
+dependencies[] = "cp"
+description = "vsite > support"
+name = "vsite Support"

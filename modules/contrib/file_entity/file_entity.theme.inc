@@ -35,35 +35,5 @@ function theme_file_entity_file_link($variables) {
     $options['attributes']['title'] = check_plain($file->filename);
   }
 
-  if (isset($file->override['wysiwyg'])) {
-    $icon = file_icon_path($file, $icon_directory);
-    $icon_size = getimagesize($icon);
-    $icon_image = imagecreatefrompng($icon);
-    $icon_size += array(
-      'width' => $icon_size[0],
-      'height' => $icon_size[1],
-    );
-
-    $image = imagecreate(200, $icon_size['height'] + 4);
-    imagecopy($image, $icon_image, 2, 2, 0, 0, $icon_size['width'], $icon_size['height']);
-
-    $str = 'Placeholder Text';
-    $font = 3;
-    $offset = $icon_size['width'] + 2;
-    $width = imagefontwidth($font);
-    $color = imagecolorallocate($image, 0, 0, 0);
-    for ($i=0, $l=strlen($str); $i<$l; $i++) {
-      $c = $str[$i];
-      imagechar($image, $font, $offset + $width*$i, 2, $c, $color);
-    }
-
-    // capture the image data
-    ob_start();
-    imagepng($image);
-    $data = ob_get_contents();
-    ob_end_clean();
-
-    return '<img src="data:image/png;base64,'.base64_encode($data).'">';
-  }
   return '<span class="file">' . $icon . ' ' . l($link_text, $url, $options) . '</span>';
 }

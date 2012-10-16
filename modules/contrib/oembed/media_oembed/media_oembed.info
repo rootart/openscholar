@@ -6,5 +6,6 @@ files[] = media_oembed.module
 files[] = MediaOEmbedStreamWrapper.inc
 files[] = media_oembed.admin.inc
 files[] = includes/media_oembed.styles.inc
+files[] = MediaInternetOEmbedHandler.inc
 dependencies[] = media_internet
 dependencies[] = oembedcore

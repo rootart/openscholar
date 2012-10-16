@@ -74,6 +74,15 @@ EOF
     '#default_value' => variable_get('os_migrate_email_notification', FALSE),
   );
 
+  $og_bundles = og_get_all_group_bundle();
+  $form['dev_fieldset']['os_migrate_default_group_bundle'] = array(
+    '#title' => t('Group Bundle'),
+    '#type' => 'select',
+    '#description' => t('Vsite content types have changed.  This option selects which content type your vsites will migrate into.  By default, vsites will become personal and projects will remain projects.'),
+    '#options' => array('keep' => t('Keep original type')) + $og_bundles['node'],
+    '#default_value' => variable_get('os_migrate_default_group_bundle', 'keep'),
+  );
+
   $form['dev_fieldset']['os_migrate_ignore_dependencies'] = array(
     '#title' => t('Ignore Dependencies'),
     '#description' => t('Migration dependencies will be ignored by default.'),

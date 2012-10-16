@@ -10,12 +10,17 @@ define('OS_FILE_FILEPATH_SINGLETENANT', 'share');
 
 /**
  * Implements hook_ctools_plugin_api().
+ *
+ * Leave this one.
  */
 function os_files_ctools_plugin_api($module, $api) {
   if ($module == 'file_entity' && $api == 'file_default_displays') {
     return array(
       'version' => 1,
     );
+  }
+  elseif ($module == "strongarm" && $api == "strongarm") {
+    return array("version" => "1");
   }
 }
 
@@ -36,6 +41,14 @@ function os_files_menu() {
   return $items;
 }
 
+function os_files_theme_registry_alter(&$reg) {
+  unset($reg['oembed']['template']);
+  $reg['oembed']['function'] = 'theme_os_files_oembed';
+}
+
+function theme_os_files_oembed($vars) {
+  return render($vars['content']);
+}
 
 /**
  * Implements hook_file_insert().
@@ -115,6 +128,8 @@ function os_files_views_api() {
 
 /**
  * Entry point for vsite aliased file downloads.
+ *
+ * This allows legacy file paths to exsit that are mapped to paths "domain/vsite/files/file1.pdf"
  */
 function os_files_download() {
   $args = func_get_args();
@@ -195,10 +210,13 @@ function os_files_file_default_displays() {
     'image__os_files_large__file_image' => array('image_style' => 'os_files_large'),
     'image__os_files_med__file_image' => array('image_style' => 'os_files_medium'),
     'image__os_files_small__file_image' => array('image_style' => 'os_files_small'),
+    'image__default__file_image' => array('image_style' => 'large'),
   );
 
-  foreach (file_info_file_types()+array('default' => array()) as $type => $info) {
+  foreach (file_type_get_enabled_types()+array('default' => array()) as $type => $info) {
     $keys["{$type}__os_files_link__os_link"] = array();
+
+    $keys["{$type}__preview__file_field_media_large_icon"] = array();
   }
 
   $displays = array();
@@ -207,7 +225,7 @@ function os_files_file_default_displays() {
       'api_version' => 1,
       'name' => $k,
       'status' => 1,
-      'weight' => 0,
+      'weight' => 5,
       'settings' => $settings,
     );
   }
@@ -239,10 +257,9 @@ function os_files_file_formatter_info() {
  */
 function os_files_file_formatter_file_link($file, $display, $langcode) {
   $title = field_get_items('file', $file, 'media_title', $langcode);
-  $title = isset($title[0])?$title[0]['value']:$file->uri;
+  $title = isset($title[0])?$title[0]['value']:file_create_url($file->uri);
 
   $path = $display['settings']['download']?file_create_url($file->uri):file_entity_uri($file);
-
 
   if (empty($file->override['wysiwyg'])) {
     return array(
@@ -297,7 +314,7 @@ function os_files_media_browser_params_alter(&$media_params) {
  * Alters the titles of the Media Browser tabs to more friendly terms
  */
 function os_files_media_browser_plugins_alter(&$output) {
-  unset($output['library']);
+  unset($output['media_default--media_browser_my_files']);
   $output['upload']['#title'] = t('My Computer');
   $output['media_default--media_browser_1']['#title'] = t('My Library');
 }
@@ -306,12 +323,11 @@ function os_files_media_wysiwyg_allowed_view_modes_alter(&$view_modes, $file) {
   $scheme = file_uri_scheme($file->uri);
   switch ($scheme) {
     case 'oembed':
-      $temp['media_original'] = $view_modes['media_original'];
+      $temp['default'] = $view_modes['default'];
       $view_modes = $temp;
     break;
     case 'public':
-      $mime = explode('/', $file->filemime);
-      $type = $mime[0];  // I do this to get the type in case bundles for files are ever expanded out of just mime type
+      $type = file_get_type($file);
       if ($type == 'image') {
         $temp['os_files_large'] = $view_modes['os_files_large'];
         $temp['os_files_med'] = $view_modes['os_files_med'];
@@ -323,20 +339,6 @@ function os_files_media_wysiwyg_allowed_view_modes_alter(&$view_modes, $file) {
       }
       $view_modes = $temp;
     break;
-  }
-}
-
-/**
- * Implements hook_stream_wrappers_alter().
- *
- * Used to extend the public stream wrapper.
- *
- * @param array $wrappers
- */
-function os_files_stream_wrappers_alter(&$wrappers) {
-  // Use OS Stream Wrapper.
-  if (isset($wrappers['public'])) {
-    $wrappers['public']['class'] = 'OSPublicStreamWrapper';
   }
 }
 
@@ -414,7 +416,7 @@ function _os_files_clean_up_fields() {
   field_delete_field('field_license');
   if ($title = field_info_instance('file', 'media_title', 'image')) {
     $descrip = field_info_instance('file', 'media_description', 'image');
-    $file_types = file_info_file_types();
+    $file_types = file_type_get_all_types();
     foreach ($file_types as $bundle => $info) {
       if (!field_info_instance('file', 'media_title', $bundle)) {
         $title_copy = $title;

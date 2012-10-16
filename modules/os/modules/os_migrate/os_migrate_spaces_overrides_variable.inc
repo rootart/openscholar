@@ -13,7 +13,8 @@ class SpacesOverridesVariableMigration extends SpacesOverridesTableMigration {
 
     $blacklist = array(
       'vsite_design_disable_shield',
-      'vsite_shields_disable_shield'
+      'vsite_shields_disable_shield',
+      'vsite_design_maintheme',
     );
     $query->condition('object_id', $blacklist, 'NOT IN');
     return $query;
@@ -79,7 +80,7 @@ class SpacesOverridesVariableMigration extends SpacesOverridesTableMigration {
   * Updates flavor variables and names.
   */
   public function _update_flavors($object_id, $value){
-    $object_id = preg_replace('/vsite_design_scholar/', 'os_appearance', $object_id);
+    $object_id = preg_replace('/vsite_design/', 'os_appearance', $object_id);
     $value = preg_replace('/^scholar_/', '', $value);
     return array(
       $object_id,
@@ -119,7 +120,7 @@ class SpacesOverridesVariableMigration extends SpacesOverridesTableMigration {
    */
   public function _update_variable_spaces_preset_og($object_id, $value){
     $presets = array(
-      'scholar' => 'os_personal',
+      'scholar' => 'os_scholar',
       'project' => 'os_department'
     );
 
@@ -151,6 +152,11 @@ class SpacesOverridesVariableMigration extends SpacesOverridesTableMigration {
       'os_shields_shield',
       $value
     );
+  }
+
+  //"scholar_book_toc_location" is now "os_booklets_toc_position".
+  public function _update_variable_scholar_book_toc_location($object_id, $value) {
+    return array('os_booklets_toc_location', $value);
   }
 
   // check if a variable is discontinued

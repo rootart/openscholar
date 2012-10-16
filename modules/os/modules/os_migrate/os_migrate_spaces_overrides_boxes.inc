@@ -12,11 +12,6 @@ class SpacesOverridesBoxesMigration extends SpacesOverridesTableMigration {
     $query = parent::query();
     $query->condition('object_id', '', '!=');
 
-
-    //$query->condition('value', '%os_boxes_node%', 'LIKE'); //testing the port function
-    //$query->condition('value', '%os_boxes_modal_image%', 'LIKE'); //testing the port function
- //   $query->condition('value', '%manual%', 'LIKE');
-
     return $query;
   }
 
@@ -163,7 +158,27 @@ class SpacesOverridesBoxesMigration extends SpacesOverridesTableMigration {
     //path to legacy module
     $src = variable_get('os_migrate_files', '');
     $src .= '/' . parent::d6_variable_get('file_directory_path');
-    $src .= '/vsite_shields/';
+
+    //finds the path to vsite_shields
+    function find_vsite_shields_path($base, $path) {
+      if ($path == 'vsite_shields') {
+        return $base . '/' . $path .'/';
+      }
+
+      $new_base = "$base/$path";
+      foreach (scandir($new_base) as $dir) {
+        if (is_dir("$new_base/$dir") && $dir != '.' && $dir !='..' ) {
+          $found = find_vsite_shields_path($new_base, $dir);
+          if ($found) {
+            return $found;
+          }
+        }
+      }
+
+      return FALSE;
+    }
+
+    $src = find_vsite_shields_path($src, '');
 
     //get files or bail out
 //     if (($files = scandir($src)) === FALSE) {
@@ -234,7 +249,7 @@ class BoxPorter {
   }
 
   function _update_format($format = NULL) { //no format -> plain_text
-    return (in_array($format, array(1,2,4,5,6))) ? 'filtered_html' : 'plain_text';
+    return (in_array($format, array(0,1,2,4,5,6))) ? 'filtered_html' : 'plain_text';
   }
 
   public function _update_block_plugin_key($key) {
@@ -569,9 +584,9 @@ class BoxPorter {
     }
 
     //get new fid from legacy delta
-    $query = db_select('spaces_overrides', 'so')
+    $query = db_select('migrate_map_spacesoverridesboxesmedia', 'mm')
       ->condition('sourceid3', $box->delta)
-      ->fields('so', array('destid1'))
+      ->fields('mm', array('destid1'))
       ->isNotNull('destid1')
       ->execute();
 
@@ -699,14 +714,17 @@ class BoxPorter {
       return $key;
     }
 
-    $box->options += array(
+    $defaults = array(
       'controls' => 'none',
       'slide_counter' => 'none',
+      'show_image_titles' => 'none',
       'pager' => 'none',
       'effect' => 'fade',
       'style' => 'dark',
       'size' => 600,
     );
+
+    $box->options = array_merge($defaults, $box->options);
 
     $box->options['gallery_nid'] = $box->options['gallery'];
     unset($box->options['gallery']);
@@ -718,6 +736,12 @@ class BoxPorter {
 
     return $box;
   }
+
+  //slideshows get the same treatment as galleries.  gain options in form.
+  public function _port_box_os_boxes_slideshow($box, $id, $key_only) {
+    return $this->_port_box_os_boxes_gallery($box, $id, $key_only);
+  }
+
 
   //convert os_boxes_node to custom html.  102 in db
   public function _port_box_os_boxes_node($box, $id,  $key_only) {

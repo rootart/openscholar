@@ -6,6 +6,13 @@
  */
 
 /**
+ * The default list of file extensions allowed by file_save_upload().
+ *
+ * Adds support for docx, xlsx, pptx and ppsx.
+ */
+define('FILE_DEFAULT_ALLOWED_EXTENSIONS', 'jpg jpeg gif png txt doc docx xls xlsx pdf ppt pptx pps ppsx odt ods odp');
+
+/**
  * As part of extending Drupal core's file entity API, this module adds some
  * functions to the 'file' namespace. For organization, those are kept in the
  * 'file_entity.file_api.inc' file.
@@ -29,6 +36,8 @@ function file_entity_hook_info() {
     'file_view',
     'file_view_alter',
     'file_displays_alter',
+    'file_type',
+    'file_type_alter',
   );
 
   return array_fill_keys($hooks, array('group' => 'file'));
@@ -67,9 +76,13 @@ function file_entity_hook_info_alter(&$info) {
  */
 function file_entity_help($path, $arg) {
   switch ($path) {
-    case 'admin/config/media/file-types':
+    case 'admin/structure/file-types':
       $output = '<p>' . t('When a file is uploaded to this website, it is assigned one of the following types, based on what kind of file it is.') . '</p>';
       return $output;
+    case 'admin/structure/file-types/manage/%/display/preview':
+    case 'admin/structure/file-types/manage/%/file-display/preview':
+      drupal_set_message(t('Some modules rely on the Preview view mode to function correctly. Changing these settings may break parts of your site.'), 'warning');
+      break;
   }
 }
 
@@ -85,14 +98,16 @@ function file_entity_access($op) {
  */
 function file_entity_menu() {
   // File Configuration
-  $items['admin/config/media/file-types'] = array(
+  // @todo Move this back to admin/config/media/file-types in Drupal 8 if
+  // MENU_MAX_DEPTH is increased to a value higher than 9.
+  $items['admin/structure/file-types'] = array(
     'title' => 'File types',
     'description' => 'Manage settings for the type of files used on your site.',
     'page callback' => 'file_entity_list_types_page',
     'access arguments' => array('administer site configuration'),
     'file' => 'file_entity.admin.inc',
   );
-  $items['admin/config/media/file-types/manage/%'] = array(
+  $items['admin/structure/file-types/manage/%file_type'] = array(
     'title' => 'Manage file types',
     'description' => 'Manage settings for the type of files used on your site.',
   );
@@ -110,6 +125,21 @@ function file_entity_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   // general view, edit, delete for files
+  $items['file/add'] = array(
+    'title' => 'Add file',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('file_entity_add_upload', array()),
+    'access arguments' => array('administer files'),
+    'file' => 'file_entity.pages.inc',
+  );
+  if (module_exists('plupload') && module_exists('multiform')) {
+    $items['file/add']['page arguments'] = array('file_entity_add_upload_multiple');
+  }
+  $items['file/add/upload'] = array(
+    'title' => 'Upload',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
   $items['file/%file'] = array(
     'title callback' => 'entity_label',
     'title arguments' => array('file', 1),
@@ -168,6 +198,21 @@ function file_entity_menu() {
       // configured as a wildcard (multiple file types sharing the same menu
       // router path).
       $file_type_argument = isset($bundle_info['admin']['bundle argument']) ? $bundle_info['admin']['bundle argument'] : $file_type;
+
+      $items[$path] = array(
+        'title' => 'Edit file type',
+        'title callback' => 'file_type_get_name',
+        'title arguments' => array(4),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('file_entity_file_type_form', $file_type_argument),
+        'file' => 'file_entity.admin.inc',
+      ) + $access;
+
+      // Add the 'File type settings' tab.
+      $items["$path/edit"] = array(
+        'title' => 'Edit',
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+      );
 
       // Add the 'Manage file display' tab.
       $items["$path/file-display"] = array(
@@ -243,6 +288,23 @@ function file_entity_menu() {
 }
 
 /**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function file_entity_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link to 'file/add' on 'admin/content/file' page.
+  if ($root_path == 'admin/content/file') {
+    $item = menu_get_item('file/add');
+    if (!empty($item['access'])) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+        '#weight' => $item['weight'],
+      );
+    }
+  }
+}
+
+/**
  * Implement hook_permission().
  */
 function file_entity_permission() {
@@ -266,6 +328,8 @@ function file_entity_permission() {
  */
 function file_entity_admin_paths() {
   $paths = array(
+    'file/add' => TRUE,
+    'file/add/*' => TRUE,
     'file/*/edit' => TRUE,
     'file/*/delete' => TRUE,
   );
@@ -299,30 +363,42 @@ function file_entity_theme() {
 /**
  * Implements hook_entity_info_alter().
  *
- * Extends the core file entity to be fieldable. Modules can define file types
- * via hook_file_type_info(). For each defined type, create a bundle, so that
- * fields can be configured per file type.
+ * Extends the core file entity to be fieldable. The file type is used as the
+ * bundle key. File types are implemented as CTools exportables, so modules can
+ * define default file types via hook_file_default_types(), and the
+ * administrator can override the default types or add custom ones via
+ * admin/structure/file-types.
  */
 function file_entity_entity_info_alter(&$entity_info) {
   $entity_info['file']['fieldable'] = TRUE;
   $entity_info['file']['entity keys']['bundle'] = 'type';
+  $entity_info['file']['bundle keys']['bundle'] = 'type';
   $entity_info['file']['bundles'] = array();
   $entity_info['file']['uri callback'] = 'file_entity_uri';
-  $entity_info['file']['view modes']['full'] = array(
-    'label' => t('Full'),
-    'custom settings' => FALSE,
+  $entity_info['file']['view modes'] += array(
+    'teaser' => array(
+      'label' => t('Teaser'),
+      'custom settings' => TRUE,
+    ),
+    'full' => array(
+      'label' => t('Full content'),
+      'custom settings' => FALSE,
+    ),
+    'preview' => array(
+      'label' => t('Preview'),
+      'custom settings' => TRUE,
+    ),
   );
-  foreach (file_info_file_types() as $type => $info) {
-    $info += array(
-      // Provide a default administration path for Field UI, but not if 'admin'
-      // has been explicitly set to NULL.
+
+  foreach (file_type_get_enabled_types() as $type) {
+    $entity_info['file']['bundles'][$type->type] = array(
+      'label' => $type->label,
       'admin' => array(
-        'path' => 'admin/config/media/file-types/manage/%',
-        'real path' => 'admin/config/media/file-types/manage/' . $type,
-        'bundle argument' => 5,
+        'path' => 'admin/structure/file-types/manage/%file_type',
+        'real path' => 'admin/structure/file-types/manage/' . $type->type,
+        'bundle argument' => 4,
       ),
     );
-    $entity_info['file']['bundles'][$type] = array_intersect_key($info, drupal_map_assoc(array('label', 'admin')));
   }
 
   // Ensure some of the Entity API callbacks are supported.
@@ -405,19 +481,17 @@ function file_entity_file_formatter_info() {
 
   // Allow file field formatters to be reused for displaying the file entity's
   // file pseudo-field.
-  if (module_exists('file')) {
-    foreach (field_info_formatter_types() as $field_formatter_type => $field_formatter_info) {
-      if (in_array('file', $field_formatter_info['field types'])) {
-        $formatters['file_field_' . $field_formatter_type] = array(
-          'label' => $field_formatter_info['label'],
-          'view callback' => 'file_entity_file_formatter_file_field_view',
+  foreach (field_info_formatter_types() as $field_formatter_type => $field_formatter_info) {
+    if (in_array('file', $field_formatter_info['field types'])) {
+      $formatters['file_field_' . $field_formatter_type] = array(
+        'label' => $field_formatter_info['label'],
+        'view callback' => 'file_entity_file_formatter_file_field_view',
+      );
+      if (!empty($field_formatter_info['settings'])) {
+        $formatters['file_field_' . $field_formatter_type] += array(
+          'default settings' => $field_formatter_info['settings'],
+          'settings callback' => 'file_entity_file_formatter_file_field_settings',
         );
-        if (isset($field_formatter_info['settings'])) {
-          $formatters['file_field_' . $field_formatter_type] += array(
-            'default settings' => $field_formatter_info['settings'],
-            'settings callback' => 'file_entity_file_formatter_file_field_settings',
-          );
-        }
       }
     }
   }
@@ -431,11 +505,6 @@ function file_entity_file_formatter_info() {
       'settings callback' => 'file_entity_file_formatter_file_image_settings',
     );
   }
-
-  $formatters['file_link'] = array(
-    'label' => t('Link'),
-    'view callback' => 'file_entity_file_formatter_file_link_view',
-  );
 
   return $formatters;
 }
@@ -525,7 +594,7 @@ function file_entity_file_formatter_file_field_settings($form, &$form_state, $se
 function file_entity_file_formatter_file_image_view($file, $display, $langcode) {
   // Prevent PHP notices when trying to read empty files.
   // @see http://drupal.org/node/681042
-  if (!filesize($file->uri)) {
+  if (!$file->filesize) {
     return;
   }
 
@@ -534,24 +603,22 @@ function file_entity_file_formatter_file_image_view($file, $display, $langcode) 
     return;
   }
 
-  $scheme = file_uri_scheme($file->uri);
-  $local_wrappers = file_get_stream_wrappers(STREAM_WRAPPERS_LOCAL);
-  if (isset($local_wrappers[$scheme]) && $image = image_load($file->uri)) {
+  if (file_entity_file_is_local($file) && isset($file->image_dimensions)) {
     if (!empty($display['settings']['image_style'])) {
       $element = array(
         '#theme' => 'image_style',
         '#style_name' => $display['settings']['image_style'],
         '#path' => $file->uri,
-        '#width' => $image->info['width'],
-        '#height' => $image->info['height'],
+        '#width' => $file->image_dimensions['width'],
+        '#height' => $file->image_dimensions['height'],
       );
     }
     else {
       $element = array(
         '#theme' => 'image',
         '#path' => $file->uri,
-        '#width' => $image->info['width'],
-        '#height' => $image->info['height'],
+        '#width' => $file->image_dimensions['width'],
+        '#height' => $file->image_dimensions['height'],
       );
     }
     return $element;
@@ -576,19 +643,6 @@ function file_entity_file_formatter_file_image_settings($form, &$form_state, $se
 }
 
 /**
- * Implements hook_file_formatter_FORMATTER_view().
- *
- * Returns a render array to display a file as just a link to that file.
- */
-function file_entity_file_formatter_file_link_view($file, $display, $langcode) {
-  $element = array(
-    '#theme' => 'file_entity_file_link',
-    '#file' => $file,
-  );
-  return $element;
-}
-
-/**
  * Menu access callback for the 'view mode file display settings' pages.
  *
  * Based on _field_ui_view_mode_menu_access(), but the Field UI module might not
@@ -597,7 +651,7 @@ function file_entity_file_formatter_file_link_view($file, $display, $langcode) {
 function _file_entity_view_mode_menu_access($file_type, $view_mode, $access_callback) {
   // Deny access if the view mode isn't configured to use custom display
   // settings.
-  $view_mode_settings = field_view_mode_settings('file', $file_type);
+  $view_mode_settings = field_view_mode_settings('file', $file_type->type);
   $visibility = ($view_mode == 'default') || !empty($view_mode_settings[$view_mode]['custom_settings']);
   if (!$visibility) {
     return FALSE;
@@ -674,10 +728,13 @@ function template_preprocess_file_entity(&$variables) {
   $variables['label']     = check_plain($label);
   $variables['page']      = $view_mode == 'full' && file_is_page($file);
 
-  // Disable the file name from being displayed as the title until we can
-  // figure out a better way to control this.
+  // Hide the file name from being displayed until we can figure out a better
+  // way to control this. We cannot simply not output the title since
+  // contextual links require $title_suffix to be output in the template.
   // @see http://drupal.org/node/1245266
-  $variables['page'] = TRUE;
+  if (!$variables['page']) {
+    $variables['title_attributes_array']['class'][] = 'element-invisible';
+  }
 
   // Flatten the file object's member fields.
   $variables = array_merge((array) $file, $variables);
@@ -838,6 +895,95 @@ function file_entity_get_hidden_stream_wrappers() {
 }
 
 /**
+ * Implements hook_ctools_plugin_api().
+ */
+function file_entity_ctools_plugin_api($owner, $api) {
+  if ($owner == 'file_entity' && $api == 'file_type') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_file_default_types().
+ */
+function file_entity_file_default_types() {
+  $types = array();
+
+  // Image.
+  $types['image'] = (object) array(
+    'api_version' => 1,
+    'type' => 'image',
+    'label' => t('Image'),
+    'description' => t('An <em>Image</em> file is a still visual.'),
+    'mimetypes' => array(
+      'image/jpeg',
+      'image/gif',
+      'image/png',
+    ),
+    'streams' => array(
+      'public',
+    ),
+  );
+
+  // Video.
+  $types['video'] = (object) array(
+    'api_version' => 1,
+    'type' => 'video',
+    'label' => t('Video'),
+    'description' => t('A <em>Video</em> file is a moving visual recording.'),
+    'mimetypes' => array(
+      'video/quicktime',
+      'video/mp4',
+      'video/x-msvideo',
+      'video/ogg',
+    ),
+    'streams' => array(
+      'public',
+    ),
+  );
+
+  // Audio.
+  $types['audio'] = (object) array(
+    'api_version' => 1,
+    'type' => 'audio',
+    'label' => t('Audio'),
+    'description' => t('An <em>Audio</em> file is a sound recording.'),
+    'mimetypes' => array(
+      'audio/mpeg',
+      'audio/x-ms-wma',
+      'audio/x-wav',
+      'audio/ogg',
+    ),
+    'streams' => array(
+      'public',
+    ),
+  );
+
+  // Document.
+  $types['document'] = (object) array(
+    'api_version' => 1,
+    'type' => 'document',
+    'label' => t('Document'),
+    'description' => t('A <em>Document</em> file is written information.'),
+    'mimetypes' => array(
+      'text/plain',
+      'application/msword',
+      'application/vnd.ms-excel',
+      'application/pdf',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.oasis.opendocument.text',
+      'application/vnd.oasis.opendocument.spreadsheet',
+      'application/vnd.oasis.opendocument.presentation',
+    ),
+    'streams' => array(
+      'public',
+    ),
+  );
+
+  return $types;
+}
+
+/**
  * Clear the field cache for any entities referencing a specific file.
  *
  * @param object $file
@@ -869,4 +1015,34 @@ function file_entity_invalidate_field_caches($file) {
     }
     cache_clear_all($cids, 'cache_field');
   }
+}
+
+/**
+ * Check if a file entity is considered local or not.
+ *
+ * @param object $file
+ *   A file entity object from file_load().
+ *
+ * @return
+ *   TRUE if the file is using a local stream wrapper, or FALSE otherwise.
+ */
+function file_entity_file_is_local($file) {
+  $scheme = file_uri_scheme($file->uri);
+  $wrappers = file_get_stream_wrappers(STREAM_WRAPPERS_LOCAL);
+  return !empty($wrappers[$scheme]) && empty($wrappers[$scheme]['remote']);
+}
+
+/**
+ * Pre-render callback for adding validation descriptions to file upload fields.
+ */
+function file_entity_upload_validators_pre_render($element) {
+  if (!empty($element['#upload_validators'])) {
+    if (!isset($element['#description'])) {
+      $element['#description'] = '';
+    }
+    if ($element['#description'] !== FALSE) {
+      $element['#description'] = theme('file_upload_help', array('description' => $element['#description'], 'upload_validators' => $element['#upload_validators']));
+    }
+  }
+  return $element;
 }

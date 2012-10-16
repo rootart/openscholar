@@ -45,7 +45,7 @@ class VsiteAccessTest extends OpenscholarWebTestCase {
     //Create A Group Node
     $group1 = array(
         'title' => 'My Test Site',
-        'type' => 'vsite',
+        'type' => 'personal',
         'purl' => 'group1',
     );
     $this->group_1 = $this->drupalCreateNode($group1);
@@ -53,7 +53,7 @@ class VsiteAccessTest extends OpenscholarWebTestCase {
     //Create A Group Node
     $group2 = array(
         'title' => 'Group 2',
-        'type' => 'vsite',
+        'type' => 'personal',
         'purl' => 'group2',
         'uid' => $this->user1->uid,
     );

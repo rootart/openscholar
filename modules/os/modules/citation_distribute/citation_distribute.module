@@ -281,7 +281,7 @@ function citation_distribute_form_biblio_node_form_alter(&$form, &$form_state, $
   );
 
   foreach(_citation_distribute_plugins() as $plugin) {
-    if (isset($plugin['title'])) {
+    if (isset($plugin['title']) && _citation_distribute_is_service_configured($plugin)) {
       $name = $plugin['name'];
 
       $form['citation_distribute'][$name] = array(
@@ -314,7 +314,7 @@ function citation_distribute_form_os_publications_settings_alter(&$form, &$form_
    );
 
   foreach (_citation_distribute_plugins() as $plugin) {
-    if (isset($plugin['title'])) {
+    if (isset($plugin['title']) && _citation_distribute_is_service_configured($plugin)) {
       $form['right']['citation_distribute_autoflags']['#options'][$plugin['class']] = $plugin['title'];
     }
   }
@@ -541,7 +541,27 @@ function _citation_distribute_distribute($nid, $plugin) {
   return $out;
 }
 
+/**
+ * @function _citation_distribute_is_service_configured
+ *
+ * Some plugins have variables that need to be set in order for the plugin to work.  If they're not set,
+ * the user shouldn't see the plugin.  This checks if they're set.
+ *
+ * To make this work, service classes should have construct set their properties to variable_get()'s
+ * output.
+ */
+function _citation_distribute_is_service_configured($plugin) {
+  $service = _citation_distribute_load_plugin($plugin);
 
+  $properties = get_object_vars($service);
+  foreach ($properties as $prop) {
+    if ($prop === NULL) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
 
 /**
  * @function _citation_distribute_unlist_db

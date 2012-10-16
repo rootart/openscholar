@@ -308,12 +308,18 @@ function os_publications_preprocess_node(&$vars) {
  */
 function os_publications_node_view_alter(&$build, $type) {
   if ($type == 'node' && $build['#bundle'] == 'biblio') {
-    $links = &$build['links'];
-    foreach ($links as $k => $l) {
-      if (is_array($l) && isset($l['#links'])) {
-        foreach ($l['#links'] as $id => $arr) {
-          if (strpos($arr['href'], 'export') !== FALSE) {
-            unset($links[$k]['#links'][$id]);
+    if ($build['#view_mode'] == 'teaser') {
+      $build['teaser']['#weight'] = 1;
+      $build['links']['#access'] = FALSE;
+    }
+    else {
+      $links = &$build['links'];
+      foreach ($links as $k => $l) {
+        if (is_array($l) && isset($l['#links'])) {
+          foreach ($l['#links'] as $id => $arr) {
+            if (strpos($arr['href'], 'export') !== FALSE) {
+              unset($links[$k]['#links'][$id]);
+            }
           }
         }
       }

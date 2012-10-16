@@ -28,7 +28,6 @@ function os_comments_fb_social_default_presets() {
         'feed' => 0,
         'media_gallery' => 0,
         'link' => 0,
-        'vsite' => 0,
         'software_project' => 0,
         'software_release' => 0,
       ),

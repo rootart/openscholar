@@ -67,7 +67,7 @@ function os_biocv_field_default_fields() {
       'label' => 'Body',
       'required' => FALSE,
       'settings' => array(
-        'display_summary' => TRUE,
+        'display_summary' => 0,
         'text_processing' => 1,
         'user_register_form' => FALSE,
       ),
@@ -140,7 +140,7 @@ function os_biocv_field_default_fields() {
       'label' => 'Body',
       'required' => FALSE,
       'settings' => array(
-        'display_summary' => TRUE,
+        'display_summary' => 0,
         'text_processing' => 1,
         'user_register_form' => FALSE,
       ),

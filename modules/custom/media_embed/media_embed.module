@@ -26,30 +26,17 @@ function media_embed_menu() {
  * Implements hook_ctools_plugin_api().
  */
 function media_embed_ctools_plugin_api($module, $api) {
-  if ($module == 'media' && $api == 'browser') {
-    return array(
-      'version' => 1,
-    );
-  }
-
   // required for browser previews and rendering of final file entity
   if ($module == 'file_entity' && $api == 'file_default_displays') {
     return array(
       'version' => 1,
     );
   }
-}
-
-/**
- * Implements hook_media_browser_plugin_info().
- *
-function media_embed_media_browser_plugin_info() {
-  $plugins = array();
-  $plugins['media_embed'] = array(
-    'title' => t('HTML'),
-    'class' => 'MediaBrowserHTML',
-  );
-  return $plugins;
+  elseif ($module == 'file_entity' && $api == 'file_type') {
+    return array(
+      'version' => 1,
+    );
+  }
 }
 
 /**
@@ -185,7 +172,25 @@ function media_embed_stream_wrappers() {
   );
 }
 
+function media_embed_file_default_types() {
+  $types = array();
 
+  // HTML.
+  $types['html'] = (object) array(
+    'api_version' => 1,
+    'type' => 'html',
+    'label' => t('HTML'),
+    'description' => t('An <em>HTML</em> file is a block of HTML code that contains an iframe, object, embed or script tag.'),
+    'mimetypes' => array(
+      'html/embed',
+    ),
+    'streams' => array(
+      'embed',
+    ),
+  );
+
+  return $types;
+}
 
 /**
  * Implements hook_file_formatter_info().
@@ -193,16 +198,9 @@ function media_embed_stream_wrappers() {
 function media_embed_file_formatter_info() {
   $formatters['media_embed'] = array(
     'label' => t('Embedded HTML'),
-    'default settings' => array('width' => '560', 'height' => '340'),
+    'default settings' => array(),
     'view callback' => 'media_embed_file_formatter_media_embed_view',
     'settings callback' => 'media_embed_file_formatter_media_embed_settings',
-    'file types' => array('html'),
-  );
-  $formatters['media_embed_thumbnail'] = array(
-    'label' => t('Embedded HTML Thumbnail'),
-    'default settings' => array('width' => '560', 'height' => '340'),
-    'view callback' => 'media_embed_file_formatter_media_embed_thumbnail_view',
-    'settings callback' => 'media_embed_file_formatter_media_embed_thumbnail_settings',
     'file types' => array('html'),
   );
   return $formatters;
@@ -215,7 +213,7 @@ function media_embed_file_formatter_info() {
  */
 function media_embed_media_wysiwyg_allowed_view_modes_alter(&$view_modes, $file) {
   if ($file->type == 'html') {
-    $view_modes = array('media_original' => $view_modes['media_original']);
+    $view_modes = array('default' => $view_modes['default']);
   }
 }
 
@@ -230,19 +228,12 @@ function media_embed_file_default_displays() {
   $default_displays = array();
 
   $default_styles = array();
-    // For default and Large view modes, use the default width and height from
-    // hook_file_formatter_info().
+  // For default
   $default_styles['html__default__media_embed'] = array();
-  $default_styles['html__default__media_embed_thumbnail'] = array();
 
-  // For the Preview view mode, match the width and height of the square
-  // thumbnail in media_image_default_styles().
-  $default_styles['html__media_preview__media_embed_thumbnail'] = array('width' => '180', 'height' => '180');
+  // For the Preview view mode, match the height and width to the media browser's standard
+  $default_styles['html__preview__file_field_media_large_icon'] = array('width' => '180', 'height' => '180');
 
-  // For the Original view mode, set width and height to empty, so that they
-  // use what's returned by the oEmbed response.
-  $default_styles['html__media_original__media_embed'] = array('width' => '', 'height' => '');
-  $default_styles['html__media_original__media_embed_thumbnail'] = array('width' => '', 'height' => '');
 
   foreach ($default_styles as $display_name => $settings) {
     $default_displays[$display_name] = (object) array(
@@ -266,11 +257,38 @@ function media_embed_file_formatter_media_embed_view($file, $display, $langcode)
 
     // Not a WYSIWYG editor instance.
     if (empty($file->override['wysiwyg'])) {
-      field_attach_prepare_view('file', array($file->fid => $file), 'full');
-      entity_prepare_view('file', array($file->fid => $file));
       $file->field_html_code['und'][0]['safe_value'] = $file->field_html_code['und'][0]['value'];
 
-      return field_attach_view('file', $file, 'full');
+      if (isset($file->override['width'])) {
+        $html = &$file->field_html_code[LANGUAGE_NONE][0]['safe_value'];
+
+        $maxwidth = $file->override['width'];
+        // copied from dead embedfilter module
+        preg_match('/height="([0-9]*)"/', $html, $fetchheight);
+        preg_match('/width="([0-9]*)"/', $html, $fetchwidth);
+        if ($fetchheight && $fetchwidth) {
+          $height = $fetchheight[1];
+          $width = $fetchwidth[1];
+        }
+
+        if ($width > $maxwidth) {
+          $diff = $width-$maxwidth;
+          $ratio = $diff/$width;
+          $heightdiff = $ratio*$height;
+          $height = round($height-$heightdiff);
+          $width = $maxwidth;
+
+          $patterns[0] = '/height="([0-9]*)"/';
+          $patterns[1] = '/width="([0-9]*)"/';
+          $replacements[1] = 'height="'.$height.'"';
+          $replacements[0] = 'width="'.$width.'"';
+
+          $html = preg_replace($patterns, $replacements, $html);
+        }
+      }
+      // file attaches fields for us. I just need to return something so we break out here.
+      $render = array('#markup' => '');
+      return $render;
     }
 
     // WYSIWYG will not handle iframes and the like properly.

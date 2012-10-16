@@ -58,4 +58,5 @@ files[] = os_migrate_theme.inc
 
 
 files[] = plugins/imagefield_crop.inc
+files[] = plugins/fields.inc
 

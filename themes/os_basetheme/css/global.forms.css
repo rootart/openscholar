@@ -337,27 +337,92 @@ html.js #user-login-form li.openid-link,
 /*
  * Search
  */
-input[type="search"] {
-  -webkit-appearance: textfield;
-  -moz-box-sizing: content-box;
-  -webkit-box-sizing: content-box;
-  box-sizing: content-box;
-  border-radius:2px;
--moz-border-radius:2px;
-border-radius:2px;
-padding: 5px 16px 5px 2px;
-width:auto;
+
+/* Search box */
+
+#search-block-form {
+  padding-bottom: 5px;
+  }
+
+#content #search-block-form {
+  margin-top: 2em;
+  }
+
+#search-block-form div.form-item {
+  border: none;
+  padding: 0;
+  margin: 0;
+  }
+
+#search-block-form .form-item label {
+  display:none;
+  }
+
+#search-block-form .container-inline {
+  line-height:normal;
+  max-width: 278px;
+  padding-right:24px;
+  height: 24px;
+  }
+
+#search-block-form .container-inline .form-item {
+  width: 100%;
+  }
+
+#search-block-form .spelling-suggestions{
+  padding-top: 1em
+}
+#search-block-form .spelling-suggestions label {
+  display: inline;
 }
 
-#search-block-form input[type="submit"] {
-background : url("../images/searchArrow.png") no-repeat center center;
-	width: 18px;
-	height:18px;
-	border: none;
-	color: transparent;	
-	margin-bottom:-6px;
+#search-block-form .container-inline .form-item,
+#search-block-form .form-submit {
+  float:left;
+  position: relative;
+  }
 
-}
+#search-block-form .container-inline .form-item .form-text {
+  height: 18px;
+  padding: 1px !important;
+  border: none;
+  border: 1px solid #d0d7e1;
+  border-bottom-color:#9eaebb;
+  -moz-border-top-colors: #d0d7e1;
+	-moz-border-left-colors: #d0d7e1;
+	-moz-border-bottom-colors: #9eaebb;
+  border-right:none;
+  background: #FFF;
+  width:100%;
+  margin: 0;
+   -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  }
+
+#header-right #vsite-widgets-search-form #edit-search {
+  width: 43px;
+  }
+
+#search-block-form input.form-submit,
+#search-block-form #edit-submit,
+#search-form #edit-submit{
+  border: medium none;
+  font-size: 10px;
+  height: 24px;
+  width: 24px;
+  margin: 0 -100% 0 0 !important;
+  padding: 0 !important;
+  text-indent: -999em;
+  background: url('../images/scholarbase-sprite.png') no-repeat 0 -64px;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  }
+
+#search-form fieldset.search-advanced {
+  clear: left;
+  }
 
 
 input[type="search"]::-webkit-search-decoration,
@@ -448,40 +513,4 @@ form table .item-list ul {
   display: none;
 }
 
-/* PUBLICATIONS SETTING FORM IN MODAL */
-.os_publications-customize-form #edit-left,
-.os_publications-customize-form #comment_settings {
-	float:left;
-	width:50%;
-}
 
-.os_publications-customize-form .form-actions {
-	clear:both;
-}
-
-.os_publications-customize-form #comment_settings {
-	width:150px;
-}
-
-.os_publications-customize-form #edit-right {
-	float:right;
-	margin-top: -695px;
-	width:50%;
-}
-
-.page-cp .os_publications-customize-form #edit-right {
-	margin-top: -795px;
-	
-}
-
-@-moz-document url-prefix() { 
-.os_publications-customize-form #edit-right {
-	margin-top:-726px;
- }
-}
-
-@-moz-document url-prefix() { 
-.page-cp .os_publications-customize-form #edit-right {
-	margin-top:-810px;
- }
-}

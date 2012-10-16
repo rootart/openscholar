@@ -92,20 +92,6 @@ function os_biocv_process_node(&$vars) {
 }
 
 /**
- * Implements hook_spaces_presets_alter
- *
- * Adds Bio Teaser block to the os_front context for personal sites.
-*/
-function os_biocv_spaces_presets_alter(&$preset) {
-  $preset['os_personal']->value['context']['os_front:reaction:block']['blocks']['boxes-bio_teaser'] = array(
-    'module' => 'boxes',
-    'delta' => 'bio_teaser',
-    'region' => 'content_top',
-    'weight' => '-10'
-  );
-}
-
-/**
  * Implements hook_os_add_new_links_alter()
  *
  * Removes "Add new > Bio" link from "Add new" contextual links if Bio exists.

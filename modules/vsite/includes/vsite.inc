@@ -92,9 +92,9 @@ function vsite_remove_entity($entity, $entity_type = 'node', $vsite = FALSE){
  * @return
  *   the SPACE object if created or FALSE.
  */
-function vsite_create_vsite($name, $domain, $uid, $preset = FALSE) {
+function vsite_create_vsite($name, $domain, $uid, $bundle = 'personal', $preset = FALSE) {
   $node = new stdClass();
-  $node->type = 'vsite';
+  $node->type = $bundle;
   node_object_prepare($node);
 
   $node->title = $name;
@@ -112,8 +112,10 @@ function vsite_create_vsite($name, $domain, $uid, $preset = FALSE) {
   if ($vsite = spaces_load('og', $node->nid)) {
     return $vsite;
   }
-
-  watchdog('vsite', t('Error creating vsite: @nid', array('@nid'=>$node->nid)), array(), WATCHDOG_ERROR);
+  else {
+    error_log(t('Error creating '.$bundle.': @nid', array('@nid'=>$node->nid)), LOG_WARNING);
+    return FALSE;
+  }
 }
 
 /**

@@ -50,7 +50,6 @@ h2, h3, h4 {
 
 h1#page-title {
   margin-top: 0;
-  margin-bottom: 1em;
   font-size:1.4em;
   color:#000;
   }
@@ -122,7 +121,7 @@ p.copy {
 .region-header-first .block-boxes-os_boxes_site_info .boxes-box, 
 .region-header-third .block-boxes-os_boxes_site_info .boxes-box, 
 .region-header-second .block-boxes-os_boxes_site_info .boxes-box {
-	height:84px;background:url('../images/siteInfoBg.gif') no-repeat;background-position:left;padding-left:20px;margin-top: 20px;
+	height:84px;background:url('../images/siteInfoBg.gif') no-repeat;background-position:left;padding-left:20px;margin-top: 20px; margin-left: 30px;
 	}
 
 /* LAYOUT ELEMENTS */

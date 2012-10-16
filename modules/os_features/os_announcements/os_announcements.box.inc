@@ -1,4 +1,7 @@
 <?php
+// $Id$
+
+
 /**
  * @file
  * os_announcements.box.inc
@@ -11,13 +14,14 @@ function os_announcements_default_box() {
   $export = array();
 
   $box = new stdClass();
-  $box->disabled = FALSE; /* Edit this to true to make a default box disabled initially */
+  /* Edit this to true to make a default box disabled initially */
+  $box->disabled    = FALSE;
   $box->api_version = 1;
-  $box->delta = 'os_announcements_latest';
-  $box->plugin_key = 'os_sv_list_box';
-  $box->title = 'Latest Announcements';
+  $box->delta       = 'os_announcements_latest';
+  $box->plugin_key  = 'os_sv_list_box';
+  $box->title       = 'Latest Announcements';
   $box->description = 'Latest Announcements';
-  $box->options = array(
+  $box->options     = array(
     'content_type' => 'announcement',
     'display' => 'display_title',
     'more' => 1,
@@ -31,3 +35,4 @@ function os_announcements_default_box() {
 
   return $export;
 }
+

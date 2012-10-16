@@ -134,6 +134,7 @@
   height: 31px;
   position: relative;
   white-space: normal;
+  line-height:14px;
 }
 
 
@@ -260,7 +261,7 @@
 }
 
 #edit-layout .ui-sortable .close-this {
-  background: url("../../../../../themes/cp/images/scholarbase-sprite.png") no-repeat scroll 0 0 transparent;
+  background: url("../../../../../themes/cp_theme/images/scholarbase-sprite.png") no-repeat scroll 0 0 transparent;
   height: 12px;
   text-indent: -999em;
   width: 12px;
@@ -293,7 +294,7 @@
 
 /* WIDGET STYLES IN UNUSED WIDGET BOX */
 .widget-container a.delete {
-  background: url("../../../../../themes/cp/images/scholarbase-sprite.png") no-repeat scroll 0 -226px transparent;
+  background: url("../../../../../themes/cp_theme/images/scholarbase-sprite.png") no-repeat scroll 0 -226px transparent;
   display: block;
   height: 11px;
   left: 82px;
@@ -304,7 +305,7 @@
 }
 
 .widget-container a.delete:hover {
-  background: url("../../../../../themes/cp/images/scholarbase-sprite.png") no-repeat scroll -14px -241px transparent;
+  background: url("../../../../../themes/cp_theme/images/scholarbase-sprite.png") no-repeat scroll -14px -241px transparent;
   display: block;
   height: 11px;
   text-indent: -999em;
@@ -381,7 +382,7 @@
 
 #websiteLabelTab { 
   height: 16px;
-  left: 726px;
+  left: 756px;
   position: relative;
   top: 40px;
   width: 99px;
@@ -414,7 +415,7 @@ html.js #cp-layout-full-form div.ctools-dropdown div.ctools-dropdown-container {
   max-height: 670px;
   overflow: auto;
   width: 275px;
-  left:550px;
+  left:580px;
   white-space: nowrap;
 }
 
@@ -434,7 +435,7 @@ html.js .page-cp-build-layout div.ctools-dropdown div.ctools-dropdown-container 
   float:right;
   display:inline;
   width:10%;
-  background: url("../../../../../themes/cp/images/scholarbase-sprite.png") no-repeat scroll 0 -297px transparent;
+  background: url("../../../../../themes/cp_theme/images/scholarbase-sprite.png") no-repeat scroll 0 -297px transparent;
   height: 19px;
   text-indent: -999em;
 }

@@ -9,8 +9,8 @@ $plugin = array(
  * Abstract base class defining a server for citation distribution.
  */
 abstract class citation_distribute_service {
-	public $name;
-	public $type; //push, file, metadata.  may not be really necessary.
+//	public $name;
+//	public $type; //push, file, metadata.  may not be really necessary.
 
 	/**
 	 * constructor function

@@ -17,6 +17,14 @@ function os_publications_strongarm() {
   /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->disabled = FALSE;
   $strongarm->api_version = 1;
+  $strongarm->name = 'biblio_author_links';
+  $strongarm->value = 0;
+  $export['biblio_author_links'] = $strongarm;
+
+  $strongarm = new stdClass();
+  /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->disabled = FALSE;
+  $strongarm->api_version = 1;
   $strongarm->name = 'biblio_base';
   $strongarm->value = 'publications';
   $export['biblio_base'] = $strongarm;

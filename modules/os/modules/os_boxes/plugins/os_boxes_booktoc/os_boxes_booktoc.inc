@@ -53,6 +53,18 @@ class os_boxes_booktoc extends os_boxes_default {
   public function render() {
     $block = parent::render();
 
+    // Checks for the table of contents display position setting configured
+    // in os_booklets; defaults to show widget, but may optionally hide this
+    // widget and instead display table of contents in node page content.
+    // @see os_booklets_settings()
+    // @see os_booklets_node_view()
+    $toc_position = variable_get('os_booklets_toc_position');
+    if ((int) $toc_position === 1) {
+      $block['title'] = '';
+      $block['subject'] = '';
+      return $block;
+    }
+
     $book_nid = $this->options['book_nid'];
     if ($book_nid < 0) {
       // the toc of the book on the current page
@@ -74,7 +86,7 @@ class os_boxes_booktoc extends os_boxes_default {
   /**
    * Return the cache parameters for this box
    */
-  public function cache_info(){
+  public function cache_info() {
 
     //Clear when book,class,class_material nodes are saved
     $cache_key = array(

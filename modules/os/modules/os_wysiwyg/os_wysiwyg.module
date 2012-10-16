@@ -58,8 +58,9 @@ function os_wysiwyg_update_files($node){
   //Delete no longer used file references
   foreach ( $curr_files as $fid => $count ) {
     if($count > 0){
-      $file = file_load($fid);
-      file_usage_delete($file, 'os_wysiwyg', 'node', $node->nid, $count);
+      if ($file = file_load($fid)) {
+        file_usage_delete($file, 'os_wysiwyg', 'node', $node->nid, $count);
+      }
     }
   }
 }

@@ -17,7 +17,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
   public static $source_bundle_map = array(
     'software_project' => 'scholar_software_project',
     'software_release' => 'scholar_software_release',
-    'media_gallery' => 'gallery'
+    'media_gallery' => 'gallery',
   );
 
   public function __construct($destination_bundle){
@@ -25,10 +25,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
 
     $this->source_content_type = $source_content_type = self::get_source_bundle($destination_bundle);
 
-    parent::__construct(MigrateGroup::getInstance('node', array(
-      'inline',
-      'users'
-    )));
+    parent::__construct(MigrateGroup::getInstance('node', array('inline','users')));
     //when extending this class, don't forget to update info file with new filename!
 
 
@@ -42,7 +39,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
       'ImageInlineOS',
       'FileInlineOS',
       'HTMLInlineOS',
-      'VsiteNodeOS'
+      'VsiteNodeOS',
     ); //og when that's done
 
 
@@ -227,7 +224,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
   function prepareRow(&$current_row){
 
     //check that destination vsite exists.  some vsites have been removed, but their content still exists
-    $query = db_select('node', 'n')->fields('n')->condition('type', 'vsite', '=')->condition('nid', $current_row->group_nid, '=');
+    $query = db_select('node', 'n')->fields('n')->condition('type', $this->_d7_vsite_type())->condition('nid', $current_row->group_nid, '=');
 
     if (! $query->execute()->fetchAssoc()) {
       $os_migrate_legacy_site = variable_get('os_migrate_legacy_site', '');
@@ -382,6 +379,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
       $this->addFieldMapping('field_upload:destination_file', 'filepath');
       $this->addFieldMapping('field_upload:source_dir')->defaultValue(variable_get('os_migrate_files', FALSE));
       $this->addFieldMapping('field_upload:destination_dir', 'file_destination');
+      $this->addFieldMapping('field_upload:og_group_ref', 'group_nid');
 
       //good defaults
       $this->addUnmigratedDestinations(parent::subfields('field_upload', array(
@@ -429,13 +427,29 @@ abstract class AbstractNodeOSMigration extends OSMigration {
   }
 
   /**
-   * Map bundle names from existing to new
+   * Map bundle names from new to legacy
    */
   public static function get_source_bundle($bundle){
-    if (array_key_exists($bundle, self::$source_bundle_map)) {
+    $og_bundles = og_get_all_group_bundle();
+    if ($bundle == self::_d7_vsite_type()) {
+      return self::_d6_vsite_type();
+    } elseif (array_key_exists($bundle, self::$source_bundle_map)) {
       return self::$source_bundle_map[$bundle];
     }
 
     return $bundle;
+  }
+
+  function _d6_vsite_type() {
+    return parent::d6_variable_get('scholar_content_type', 'vsite');
+  }
+
+  function _d7_vsite_type() {
+    $override = variable_get('os_migrate_default_group_bundle', variable_get('os_default_group_bundle', 'keep'));
+    if ($override == 'keep') {
+      return variable_get('os_default_group_bundle', 'personal');
+    } else {
+      return $override;
+    }
   }
 }

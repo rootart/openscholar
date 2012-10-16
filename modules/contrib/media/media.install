@@ -96,15 +96,15 @@ function media_schema() {
         'default' => 0,
       ),
     ),
+    'primary key' => array('fid'),
+    'indexes' => array(
+      'timestamp' => array('timestamp'),
+    ),
     'foreign keys' => array(
       'file_managed' => array(
         'table' => 'file_managed',
         'columns' => array('fid' => 'fid'),
       ),
-    ),
-    'primary key' => array('fid'),
-    'indexes' => array(
-      'timestamp' => array('timestamp'),
     ),
   );
 
@@ -170,12 +170,6 @@ function media_install() {
   foreach ($types as $name => $type) {
     media_type_save($type);
 
-    // @todo By default, we hide the file display in the 'small' view mode for
-    //   legacy reasons. Does it still make sense to do so? See
-    //   http://drupal.org/node/1051090.
-    $bundle_settings = field_bundle_settings('file', $name);
-    $bundle_settings['extra_fields']['display']['file']['media_small'] = array('weight' => 0, 'visible' => FALSE);
-    field_bundle_settings('file', $name, $bundle_settings);
   }
 }
 
@@ -187,6 +181,21 @@ function media_uninstall() {
   foreach (media_variable_default() as $name => $value) {
     media_variable_del($name);
   }
+}
+
+/**
+ * Implements hook_update_dependencies().
+ */
+function media_update_dependencies() {
+  // This update function requires field_update_7002() to run before it since
+  // the field_bundle_settings variable has been split into separate variables
+  // per entity type and bundle.
+  $dependencies['media'][7016] = array(
+    'field' => 7002,
+    'rules' => 7205,
+  );
+
+  return $dependencies;
 }
 
 /**
@@ -450,6 +459,13 @@ function media_update_7015() {
 
 /**
  * Convert Media entities to File entities.
+ *
+ * This update function requires field_update_7002() to run before it since
+ * the field_bundle_settings variable has been split into separate variables
+ * per entity type and bundle.
+ *
+ * @see http://drupal.org/node/1418708
+ * @see http://drupal.org/node/1211008
  */
 function media_update_7016() {
   // Allow File Entity module to take over the {file_managed}.type field. It
@@ -510,32 +526,31 @@ function media_update_7016() {
   // Update the field_bundle_settings configuration variable: move media bundle
   // settings to file bundles, and move settings of the old self-referencing
   // file field to the new file pseudo-field.
-  $settings = variable_get('field_bundle_settings', array());
-  if (!isset($settings['file'])) {
-    $settings['file'] = array();
-  }
-  if (isset($settings['media'])) {
-    $settings['file'] = array_merge($settings['file'], $settings['media']);
-    unset($settings['media']);
-  }
   foreach ($instances as $instance) {
     if ($instance['field_name'] === 'file' && !$instance['deleted']) {
+      $file_settings = field_bundle_settings('file', $instance['bundle']);
+      $media_settings = field_bundle_settings('media', $instance['bundle']);
+      $file_settings = array_merge($file_settings, $media_settings);
       if (isset($instance['widget']['weight'])) {
-        $settings['file'][$instance['bundle']]['extra_fields']['form']['file']['weight'] = $instance['widget']['weight'];
+        $file_settings['extra_fields']['form']['file']['weight'] = $instance['widget']['weight'];
       }
       if (isset($instance['display'])) {
         foreach ($instance['display'] as $view_mode => $display) {
           if (isset($display['weight'])) {
-            $settings['file'][$instance['bundle']]['extra_fields']['display']['file'][$view_mode]['weight'] = $display['weight'];
+            $file_settings['extra_fields']['display']['file'][$view_mode]['weight'] = $display['weight'];
           }
           if (isset($display['type'])) {
-            $settings['file'][$instance['bundle']]['extra_fields']['display']['file'][$view_mode]['visible'] = ($display['type'] != 'hidden');
+            $file_settings['extra_fields']['display']['file'][$view_mode]['visible'] = ($display['type'] != 'hidden');
           }
         }
       }
+      field_bundle_settings('file', $instance['bundle'], $file_settings);
     }
   }
-  variable_set('field_bundle_settings', $settings);
+  // Delete old media bundle settings.
+  db_delete('variable')
+    ->condition('name', db_like('field_bundle_settings_media__') . '%', 'LIKE')
+    ->execute();
 
   // Copy field formatter settings of old self-referencing file field to file
   // pseudo-field formatter settings.
@@ -688,4 +703,194 @@ function media_update_7201() {
  */
 function media_update_7202() {
   module_enable(array('views'));
+}
+
+/**
+ * Empty update function to trigger cache clear.
+ */
+function media_update_7203() {
+  // Do nothing.
+}
+
+/**
+ * Update old Media view modes to the new File Entity ones.
+ */
+function media_update_7204() {
+  $view_mode_updates = array(
+    'media_preview' => 'preview',
+    'media_small' => 'teaser',
+    'media_large' => 'full',
+  );
+
+  // Update the media__wysiwyg_default_view_mode variable.
+  $wysiwyg_default_view_mode = variable_get('media__wysiwyg_default_view_mode');
+  if (isset($wysiwyg_default_view_mode) && isset($view_mode_updates[$wysiwyg_default_view_mode])) {
+    $wysiwyg_default_view_mode = $view_mode_updates[$wysiwyg_default_view_mode];
+    variable_set('media__wysiwyg_default_view_mode', $wysiwyg_default_view_mode);
+  }
+
+  // Update view mode references in the 'field_bundle_settings' variable.
+  $field_bundle_settings = variable_get('field_bundle_settings');
+  if (!empty($field_bundle_settings['file'])) {
+    foreach ($field_bundle_settings['file'] as $file_type => $info) {
+      // Per-bundle information about the view modes.
+      foreach ($view_mode_updates as $old_view_mode => $new_view_mode) {
+        if (isset($info['view_modes'][$old_view_mode])) {
+          $field_bundle_settings['file'][$file_type]['view_modes'][$new_view_mode] = $info['view_modes'][$old_view_mode];
+          unset($field_bundle_settings['file'][$file_type]['view_modes'][$old_view_mode]);
+        }
+        // The File Entity module defaults to not use custom settings for the
+        // new view modes, but the Media module used to default to using custom
+        // settings, so if this variable is not defined, use the prior default.
+        if (!isset($field_bundle_settings['file'][$file_type]['view_modes'][$new_view_mode]['custom_settings'])) {
+          $field_bundle_settings['file'][$file_type]['view_modes'][$new_view_mode]['custom_settings'] = TRUE;
+        }
+      }
+
+      // Settings for the "extra fields" configured on the Manage Display page.
+      if (!empty($info['extra_fields']['display'])) {
+        foreach ($info['extra_fields']['display'] as $extra_field_name => $extra_field_info) {
+          foreach ($view_mode_updates as $old_view_mode => $new_view_mode) {
+            if (isset($extra_field_info[$old_view_mode])) {
+              $field_bundle_settings['file'][$file_type]['extra_fields']['display'][$extra_field_name][$new_view_mode] = $extra_field_info[$old_view_mode];
+              unset($field_bundle_settings['file'][$file_type]['extra_fields']['display'][$extra_field_name][$old_view_mode]);
+            }
+          }
+        }
+      }
+    }
+  }
+  variable_set('field_bundle_settings', $field_bundle_settings);
+
+  // Move settings for fields attached to files from the old view modes to the
+  // new ones.
+  $instances = field_read_instances(array('entity_type' => 'file'));
+  foreach ($instances as $instance) {
+    $updated = FALSE;
+    foreach ($view_mode_updates as $old_view_mode => $new_view_mode) {
+      if (isset($instance['display'][$old_view_mode])) {
+        $instance['display'][$new_view_mode] = $instance['display'][$old_view_mode];
+        unset($instance['display'][$old_view_mode]);
+        $updated = TRUE;
+      }
+    }
+    if ($updated) {
+      field_update_instance($instance);
+    }
+  }
+
+  // Move "Manage file display" settings from old view modes to new ones.
+  $file_display_names = db_query('SELECT name FROM {file_display}')->fetchCol();
+  foreach ($file_display_names as $old_file_display_name) {
+    list($file_type, $view_mode, $formatter) = explode('__', $old_file_display_name, 3);
+    if (isset($view_mode_updates[$view_mode])) {
+      $view_mode = $view_mode_updates[$view_mode];
+      $new_file_display_name = implode('__', array($file_type, $view_mode, $formatter));
+      db_delete('file_display')->condition('name', $new_file_display_name)->execute();
+      db_update('file_display')->fields(array('name' => $new_file_display_name))->condition('name', $old_file_display_name)->execute();
+    }
+  }
+
+  // Update file/image/media fields that use a formatter that reference an old
+  // file view modes to reference the new ones.
+  foreach (field_read_instances() as $instance) {
+    if (!empty($instance['display'])) {
+      $updated = FALSE;
+      foreach ($instance['display'] as $instance_view_mode => $display) {
+        if (isset($display['settings']['file_view_mode']) && isset($view_mode_updates[$display['settings']['file_view_mode']])) {
+          $instance['display'][$instance_view_mode]['settings']['file_view_mode'] = $view_mode_updates[$display['settings']['file_view_mode']];
+          $updated = TRUE;
+        }
+      }
+      if ($updated) {
+        field_update_instance($instance);
+      }
+    }
+  }
+
+  // Update formatter settings that reference the old view modes within saved
+  // Views.
+  if (db_table_exists('views_display')) {
+    $result = db_select('views_display', 'v')->fields('v', array('vid', 'id', 'display_options'))->execute();
+    foreach ($result as $record) {
+      if (!empty($record->display_options)) {
+        $display_options = unserialize($record->display_options);
+        if (_media_update_7204_update_views_display_options($display_options, $view_mode_updates)) {
+          db_update('views_display')
+            ->fields(array('display_options' => serialize($display_options)))
+            ->condition('vid', $record->vid)
+            ->condition('id', $record->id)
+            ->execute();
+        }
+      }
+    }
+  }
+
+  // Update formatter settings that reference the old view modes within unsaved
+  // Views in the CTools object cache. Objects in the CTools cache are instances
+  // of classes, so the Views module must be enabled to unserialize it
+  // correctly.
+  if (db_table_exists('ctools_object_cache') && module_exists('views')) {
+    $result = db_select('ctools_object_cache', 'c')->fields('c', array('sid', 'name', 'obj', 'data'))->condition('obj', 'view')->execute();
+    foreach ($result as $record) {
+      $view = unserialize($record->data);
+      if (!empty($view->display)) {
+        $updated = FALSE;
+        foreach ($view->display as $display_name => $display) {
+          if (!empty($display->display_options) && _media_update_7204_update_views_display_options($display->display_options, $view_mode_updates)) {
+            $updated = TRUE;
+          }
+        }
+        if ($updated) {
+          db_update('ctools_object_cache')
+            ->fields(array('data' => serialize($view)))
+            ->condition('sid', $record->sid)
+            ->condition('name', $record->name)
+            ->condition('obj', $record->obj)
+            ->execute();
+        }
+      }
+    }
+  }
+
+  // Clear caches that might contain stale Views displays.
+  if (module_exists('views')) {
+    cache_clear_all('*', 'cache_views', TRUE);
+    cache_clear_all('*', 'cache_views_data', TRUE);
+  }
+  if (module_exists('block')) {
+    cache_clear_all('*', 'cache_block', TRUE);
+  }
+  cache_clear_all('*', 'cache_page', TRUE);
+
+  // We still have the old media_link and media_original view modes that must be
+  // supported for now.
+  // @TODO: Make this apply only to updates from Media 1.x.
+  // @see media_entity_info_alter()
+  variable_set('media__show_deprecated_view_modes', TRUE);
+}
+
+/**
+ * Helper function for media_update_7204() to update display options within Views.
+ */
+function _media_update_7204_update_views_display_options(&$display_options, $view_mode_updates) {
+  $updated = FALSE;
+
+  // Update fields that use a formatter with a file_view_mode formatter setting.
+  if (!empty($display_options['fields'])) {
+    foreach ($display_options['fields'] as $field_name => $field_display) {
+      if (isset($field_display['settings']['file_view_mode']) && isset($view_mode_updates[$field_display['settings']['file_view_mode']])) {
+        $display_options['fields'][$field_name]['settings']['file_view_mode'] = $view_mode_updates[$field_display['settings']['file_view_mode']];
+        $updated = TRUE;
+      }
+    }
+  }
+
+  // Update Views that display files directly using a row plugin with a view
+  // mode setting.
+  if (isset($display_options['row_plugin']) && $display_options['row_plugin'] === 'file' && isset($display_options['row_options']['view_mode']) && isset($view_mode_updates[$display_options['row_options']['view_mode']])) {
+    $display_options['row_options']['view_mode'] = $view_mode_updates[$display_options['row_options']['view_mode']];
+    $updated = TRUE;
+  }
+  return $updated;
 }

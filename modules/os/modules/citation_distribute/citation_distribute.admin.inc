@@ -7,6 +7,21 @@
  */
 function citation_distribute_admin() {
   $form = array();
+
+  $unconfigured = array();
+  foreach ( _citation_distribute_plugins() as $plugin ) {
+    if (isset($plugin['title']) && !_citation_distribute_is_service_configured($plugin)) {
+      $unconfigured[] = $plugin['title'];
+    }
+  }
+
+  if (count($unconfigured)) {
+    $form['citation_distribute_config_message'] = array(
+      '#type' => 'markup',
+      '#markup' => '<div class="messages warning">' . t('The following plugin(s) need to be configured:') . implode(', ', $unconfigured) . '</div>',
+    );
+  }
+
   $form['citation_distribute'] = array(
     '#type' => 'fieldset',
     '#title' => t('Configure Citation Distribute'),
@@ -84,7 +99,7 @@ function citation_distribute_plugin_admin_form($form, &$state, $service) {
 			break;
 		}
 	}
-	
+
 	if ($instance = _citation_distribute_load_plugin($plugins[$plugin])) {
 		if (method_exists($instance, 'admin_form')) {
       $form = $instance->admin_form();

@@ -28,25 +28,65 @@ function vsite_register_form($form, &$state) {
     '#attached' => array('js' => array(drupal_get_path('module', 'vsite_register') . '/vsite_register.js')),
   );
 
+  $group_types = og_get_all_group_bundle();
+  $default_bundle = variable_get('os_default_group_bundle', 'personal');
+  $bundles = array();
+  foreach ($group_types['node'] as $bundle => $label) {
+  	if(user_access("create {$bundle} content")){
+  	  $bundles[$bundle] = $label;
+  	}
+  }
+  if(!isset($bundles[$default_bundle])){
+    $default_bundle = current($bundles);
+  }
+
+  $form['bundle'] = array(
+    '#title' => t('Type of site'),
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#options' => $bundles,
+    '#default_value' => $default_bundle,
+  );
+
+  if (count($bundles) <= 1) {
+    $form['bundle']['#type'] = 'value';
+    $form['bundle']['#value'] = $default_bundle;
+  }else{
+    $form['bundle']['#ajax'] = array(
+      'event' => 'change',
+      'wrapper' => 'preset-wrapper',
+      'callback' => 'vsite_register_ajax_avalible_presets',
+      'method' => 'replace',
+    );
+  }
+
+  $selected_bundle = isset($state['values']['bundle']) ? $state['values']['bundle'] : $default_bundle;
+
   //Get enabled presets and load their titles
   $enabled_presets = variable_get('os_enabled_spaces_presets', array());
   $presets = spaces_preset_load();
   foreach($enabled_presets as $key => $value) {
     $enabled_presets[$key] = $presets[$key]->title;
+    //Remove presets that don't go with this bundle
+    if(isset($presets[$key]->value['bundles']) && !in_array($selected_bundle, $presets[$key]->value['bundles'])){
+     unset($enabled_presets[$key]);
+    }
   }
-  $default_preset = variable_get('spaces_preset_og', 'os_personal');
+  $default_preset = variable_get('spaces_preset_og', 'os_scholar');
 
   $form['preset'] = array(
-    '#title' => t('Type of site'),
+    '#prefix' => '<div id="preset-wrapper">',
+    '#suffix' => '</div>',
+    '#title' => t('Initial Setup'),
     '#type' => 'select',
     '#required' => TRUE,
     '#options' => $enabled_presets,
-    '#default_value' => (isset($enabled_presets[$default_preset])) ? $default_preset : current($enabled_presets),
+    '#default_value' => (isset($enabled_presets[$default_preset])) ? $default_preset : current(array_keys($enabled_presets)),
   );
 
   if (count($enabled_presets) <= 1) {
     $form['preset']['#type'] = 'value';
-    $form['preset']['#value'] = current($enabled_presets);
+    $form['preset']['#value'] = $form['preset']['#default_value'];
   }
 
   $form['vsite_private'] = array(
@@ -235,7 +275,7 @@ function vsite_register_form_submit(&$form, &$state) {
   }
 
   //create the vsite
-  if ($vsite = vsite_create_vsite($values['domain'], $values['domain'], $site_owner->uid, $values['preset'])) {
+  if ($vsite = vsite_create_vsite($values['domain'], $values['domain'], $site_owner->uid, $values['bundle'], $values['preset'])) {
     //add user to vsite
     module_load_include('inc', 'vsite', 'includes/user');
     vsite_user_add($site_owner);
@@ -286,7 +326,7 @@ function vsite_register_form_validate(&$form, &$state) {
         $state['triggering_element']['#ajax']['callback'] == 'iqss_pinserver_register_ajax_validation') {
       //ajax callback will validate just this element and return a message.
       return;
-    } else {
+    } else if ($state['triggering_element']['#ajax']['callback'] != 'vsite_register_ajax_avalible_presets'){
       //form is done.  maybe this should happen after the validate?  or at least duplicate its efforts.
       return vsite_register_ajax_submit_validation($form, $state);
     }
@@ -319,6 +359,19 @@ function vsite_register_ajax_validation(&$form, &$state) {
     'errors' => _vsite_register_validate($elem, $state['values']),
   )));
   //$errors = form_get_errors();//$state['triggering_element']['#name']);
+}
+
+/**
+ * Update the avalible presets
+ *
+ * @param $form
+ * @param $form_state
+ * @return $form
+ */
+function vsite_register_ajax_avalible_presets($form, $form_state) {
+
+  //Hard work is done in the form build function, just return the item
+  return $form['preset'];
 }
 
 /**

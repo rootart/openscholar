@@ -54,6 +54,16 @@ function cp_menu_menu() {
   return $items;
 }
 
+/**
+ * Implements hook_admin_paths().
+ */
+function cp_menu_admin_paths() {
+  $paths = array(
+    'cp/menu/*' => TRUE,
+  );
+  return $paths;
+}
+
 function cp_menu_theme() {
   $items = array();
 
@@ -144,8 +154,8 @@ function cp_menu_contextual_links_view_alter(&$element, $items) {
 	          if ($space = spaces_get_space()) {
 	            $fragment = $space->group->purl . '/' . $fragment;
 	          }
-	          ctools_include('modal');
-	          ctools_modal_add_js();
+	          //ctools_include('modal');
+	          //ctools_modal_add_js();
 	          $element['#links']['menu-add'] = array('title' => t('Add menu item'), 'href' => $fragment . $menu, 'attributes' => array('class' => array('ctools-use-modal')));
 	        }
 	      }

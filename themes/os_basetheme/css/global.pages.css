@@ -24,13 +24,15 @@ body {
 }
 
 
-#header /* Main site header. */ {
+#header-container {
+	padding: 0 10px 10px;
 }
+
 
 /* bigscreen three_col_grail */
 
 #columns {
-    
+    min-height:300px;
 }
 
 
@@ -91,6 +93,11 @@ div.messages {
   margin-right: 8px;
 }
 
+.block-boxes-os_boxes_site_logo .block-inner {
+	margin-left: 0;
+	margin-right: 0;
+}
+
 #main-content {
   margin-left: 15px;
   margin-right: 15px;
@@ -145,11 +152,11 @@ logged-in.page-cp #block-os-powered-by {
     background: url("../images/poweredby.png") no-repeat scroll 0 0 transparent;
     border: medium none !important;
     display: block;
-    height: 15px;
+    height: 26px;
     padding: 0 !important;
     text-decoration: none !important;
     text-indent: -999em;
-    width: 140px;
+    width: 85px;
     margin-top:-25px;
   }
 
@@ -203,6 +210,7 @@ logged-in.page-cp #block-os-powered-by {
 
 
 h1#page-title /* The title of the page. */ {
+	margin-bottom:1em;
 }
 
 div.messages /* Important messages (status, warning, and error) for the user. See also the declarations in messages.css. */ {
@@ -326,6 +334,12 @@ ul.links li {
     padding-left: 15px;
 }
 
+.node-book .links li span a {
+    background: url("../images/scholarbase-sprite.png") 0 -524px no-repeat;
+    color: #3A6A8C;
+    padding-left: 15px;
+}
+
 
 /* ADD CLASS ICON */
 ul.class_material_field_class {
@@ -346,9 +360,9 @@ ul.class_material_field_class a.class_material_field_class_anchor {
 
 .media-widget a#edit-select,
 .media-widget a.button.launcher {
-    background: url("../images/scholarbase-sprite.png") 0 -431px no-repeat;
+    background: url("../images/scholarbase-sprite.png") 0 -492px no-repeat;
     color: #3A6A8C;
-    padding-left: 12px;
+    padding-left: 16px;
    }
 
 .media-widget a.ctools-modal-media-file-edit {
@@ -656,6 +670,10 @@ padding:10px;
 margin-top: 1px;
 border-top:1px solid #ccc;
 	}
+	
+	.ui-tabs .ui-tabs-nav {
+  padding: 0;
+}
 	
 .ui-tabs .ui-tabs-nav li a {
     padding: 0.15em 1em;

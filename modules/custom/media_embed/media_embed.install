@@ -62,7 +62,7 @@ function media_embed_install() {
       'display' => array(
       	'file' => array(
           'default' => array(
-            'visible' => FALSE,
+            'visible' => TRUE,
             'weight' => 0,
           ),
       	),

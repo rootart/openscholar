@@ -44,7 +44,7 @@ class PersonNodeOSMigration extends AbstractNodeOSMigration {
     $this->addFieldMapping('field_person_photo', 'field_person_photo')
       ->defaultValue(NULL);
     $this->addSimpleMappings(parent::subfields('field_person_photo', array('destination_file', 'cropbox_x', 'cropbox_y', 'cropbox_height' ,'cropbox_width', 'alt', 'title')));
-    $this->addFieldMapping('field_person_photo:source_dir')
+    $this->addFieldMapping('field_person_photo:source_dir', 'field_person_photo:source_dir')
       ->defaultValue(variable_get('os_migrate_files', NULL));
     $this->addUnmigratedDestinations(parent::subfields('field_person_photo', array('file_class', 'language', 'destination_dir', 'file_replace', 'preserve_files')));
 
@@ -129,6 +129,8 @@ class PersonNodeOSMigration extends AbstractNodeOSMigration {
 
       $current_row->{'field_person_photo:cropbox_alt'} = $data['alt'];
       $current_row->{'field_person_photo:cropbox_title'} = $data['title'];
+    } else {
+      $current_row->{'field_person_photo:source_dir'} = NULL;
     }
 
     return parent::prepareRow($current_row); //false -> skip this row

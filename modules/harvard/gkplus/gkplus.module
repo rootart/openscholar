@@ -4,12 +4,80 @@
 /**
  * @file
  * Customizations for Gary King's website.
- *
- * @todo implement 'child indent';
- *   was "override_child" in _iqss_gking_term_page_tree()
- * @todo implement 'hidden heading';
- *   was "hidden_term_heading" in _iqss_gking_term_page_tree()
  */
+
+/**
+ * Implements hook_menu().
+ */
+function gkplus_menu() {
+  $items = array();
+
+  $items['taxonomy/%ctools_js/nodeorder/%'] = array(
+    'title' => 'Order Taxonomy Nodes',
+    'page callback' => 'gkplus_nodeorder_form',
+    'page arguments' => array(1, 3),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['gking_update_filefield/%'] = array(
+    'title' => 'Update Filefield',
+    'page callback' => 'gkplus_update_filefield_page',
+    'page arguments' => array(1),
+    'access callback' => 'gkplus_access_file',
+    'access arguments' => array(1),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_strongarm().
+ *
+ * @ingroup nodeorder
+ */
+function gkplus_strongarm() {
+  $conf = array();
+
+  // Hide the nodeorder links on term nodes
+  $conf['nodeorder_show_links_on_node'] = 0;
+
+  return $conf;
+}
+
+/**
+ * Page callback; provides nodeorder form for a given taxonomy term.
+ *
+ * @ingroup nodeorder
+ */
+function gkplus_nodeorder_form($js = NULL, $tid = NULL) {
+  // Gracefully degrades if $js is not set.
+  if (!$js) {
+    return drupal_get_form('nodeorder_admin_display_form', $tid);
+  }
+
+  ctools_include('ajax');
+  ctools_include('modal');
+  require_once (drupal_get_path('module', 'nodeorder') . '/nodeorder.admin.inc');
+
+  $form_state = array(
+    'title' => t('Order Term Nodes'),
+    'ajax' => TRUE,
+    'build_info' => array(
+       'args' => array($tid),
+    ),
+  );
+
+  $output = ctools_modal_form_wrapper('nodeorder_admin_display_form', $form_state);
+
+  if ($form_state['submitted'] && form_get_errors() == FALSE) {
+    $output = array();
+    $output[] = ctools_ajax_command_reload();
+  }
+  print ajax_render($output);
+  exit;
+}
 
 /**
  * Implements hook_init().
@@ -29,10 +97,11 @@ function gkplus_cron() {
     'tree' => TRUE,
     'max_depth' => 2,
     'description' => TRUE,
-    'template' => 'taxonomy_term',
   );
 
   variable_set('os_taxonomy_term_page_options', $options);
+
+  _gkplus_updatefile_cron();
 }
 
 /**
@@ -200,6 +269,21 @@ function gkplus_form_taxonomy_form_term_submit($form, &$form_state) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for taxonomy_form_vocabulary.
+ *
+ * Hides nodeorder's "Orderable" checkbox on the vocabulary edit form.
+ *
+ * @see gkplus_enable()
+ *
+ * @ingroup nodeorder
+ */
+function gkplus_form_taxonomy_form_vocabulary_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['settings']['orderable'])) {
+    $form['settings']['orderable']['#type'] = 'value';
+  }
+}
+
+/**
  * Implements hook_form_BASE_FORM_ID_alter() for node_form.
  */
 function gkplus_form_node_form_alter(&$form, &$form_state, $form_id) {
@@ -252,6 +336,33 @@ function gkplus_preprocess_html(&$vars) {
 }
 
 /**
+ * Implements hook_preprocess_HOOK for taxonomy-term.tpl.php.
+ *
+ * Adds nodeorder admin link to terms for admin on gking site only.
+ *
+ * @ingroup nodeorder
+ */
+function gkplus_preprocess_taxonomy_term(&$vars) {
+  if (!_gkplus_check_purl()) {
+    return;
+  }
+  $tid = $vars['term']->tid;
+  if (os_taxonomy_count_attached_nodes($tid) < 2) {
+    return;
+  }
+  if (!(module_exists('nodeorder') || !spaces_access_admin())) {
+    return;
+  }
+
+  ctools_include('ajax');
+  ctools_include('modal');
+
+  $vars['title_prefix'] = "<span class='term-admin-links'>"
+    . ctools_modal_text_button(t('Sort Section'), "taxonomy/nojs/nodeorder/$tid", t('Sort Section'), "term-admin-link term-admin-sort-link")
+    . "</span>";
+}
+
+/**
  * Implements hook_preprocess_HOOK for theme_os_taxonomy_tagged_nodes().
  *
  * @ingroup term_display_options
@@ -286,6 +397,92 @@ function gkplus_preprocess_os_taxonomy_tagged_nodes(&$vars) {
   else {
     $vars['options']['attributes']['class'][] = 'gkplus-no-indent';
   }
+}
+
+/**
+ * Page callback; updates a node that has an attached file with the same name.
+ *
+ * @param string $filename
+ * @param bool $return
+ *
+ * @ingroup updatefile
+ */
+function gkplus_update_filefield_page($filename, $return = FALSE) {
+  $source_uri = 'public://gking/tmpdir/' . $filename;
+  $dest_uri = 'public://gking/files/' . $filename;
+
+  // First makes sure we have a file to copy to.
+  $fid = db_select('file_managed', 'f')
+    ->fields('f', array('fid'))
+    ->condition('uri', $dest_uri, '=')
+    ->range(0, 1)
+    ->orderBy('fid', 'DESC')
+    ->execute()
+    ->fetchField();
+  if ($fid === FALSE) {
+    print t("Error: No existing file found at <em>@destination</em>", array('@destination' => $dest_uri));
+    exit();
+  }
+
+  // Copies the unmanaged file from tmpdir to the files dir.
+  $source_filepath = file_stream_wrapper_get_instance_by_uri('public://')->getDirectoryPath() . '/gking/tmpdir/' . $filename;
+  $file = file_unmanaged_copy($source_filepath, $dest_uri, FILE_EXISTS_REPLACE);
+  if ($file === FALSE) {
+    print t("Error: Could not copy file: <em>@destination</em>", array('@destination' => $dest_uri));
+    if (!$return) {
+      exit();
+    }
+    return FALSE;
+  }
+
+  // Updates the file table to reflect new timestamp and filesize.
+  $realpath = drupal_realpath($dest_uri);
+  $filesize = filesize($realpath);
+  $timestamp = time();
+  db_update('file_managed')
+    ->fields(array('filesize' => $filesize, 'timestamp' => $timestamp))
+    ->condition('fid', $fid, '=')
+    ->execute();
+
+  print t("Successfully updated file: <em>@filename</em>", array('@filename' => $filename));
+  if (!$return) {
+    exit();
+  }
+  return TRUE;
+}
+
+/**
+ * Returns whether a file exists in the temp directory.
+ *
+ * @ingroup updatefile
+ */
+function gkplus_access_file($filename) {
+  $temp_path = _gkplus_temp_path();
+  $filepath = $temp_path . $filename;
+  return file_exists($filepath);
+}
+
+/**
+ * Cron callback; attempts to upload any system file updated since last cron.
+ *
+ * @see gkplus_cron()
+ *
+ * @ingroup updatefile
+ */
+function _gkplus_updatefile_cron() {
+  $last_update = variable_get('gkplus_last_updated_filefields', 0);
+  $temp_path  = _gkplus_temp_path();
+  if ($handle = opendir($temp_path)) {
+    while (FALSE !== ($file = readdir($handle))) {
+      $filepath = $temp_path . $file;
+      drupal_set_message("found file " . $filepath . "\nfilectime: " . filectime($filepath) . "\nlast update: " . $last_update, "warning");
+      if (filectime($filepath) >= $last_update && is_file($filepath) && !(strpos($file, '.') === 0)) {
+        gkplus_update_filefield_page($file, TRUE);
+      }
+    }
+    closedir($handle);
+  }
+  variable_set('gkplus_last_updated_filefields', time());
 }
 
 /**
@@ -331,6 +528,19 @@ function _gkplus_entity_setting_update($etid, $setting, $value) {
     unset($etids[array_search($etid, $etids)]);
     variable_set($variable_name, $etids);
   }
+}
+
+/**
+ * Returns the directory filepath for the automatic updatefile directory.
+ *
+ * @ingroup updatefile
+ */
+function _gkplus_temp_path() {
+  $temp_dir    = variable_get('gking_script_tmpdir', "/gking/tmpdir/");
+  $files_dir   = file_stream_wrapper_get_instance_by_uri('public://')->getDirectoryPath();
+  $temp_path   = $files_dir . $temp_dir;
+
+  return $temp_path;
 }
 
 /**

@@ -8,7 +8,7 @@
 // this function needed on both the .install and .module file
 include_once('harvard_activity_reports.function.inc');
 
- 
+
 /**
  * Display help and module information
  * @param path which path of the site we're displaying help
@@ -31,8 +31,8 @@ function harvard_activity_reports_help($path, $arg) {
 function harvard_activity_reports_perm() {
   return array('access harvard_activity_reports content');
 } // function har_perm()
- 
- 
+
+
 /**
  * Implementation of hook_menu().
 */
@@ -47,7 +47,7 @@ function harvard_activity_reports_menu() {
 }// end function
 
 /**
- * 
+ *
  * Funciton to query the iqss_pinserver_register table for a user id and returns the id
  * accepts a hashed HUID
  * @param unknown_type $id
@@ -82,16 +82,16 @@ function harvard_activity_reports_query_user_by_id($id)  {
 }// end function
 
 /**
- * 
- * Function to query and return back a users UID  
+ *
+ * Function to query and return back a users UID
  * accepts a site variable and the url is parsed and queried from the purl table
  * @param unknown_type $site
  */
-function harvard_activity_reports_query_user_by_site($site) {	
+function harvard_activity_reports_query_user_by_site($site) {
 	// scholar variable
 	$scheme = "http";
 	$siteUrl = $site;
-	
+
 	// make sure its not empty
 	if($siteUrl != "") {
 		// parse the url
@@ -122,12 +122,12 @@ function harvard_activity_reports_query_user_by_site($site) {
 			 }else{
 			 	// they are a unique user, just use the host
 			 	$provider = "vsite_domain";
-				$path = $host;		
+				$path = $host;
 		 	} // end if
 		 	// query the database
-		 	$urlNodeResult = db_query('SELECT n.uid FROM {node} n, {purl} p WHERE p.value = :path AND p.provider = :provider AND n.nid = p.id', array(':path'=>$path, ':provider'=>$provider))->fetchField(); 
+		 	$urlNodeResult = db_query('SELECT n.uid FROM {node} n, {purl} p WHERE p.value = :path AND p.provider = :provider AND n.nid = p.id', array(':path'=>$path, ':provider'=>$provider))->fetchField();
 		 	if($urlNodeResult!=''){
-				$userSiteID = $urlNodeResult;	 	
+				$userSiteID = $urlNodeResult;
 			}else{
 		 		$userSiteID = FALSE;
 		 	}// end if
@@ -141,21 +141,31 @@ function harvard_activity_reports_query_user_by_site($site) {
 }// end function
 
 /**
- * 
- * function to query and return a users vsite ID based on their UID 
+ *
+ * function to query and return a users vsite ID based on their UID
  * vsite id will then be used to node load
  * @param unknown_type $uid
  */
 function harvard_activity_reports_query_vsite_id($uid) {
 	// now that we have the UID, grab their VSITE node ID from the Node table
-	$nodeResults = db_query("SELECT nid FROM {node} WHERE uid = :uid AND type='vsite'",array(':uid'=>$uid))->fetchField();
+	//$nodeResults = db_query("SELECT nid FROM {node} WHERE uid = :uid AND type='vsite'",array(':uid'=>$uid))->fetchField();
+  $group_types = og_get_all_group_bundle();
+  $group_types = array_keys($group_types['node']);
+
+	$nodeResults = db_select('node', 'n')
+	  ->condition('uid', $uid)
+	  ->condition('type', $group_types, 'IN')
+	  ->fields('n', array('nid'))
+	  ->execute()
+	  ->fetchField();
+
 	if($nodeResults!=''){ // make sure theres data
 		// updated for drupal 7 - db_fetch_array removed
 			$nid = $nodeResults;
 	}else{
 		$nid = FALSE;
 	}// end node results
-	
+
 	return $nid;
 }// end function
 
@@ -181,10 +191,10 @@ function harvard_activity_reports_update_huid_hash($uid,$hashID) {
 				))
 				->execute();
 		}// end if
-	}// end if 
+	}// end if
 	// no need to return anything
 	return $return;
-}// end function 
+}// end function
 
 /**
  * Function to return the HUID that was originally sent over
@@ -201,18 +211,18 @@ function harvard_activity_reports_get_url_id () {
 	}else{
 		$urlID = NULL;
 	}
-	
+
 	return $urlID;
 }// end function
 
 /**
- * 
+ *
  * Implementation harvard_activity_reports_query_user().
  * Custom query to pull the user publicatios from the passed HUID
  */
 function harvard_activity_reports_query_user() {
 	// use drupal_get_query_parameters when we switch over to 7
-	
+
 	// get the ID from the "id" parameter of the link
 	if(isset($_GET['id']) || isset($_GET['site_url'])) { // make sure it's set first
 		// step through and see what we have first
@@ -265,7 +275,7 @@ function harvard_activity_reports_query_user() {
 				$nid = FALSE;
 			}// end if
 		}else{ // neither are here, error out
-			$nid = FALSE;	
+			$nid = FALSE;
 		}// end isset id
 	}else{ // no id set, tell them
 		$nid = FALSE;
@@ -275,10 +285,10 @@ function harvard_activity_reports_query_user() {
 }// end function
 
 /**
- * 
+ *
  * Function to pull the users information via node load
  */
-function harvard_activity_reports_load_user_info($nid){ 
+function harvard_activity_reports_load_user_info($nid){
 	// make sure we have a proper nid first
 	if($nid != FALSE){
 		// query for all the biblio nodes
@@ -296,12 +306,12 @@ function harvard_activity_reports_load_user_info($nid){
 	}else {
 		$biblio = FALSE;
 	}
-	
+
 	return $biblio;
 }// end function
 
 /**
- * 
+ *
  * Function to sort my xml array by the biblio_year
  * Function was "borrowed" from http://www.firsttube.com/read/sorting-a-multi-dimensional-array-with-php/
  */
@@ -317,7 +327,7 @@ function harvard_activity_reports_subval_sort($a,$subkey) {
 }// end function
 
 /**
- * 
+ *
  * Function to create the XML based on the info passed into it from the load_user_info functon
  * @param unknown_type $nodeLoad
  */
@@ -332,10 +342,10 @@ function harvard_activity_reports_create_xml($nodeLoad, $huID, $status,$nid) {
 	/* create a dom document with encoding utf8 */
     $domtree = new DOMDocument('1.0', 'UTF-8');
     $domtree->formatOutput=true;
-	
+
     /* create the root element of the xml tree */
     $xmlRoot = $domtree->createElement("response");
-    
+
     // setup the response xml root
     $response = $domtree->createAttribute("xmlns:xsi");
     $xmlRoot->appendChild($response);
@@ -349,7 +359,7 @@ function harvard_activity_reports_create_xml($nodeLoad, $huID, $status,$nid) {
     //
     /* append it to the document created */
     $xmlRoot = $domtree->appendChild($xmlRoot);
-    
+
     // create the person element
     $personElement = $domtree->createElement("person");
     $xmlRoot->appendChild($personElement);
@@ -365,7 +375,7 @@ function harvard_activity_reports_create_xml($nodeLoad, $huID, $status,$nid) {
     // now the test node
     $asAttValue = $domtree->createTextNode($xmlStatus);
     $asAtt->appendChild($asAttValue);
-	
+
     // load in the vsite data
     // DOESNT YET WORK IN DRUPAL 7
     //$vsite=vsite_get_vsite($siteNID);
@@ -398,39 +408,39 @@ function harvard_activity_reports_create_xml($nodeLoad, $huID, $status,$nid) {
     				// publication source value
     				$pubSourceValue = $domtree->createTextNode('OpenScholar');
     				$pubSource->appendChild($pubSourceValue);
-					
+
     				// Commented out as it's not being used right now and it doesnt yet work in drupal 7
 	    				// Get the URL of the publication on the users site only
 						//$nid = $value['biblio_nid']; // Node ID
 						// load in the url from the vsite module
 						//$vsite->get_absolute_url('node/' . $nid);
 					//
-    				
+
     			// citation info
     			$currentPub->appendChild($domtree->createElement("citation",$value['biblio_author'] . ". " . $value['biblio_title'] . ". " . $value['biblio_secondary_title']));
-    			
+
     			// biblio basic info
     			// create the proper linkTo
     			$currentPub->appendChild($domtree->createElement('linkToArticle',$value['biblio_url']));
-    			// biblio citation information 
+    			// biblio citation information
     			$currentPub->appendChild($domtree->createElement('yearOfPublication',$value['biblio_year']));
     			// $currentPub->appendChild($domtree->createElement('biblio_volume',$value['biblio_volume']));
     			// $currentPub->appendChild($domtree->createElement('biblio_issue',$value['biblio_issue']));
     		}// end foreach
     		break;
     	case "error":
-    		$xmlRoot->appendChild($domtree->createElement('errorMessage',$xml['biblio_error_message']));	
+    		$xmlRoot->appendChild($domtree->createElement('errorMessage',$xml['biblio_error_message']));
     		break;
     	case "unknown":
-    		$xmlRoot->appendChild($domtree->createElement('errorMessage',$xml['biblio_error_message']));	
+    		$xmlRoot->appendChild($domtree->createElement('errorMessage',$xml['biblio_error_message']));
     		break;
-    }// end case switch    
+    }// end case switch
     $xmlReturn = $domtree->saveXML();
-    return $xmlReturn;	
+    return $xmlReturn;
 }// end function
 
 /**
- * 
+ *
  *  Implementation of the hook_page() function
  */
 function harvard_activity_reports_page() {
@@ -450,7 +460,7 @@ function harvard_activity_reports_page() {
 		// xml status is ok
 		$status = "ok";
 		// grab the users HUID
-		
+
 		// run the check module exists
 		if(harvard_activity_reports_check_module('iqss_pinserver_register')==TRUE) {
 			$huidResult = db_query("SELECT i.huid FROM {iqss_pinserver_register} i, {node} n WHERE n.nid = :nid AND i.uid = n.uid",array(':nid'=>$nid))->fetchField();
@@ -459,8 +469,8 @@ function harvard_activity_reports_page() {
 		}else{
 			$huID = NULL;
 		}// end if
-		
-		// now load in the user's biblio 
+
+		// now load in the user's biblio
 		$xml = harvard_activity_reports_load_user_info($nid);
 		// create an instance of the citation class
 		// $citationTest = new citation_distribute_service_googlescholar(); - no longer needed, found the same info in the node load
@@ -471,7 +481,7 @@ function harvard_activity_reports_page() {
 		// loop through each node
 		foreach($xml as $xmlLoad) {
 			// node load in all the data, found the MySQL query to get the same data was intensive and just about as heavy
-			// so to save work, we'll back to node load 
+			// so to save work, we'll back to node load
 			$biblioDataRow = node_load($xmlLoad['nid'], NULL, TRUE);
 			// check to make sure we're greater than or = too the $year variable
 			if($getYear == TRUE) { // they want only a specific year, so just pull that year only
@@ -492,12 +502,12 @@ function harvard_activity_reports_page() {
 					$contributers = $biblioDataRow->biblio_contributors;
 					// author work
 						// get the counts of the number of authors
-						$authorCounter = 1; 
+						$authorCounter = 1;
 						$authorCount = count($contributers);
 						$authorList = '';
 						// grab out all the contributers and list them
 						foreach($contributers as $contributeAuthor){
-							// as long as there are more than one author 
+							// as long as there are more than one author
 							if($authorCount !=1){
 								if($authorCounter == $authorCount) {
 									// append an "and" at the end
@@ -510,7 +520,7 @@ function harvard_activity_reports_page() {
 							}else{ // only one author, no need for "ands" or ","
 								$authorList .= $contributeAuthor['name'];
 							}
-							$authorCounter++;		
+							$authorCounter++;
 						}
 						// push the final author list into the main array
 					$biblioDataArray[$counter]['biblio_author'] = $authorList;
@@ -535,12 +545,12 @@ function harvard_activity_reports_page() {
 					$contributers = $biblioDataRow->biblio_contributors;
 					// author work
 						// get the counts of the number of authors
-						$authorCounter = 1; 
+						$authorCounter = 1;
 						$authorCount = count($contributers);
 						$authorList = '';
 						// grab out all the contributers and list them
 						foreach($contributers as $contributeAuthor){
-							// as long as there are more than one author 
+							// as long as there are more than one author
 							if($authorCount !=1){
 								if($authorCounter == $authorCount) {
 									// append an "and" at the end
@@ -553,7 +563,7 @@ function harvard_activity_reports_page() {
 							}else{ // only one author, no need for "ands" or ","
 								$authorList .= $contributeAuthor['name'];
 							}
-							$authorCounter++;		
+							$authorCounter++;
 						}
 						// push the final author list into the main array
 					$biblioDataArray[$counter]['biblio_author'] = $authorList;
@@ -578,6 +588,6 @@ function harvard_activity_reports_page() {
 		$xmlReturn = harvard_activity_reports_create_xml($biblioDataArray, $huID, $status,$nid);
 	}// end if nid != false
 	// send back the xml
-	echo $xmlReturn;	
+	echo $xmlReturn;
 }//end function
 

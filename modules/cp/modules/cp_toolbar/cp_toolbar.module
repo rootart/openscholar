@@ -259,17 +259,6 @@ function cp_toolbar_fill_drawer() {
       'cp/users',
     ),
   );
-
-  $drawer['people-drawer']['add'] = array(
-    '#theme' => 'links',
-    '#links' => array(
-      'users' => menu_get_item('cp/users/add'),
-    ),
-    '#attributes' => array(
-      'class' => 'toolbar-add',
-    ),
-  );
-
   $drawer['people-drawer']['list'] = array(
     '#theme' => 'links',
     '#links' => array(

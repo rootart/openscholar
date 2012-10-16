@@ -10,6 +10,47 @@
 include_once 'os_booklets.features.inc';
 
 /**
+ * Implements hook_menu().
+ */
+function os_booklets_menu() {
+  $items = array();
+
+  $items['features/os_booklets'] = array(
+    'title' => 'Booklets Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('os_booklets_settings'),
+    'access callback' => module_exists('spaces') ? 'spaces_access_admin' : 'user_access',
+    'access arguments' => module_exists('spaces') ? array() : array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'os_booklets.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function os_booklets_node_view($node, $view_mode, $langcode) {
+  // Only alters the node object if this book needs a table of contents inline.
+  if ($node->type !== 'book' || $view_mode !== 'full') {
+    return;
+  }
+  $toc_position = variable_get('os_booklets_toc_position', 0);
+  if ((int) $toc_position === 0) {
+    return;
+  }
+
+  // Adds the table of contents (toc) block to the top of the node content.
+  $block = os_books_build_toc($node, TRUE);
+  $content = '<div class="book-menu"><h3 class="title">' . $block['subject'] . '</h3>' . $block['content'] . '</div>';
+  $node->content['os_booklets_toc'] = array(
+    '#weight' => -10,
+    '#markup' => $content,
+  );
+}
+
+/**
  * Implements hook_vsite_og_node_type_info().
  */
 function os_booklets_vsite_og_node_type_info() {

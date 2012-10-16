@@ -111,8 +111,10 @@ function vsite_role_grant($uid, $role_name, $site_id = false, $group_type = 'nod
   }
 
   if($site_id){
+    $wrapper = entity_metadata_wrapper($group_type, $site_id);
+    $bundle = $wrapper->getBundle();
     //Add role via OG
-    $roles = og_roles($group_type, 'vsite', $site_id);
+    $roles = og_roles($group_type, $bundle, $site_id);
     foreach ($roles as $rid => $role) {
       if($role == $role_name){
         og_role_grant($group_type, $site_id, $uid, $rid);
@@ -148,8 +150,10 @@ function vsite_role_revoke($uid, $role_name, $site_id = false, $group_type = 'no
   }
 
   if($site_id){
+    $wrapper = entity_metadata_wrapper($group_type, $site_id);
+    $bundle = $wrapper->getBundle();
     //Add role via OG
-    $roles = og_roles($group_type, 'vsite', $site_id);
+    $roles = og_roles($group_type, $bundle, $site_id);
     foreach ($roles as $rid => $role) {
       if($role == $role_name){
         og_role_revoke($group_type, $site_id, $uid, $rid);

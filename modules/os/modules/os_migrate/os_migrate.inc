@@ -30,7 +30,7 @@ abstract class OSMigration extends Migration {
     // ->issueNumber(1234) to a mapping.
     $this->issuePattern = 'https://redmine.hmdc.harvard.edu/issues/:id:';
 
-    //$this->restrict_vsites = array(6879, 6744, 1, 8921);
+   // $this->restrict_vsites = array(176);
   }
 
   /**
@@ -610,9 +610,9 @@ abstract class OSMigration extends Migration {
     );
 
     $sizes = array(
-      'imagecache-inline_larger' => 'media_large',
-      'imagecache-inline_default' => 'media_original',
-      '' => 'media_large',
+      'imagecache-inline_larger' => 'os_files_large',
+      'imagecache-inline_default' => 'os_files_large',
+      '' => 'os_files_large',
     );
 
     $attributes = array();
@@ -623,6 +623,9 @@ abstract class OSMigration extends Migration {
         $class = $dom_object->getAttribute('class');
         if (isset($sizes[$class])) {
           $tag['view_mode'] = $sizes[$class];
+        } else {
+          $tag['view_mode'] = 'os_files_large';
+          parent::saveMessage(t('No image cache size for class: @class, assuming original.', array('@class' => $class)), MigrationBase::MESSAGE_INFORMATIONAL);
         }
         $attributes = array('width'=>'width', 'height'=>'height');
       break;

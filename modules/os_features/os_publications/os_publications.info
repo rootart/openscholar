@@ -46,6 +46,7 @@ features[user_permission][] = show download links
 features[user_permission][] = show export links
 features[user_permission][] = show filter tab
 features[user_permission][] = show sort links
+features[variable][] = biblio_author_links
 features[variable][] = biblio_base
 features[variable][] = biblio_base_title
 features[variable][] = biblio_contrib_fields_delta

@@ -1,14 +1,59 @@
-h1#page-title {
-	color:#8996A0;
-	font-size:2em;
+body {
+	font-family:helvetica,arial,sans-serif;
 }
 
 
+#page {
+padding: 0;
+}
+
+#branding h1.page-title {
+	color:#8996A0;
+	font-size:2em;
+	font-weight:bold;
+}
+
+#branding {
+overflow: hidden;
+padding: 30px 20px 0 38px;
+position: relative;
+background-color: #FFF;
+}
+
 /* GENERAL CP STYLES */
+
 
 a {color:#4E84C4;}
 
 strong {color:#444;}
+
+fieldset {
+background: #f1f1f1;
+}
+
+.vertical-tabs-panes fieldset {
+background: #FFF;
+}
+
+.region-footer {
+background: #000;
+color: #FFFFFF;
+height:30px;
+bottom: 0;
+position: fixed;
+width: 100%;
+z-index: 10;
+text-align:right;
+}
+
+region-footer a {
+ color: #FFFFFF;
+ }
+
+.region-footer .region-inner {
+  padding: 10px 20px 0 15px;
+ z-index:1;
+}
 
 h3 {margin:0;}
 
@@ -182,13 +227,11 @@ table.spaces td.option, table.spaces td.storage {
 }
 
 #edit-menu-table .section-heading {
-	background: none repeat scroll 0 0 #ECECEC;
-    border-bottom: 3px solid #C4C2C2;
-    border-top: 3px solid #C4C2C2;
-    font-size: 14px;
+	background: #E1E2DC;
+    border-bottom: 2px solid #C4C2C2;
+    border-top: 2px solid #C4C2C2;
     height: 25px;
-    border-top: 20px solid #FFF;
-    font-weight:bold;
+    text-transform:uppercase;
     }
     
 
@@ -196,13 +239,22 @@ table.spaces td.option, table.spaces td.storage {
     width: 70%;
 }
  
+ 
+ 
+ #user-register-form {
+ 	background:#f1f1f1;
+    padding:15px;
+    border: 1px solid #CCC;
+ }
 
 /* CP/BUILD MENU */ 
 .page-cp-build-menu table thead {
 	display:none;
+	
     }
     
-#edit-menu-table {width:775px;}   
+#edit-menu-table,
+#cp-menu-build-form {width:775px;}   
 
 
 #cp-appearance-theme-picker-form select {max-width:90px;overflow:hidden;}
@@ -252,4 +304,41 @@ body.page-cp.page-cp-account #messages {
 	margin:-10px -8px;
 	padding:7px;
 }
+
+
+/* PUBLICATIONS SETTING FORM IN MODAL */
+.os_publications-customize-form .column-left,
+.os_publications-customize-form #comment_settings {
+	float:left;
+	width:48%;
+	clear:left;
+}
+
+.os_publications-customize-form .form-actions {
+	clear:both;
+}
+
+.os_publications-customize-form #comment_settings {
+width:30%;
+}
+
+.os_publications-customize-form .column-right {
+	float:right;
+	width:48%;
+	clear:right;
+	margin-top: -1045px;
+}
+ 
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
   

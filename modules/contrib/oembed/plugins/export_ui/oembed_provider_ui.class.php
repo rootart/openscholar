@@ -35,4 +35,40 @@ class oembed_provider_ui extends ctools_export_ui {
       '#default_value' => $form_state['item']->scheme,
     );
   }
+
+  /**
+   * Overrides ctools_export_ui::edit_form_submit().
+   */
+  function edit_form_submit(&$form, &$form_state) {
+    // Clear the oEmbed provider cache.
+    oembedcore_providers_reset();
+    return parent::edit_form_submit($form, $form_state);
+  }
+
+  /**
+   * Overrides ctools_export_ui::edit_form_import_submit().
+   */
+  function edit_form_import_submit($form, &$form_state) {
+    // Clear the oEmbed provider cache.
+    oembedcore_providers_reset();
+    return parent::edit_form_import_submit($form, $form_state);
+  }
+
+  /**
+   * Overrides ctools_export_ui::delete_form_submit().
+   */
+  function delete_form_submit(&$form_state) {
+    // Clear the oEmbed provider cache.
+    oembedcore_providers_reset();
+    return parent::delete_form_submit($form_state);
+  }
+
+  /**
+   * Overrides ctools_export_ui::set_item_state().
+   */
+  function set_item_state($state, $js, $input, $item) {
+    // Clear the oEmbed provider cache.
+    oembedcore_providers_reset();
+    return parent::set_item_state($state, $js, $input, $item);
+  }
 }

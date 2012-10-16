@@ -64,7 +64,7 @@ function os_layout_get_contexts($privacy = array(1, 2)) {
 /**
  * Returns the blocks for a individual context
  *
- * @param $context
+ * @param $context_name
  *  The identifier string for a context.
  *
  * @param $load_meta
@@ -76,18 +76,18 @@ function os_layout_get_contexts($privacy = array(1, 2)) {
  * @return
  *  List of blocks.
  */
-function os_layout_get($context, $load_meta = FALSE, $unused_blocks = FALSE) {
+function os_layout_get($context_name, $load_meta = FALSE, $unused_blocks = FALSE) {
    // context load alters the context (for vsites) so no need to do anything
    // extra.
-  $o_context = context_load($context);
+  $context = context_load($context_name);
 
-  if (! is_object($o_context) || ! isset($o_context->reactions['block'])) {
+  if (! is_object($context) || ! isset($context->reactions['block'])) {
     // This was an invalid context.
     return FALSE;
   }
 
-  if (array_key_exists('blocks', $o_context->reactions['block'])) {
-    $block_settings = $o_context->reactions['block']['blocks'];
+  if (array_key_exists('blocks', $context->reactions['block'])) {
+    $block_settings = $context->reactions['block']['blocks'];
   }
   else {
     // No blocks set yet for this context.
@@ -171,20 +171,20 @@ function os_layout_get_multiple($contexts, $load_meta = FALSE, $unused_blocks = 
 /**
  * Saves an array blocks for a individual context.
  *
- * @param $context
- * @param $blocks
+ * @param string $context_name
+ * @param array $blocks
  */
-function os_layout_set($context, $blocks) {
+function os_layout_set($context_name, $blocks) {
   _os_layout_sanitize_blocks($blocks);
   if (module_exists('vsite_layout')) {
-    // Write the context to the overrides table.
-    vsite_layout_context_set($context, $blocks);
+    // Writes the context to the overrides table.
+    vsite_layout_context_set($context_name, $blocks);
   }
   else {
-    $o_context = context_load($context);
-    $o_context->reactions['block']['blocks'] = $blocks;
+    $context = context_load($context_name);
+    $context->reactions['block']['blocks'] = $blocks;
     // write the context to the database.
-    context_save($o_context);
+    context_save($context);
   }
 }
 

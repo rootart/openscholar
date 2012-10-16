@@ -137,6 +137,11 @@ class os_taxonomy_fbt extends os_boxes_default {
    * Implementation of boxes_content::render().
    */
   public function render() {
+    if (empty($this->options['vocabulary'])) {
+      // There are no vocabularies defined in the VSite.
+      return;
+    }
+
     // Reset the keys.
     foreach (array_keys($this->form_elements()) as $setting) {
       $this->options['settings'][$setting] = !empty($this->options['settings'][$setting]) ? $this->options['settings'][$setting] : NULL;

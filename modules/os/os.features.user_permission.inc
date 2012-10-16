@@ -224,15 +224,6 @@ function os_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: administer oembed presets.
-  $permissions['administer oembed presets'] = array(
-    'name' => 'administer oembed presets',
-    'roles' => array(
-      0 => 'administrator',
-    ),
-    'module' => 'oembedcore',
-  );
-
   // Exported permission: administer pathauto.
   $permissions['administer pathauto'] = array(
     'name' => 'administer pathauto',

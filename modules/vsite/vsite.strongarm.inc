@@ -64,6 +64,7 @@ function vsite_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'locale_custom_strings_en';
   $strongarm->value = array(''=>array(
+    'User %name is already subscribed to group.' => 'User %name is already a member of this website.',
     '%user has been added to group.' => '%user has been added to the website.',
     'Allow non-members to join a group without an approval from group administrators.' => 'Allow non-members to join a website without an approval from group administrators.',
     'OG audience list' => 'Website audience list',
@@ -146,7 +147,9 @@ function vsite_strongarm() {
   $strongarm->name = 'os_enabled_spaces_presets';
   $strongarm->value = array(
     'os_department' => 'os_department',
-    'os_personal' => 'os_personal',
+    'os_department_minimal' => 'os_department_minimal',
+    'os_scholar' => 'os_scholar',
+    'os_project' => 'os_project',
   );
   $export['os_enabled_spaces_presets'] = $strongarm;
 

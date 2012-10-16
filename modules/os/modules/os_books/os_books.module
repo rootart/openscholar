@@ -65,14 +65,17 @@ function os_books_build_tree($node, $flatten = FALSE) {
 }
 
 /**
- * Given a node in a book, builds a full table of contents for that book.
+ * Builds a full table of contents for a given book node.
  *
- * @param $nid
- *  Either a nid or a full node object.
+ * @param object|int $node
+ *   Either a nid or a full node object.
  *
- * @param $separate
- *  True if the function should split the top level and second level into
- *  separate.
+ * @param bool $separate
+ *   True if the function should split the top level and second level into
+ *   separate.
+ *
+ * @return array|NULL $block
+ *   Returns NULL if node cannot be loaded or $node->book is not set.
  */
 function os_books_build_toc($node, $separate = FALSE) {
   $block = array();
@@ -150,16 +153,6 @@ function os_books_node_view($node, $view_mode) {
           ),
         ), 'setting');
         $node->content['#attached']['js'][] = drupal_get_path('module', 'os_books').'/os_books.js';
-      }
-
-      if (1 || isset($node->book['toc_in_body']) && $node->book['toc_in_body']) {
-        $block_toc = os_books_build_toc($node, true);
-        //$output = theme_box($block_toc['subject'], $block_toc['content'], $region = 'main');
-        $output = '<div class="book-menu"><h3 class="title">' . $block_toc['subject'] . '</h3>' . $block_toc['content'] . '</div>';
-        $node->content['booktoc'] = array(
-          '#weight' => -10,
-          '#markup' => $output,
-        );
       }
 
       // Unset the book navigation links.

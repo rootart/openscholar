@@ -1,4 +1,7 @@
 name = GK+
 description = Customizations for Gary King's website.
 core = 7.x
+dependencies[] = contextual_annotation
+dependencies[] = nodeorder
 package = IQSS
+files[] = gkplus.install

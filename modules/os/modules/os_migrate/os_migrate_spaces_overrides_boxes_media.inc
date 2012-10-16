@@ -51,11 +51,8 @@ class SpacesOverridesBoxesMediaMigration extends OSMigration {
   }
   public function query() {
     $query = parent::d6_db_select('spaces_overrides', 'so')->condition('object_type', 'boxes')->condition('value', '%os_boxes_oembed%', 'LIKE')->fields('so');
-    $query->join('og_uid', 'og_uid', 'og_uid.nid = so.id');
-    $query->fields('og_uid', array(
-      'uid'
-    ));
-    $query->condition('og_uid.is_admin', 1);
+    $query->join('node', 'n', 'n.nid = so.id');
+    $query->fields('n', array('uid'));
     return $query;
   }
   public function prepareRow(&$row) {

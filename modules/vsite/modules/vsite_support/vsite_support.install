@@ -1,0 +1,34 @@
+<?php
+/**
+ * Implements hook_install().
+ */
+function vsite_support_install() {
+  // Install additional contact categories for the contanct module.
+  if(module_exists('contact')) {
+  	// Check to see if the categories already exist.
+  	// Bug Report
+  	$bug_result = db_query('SELECT cid FROM {contact} WHERE category = :category', array(':category'=>'Bug report'))->fetchField();
+  	if(!$bug_result) {
+  	  db_insert('contact')
+        ->fields(array(
+          'category' => 'Bug report',
+          'recipients' => variable_get('site_mail', ini_get('sendmail_from')),
+          'selected' => 0,
+          'reply' => '',
+      ))
+      ->execute();
+  	}
+  	// Feature Request.
+    $fr_result = db_query('SELECT cid FROM {contact} WHERE category = :category',array(':category'=>'Feature request'))->fetchField();
+  	if(!$fr_result) {
+  	  db_insert('contact')
+        ->fields(array(
+          'category' => 'Feature request',
+          'recipients' => variable_get('site_mail', ini_get('sendmail_from')),
+          'selected' => 0,
+          'reply' => '',
+      ))
+      ->execute();
+  	}
+  }
+}

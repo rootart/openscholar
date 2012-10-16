@@ -10,10 +10,6 @@
 include_once 'os_dataverse.features.inc';
 
 /**
- * Drupal hooks
- */
-
-/**
  * Implements hook_menu().
  */
 function os_dataverse_menu() {
@@ -28,7 +24,7 @@ function os_dataverse_menu() {
   );
 
   $items['features/os_dataverse'] = array(
-    'title' => 'Settings',
+    'title' => 'Dataverse Settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('os_dataverse_settings'),
     'access callback' => module_exists('spaces') ? 'spaces_access_admin' : 'user_access',
@@ -51,14 +47,6 @@ function os_dataverse_preprocess_page(&$vars) {
     $vars['title'] = '';
   }
 }
-
-/**
- * OpenScholar hooks
- */
-
-/**
- * Custom functions
- */
 
 /**
  * Provides content for page at /data

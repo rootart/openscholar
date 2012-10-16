@@ -36,21 +36,28 @@ class OSNodeFieldQuery extends EntityFieldQuery {
 }
 
 /**
- * Usage
-
-include_once drupal_get_path('module', 'os') . '/includes/node.inc';
-$query = new OSNodeFieldQuery('announcement');
-$query
-  ->propertyOrderBy('created', 'DESC')
-  ->fieldCondition('field_whatever', 'value', '1')
-  ->range(0,3);
-$result = $query->execute();
-
-if (!isset($result['node'])) {
-  // No results
-}
-else {
-  $nodes = node_load_multiple(array_keys($result['node'));
-}
-
+ * Example usage of class OSNodeFieldQuery.
  */
+function _os_example_get_announement_nodes() {
+  // Includes this file -- for use in other modules.
+  //include_once drupal_get_path('module', 'os') . '/includes/node.inc';
+
+  // Creates a new EntityFieldQuery for nodes of the given type, accounting for
+  // current space if the vsite module is enabled.
+  $query = new OSNodeFieldQuery('announcement');
+  $query
+    ->propertyOrderBy('created', 'DESC')
+    ->fieldCondition('field_whatever', 'value', '1')
+    ->range(0,3);
+  $result = $query->execute();
+
+  // Handles results.
+  if (!isset($result['node'])) {
+    // No results
+    return array();
+  }
+  else {
+    $nodes = node_load_multiple(array_keys($result['node']));
+    return $nodes;
+  }
+}

@@ -81,6 +81,12 @@ function os_links_views_default_views() {
     'link' => 'link',
   );
 
+  /* Filter criterion: Spaces: Content in current space */
+
+  $handler->display->display_options['filters']['current']['id'] = 'current';
+  $handler->display->display_options['filters']['current']['table'] = 'spaces';
+  $handler->display->display_options['filters']['current']['field'] = 'current';
+
   /* Display: Page */
 
 

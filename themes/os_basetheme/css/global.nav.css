@@ -561,15 +561,15 @@ ul.nice-menu {
 
 
 ul.nice-menu li {
- border:none;
- background-color: none;
- background: none;
+ border:none !important;
+ background-color: none !important;
+ background: none !important;
 }
 
 
 ul.nice-menu a {
     color: #293352;
-    text-decoration:none;
+    text-decoration:none !important;
     background: none;
 }
 
@@ -586,7 +586,7 @@ ul.nice-menu ul li {
 
 
 ul.nice-menu ul li a {
-    border:none;
+    border:none !important;
 }
 
 
@@ -596,7 +596,7 @@ ul.nice-menu-left ul a {
 }
 
 .sidebar ul.nice-menu ul {
-    border-top: none;
+    border-top: none !important;
 }
 
 .sidebar ul.nice-menu ul li,
@@ -606,14 +606,14 @@ ul.nice-menu-left ul a {
 
 .sidebar ul.nice-menu {
     width:100%;
-   border-top: none;
+   border-top: none !important;
 }
 
 ul.nice-menu-left li.menuparent,
 ul.nice-menu-right li.menuparent,
 ul.nice-menu-left li.menuparent:hover,
 ul.nice-menu-right li.menuparent:hover {
-    background:none;
+    background:none !important;
 }
 
 ul.nice-menu-right, ul.nice-menu-left, 
@@ -627,16 +627,16 @@ ul.nice-menu-right li, ul.nice-menu-left li {
 
 ul.nice-menu-down {
   float: left; /* LTR */
-  border: 0;
+  border: 0 !important;
   z-index: 400;
 }
 
 ul.nice-menu-down li {
-  border-top: none;
+  border-top: none !important;
 }
 
 ul.nice-menu-down li li {
-  border-top: 0;
+  border-top: 0 !important;
 }
 
 ul.nice-menu-down ul {
@@ -657,126 +657,17 @@ ul.nice-menu-down .menuparent a {
 }
 
 ul.nice-menu-down li.menuparent {
-  background: none; /* LTR */
+  background: none !important; /* LTR */
 }
 
 ul.nice-menu-down li.menuparent:hover {
-  background: none; /* LTR */
+  background: none !important; /* LTR */
 }
 
 ul.nice-menu-down li li.menuparent {
-  background: none; /* LTR */
+  background: none !important; /* LTR */
 }
 
 ul.nice-menu-down li li.menuparent:hover {
-  background: none; /* LTR */
-}
-
-/* CP MINI MENU */
-
-#block-cp-cp-minimenu {
-	padding:0 0 3px 6px !important;
-	position: fixed;
-	top: 0;
-	right: 0;
-	background:#EFEFEF;
-	border-left:1px solid #CCC;
-	border-bottom:1px solid #CCC;
-	border-radius:0 0 0 6px;
-	-moz-border-radius:0 0 0 6px;
-}
-
-
-.not-logged-in #block-cp-cp-minimenu {
-    padding:0 !important;
-   
-}
-
-.toolbar #block-cp-cp-minimenu {
-top: 30px;
-	}
-	
-.toolbar-drawer #block-cp-cp-minimenu {
-top: 66px;
-	}
-
-
-#block-cp-cp-minimenu ul li.menu-path-cp-content {
-	background-position: -1px -62px ;
-   }
-   
-#block-cp-cp-minimenu ul li.menu-path-cp-settings {
-	background-position: 3px -41px ;
-   }
-   
-#block-cp-cp-minimenu ul li.menu-path-cp-build {
-	background-position: 0 3px ;
-   }
-   
-#block-cp-cp-minimenu ul li.menu-path-cp-appearance {
-	background-position: 2px -19px ;
-   }
-   
-#block-cp-cp-minimenu ul li.menu-path-cp-users {
-	background-position: 2px -85px ;
-   } 
-   
-#block-cp-cp-minimenu ul li.menu-path-cp-account {
-	background-position: 2px -130px ;
-   }   
-   
-.not-logged-in #block-cp-cp-minimenu ul li.menu-path-cp-account {
-	background: none;
-   }             
-      
-#block-cp-cp-minimenu ul li a {
-	font-family:helvetica;
-	font-style: normal;
-    height: 15px;
-    padding-left: 23px !important;
-    padding-top: 5px !important;
-    font-weight:normal;
-    color:#293352;
-    font-size:13px;
-    text-transform:none;
-}
-
-.not-logged-in #block-cp-cp-minimenu ul li a {
- 	padding-left: 0 !important;
-   
-}
-
-#block-cp-cp-minimenu ul li a:visited,
-#block-cp-cp-minimenu ul li a:hover
- {
-    color:#293352;
-}
-
-#block-cp-cp-minimenu ul li ul {
-	border-top:none;
-	border-left:1px solid #CCC;
-	border-right:1px solid #CCC;
-	border-bottom:1px solid #CCC;
-	margin:-11px 0 0 18px;
-    top: 38px;
-}
-
-#block-cp-cp-minimenu ul li ul li {
-	border:none;
-}
-
-#block-cp-cp-minimenu ul li ul li a {
-	background: #EFEFEF;
-	padding-left: 4px !important;
-	font-weight: normal;
-}
-
-#block-cp-cp-minimenu h2 {
-    display:none;
-}
-
-#block-cp-cp-minimenu ul li.menu-path-user a {
-	font-weight:bold;
-	background:#EFEFEF;
-	padding-left: 5px !important;
+  background: none !important; /* LTR */
 }

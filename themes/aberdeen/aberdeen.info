@@ -17,8 +17,11 @@
 
 ;----------// Stylesheets
 
-  stylesheets[screen][] = css/aberdeen.responsive.layout.css
   stylesheets[screen][] = css/aberdeen.css
+  stylesheets[screen][] = css/aberdeen.responsive.layout.css
+  stylesheets[screen][] = css/aberdeen.responsive.smartphone.css
+  
+
   
   scripts[] = aberdeen.js
     

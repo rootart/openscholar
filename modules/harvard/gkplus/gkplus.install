@@ -1,0 +1,122 @@
+<?php
+
+/**
+ * Implementaton of hook_enable().
+ *
+ * @ingroup nodeorder
+ * @ingroup updatefile
+ */
+function gkplus_enable() {
+  // Adjust system weight for module gkplus to be after nodeorder.
+  _gkplus_adjust_module_weight(array('gkplus'), '>', array('nodeorder'));
+  // Note: D6 also cared about modules 'vsite_layout' & 'vsite_taxonomy',
+  // but it didn't seem necessary when porting... yet.
+
+  // Creates the update file directory if it doesn't already exist.
+  $temp_path = _gkplus_temp_path();
+  if (!is_dir($temp_path)) {
+    mkdir($temp_path, 0775);
+  }
+}
+
+/**
+ * Implements hook_install().
+ */
+function gkplus_install() {
+  // Adds an HTML block to gary's classes context.
+  _gkplus_classes_widget();
+}
+
+/**
+ * Adjusts module weights to ensure greater/lesser weight.
+ *
+ * @param array $update
+ * @param string $condition
+ * @param array $compare
+ */
+function _gkplus_adjust_module_weight($update, $condition, $compare) {
+  if (!$update || !$condition || !$compare) {
+    return;
+  }
+
+  // Continues only if we are comparing with less than or greater than.
+  switch ($condition) {
+    case '>':
+      $sort = 'DESC';
+      $weight = $weight + 1;
+      break;
+    case '<':
+      $sort = 'ASC';
+      $weight = $weight - 1;
+      break;
+    default:
+      return;
+  }
+
+  // Finds the highest weight among the compared modules.
+  $weight = db_select('system', 's')
+    ->fields('s', array('weight'))
+    ->condition('name', $compare, 'IN')
+    ->range(0, 1)
+    ->orderBy('weight', $sort)
+    ->execute()
+    ->fetchField();
+  if ($weight === FALSE) {
+    return;
+  }
+
+  // Updates the given module with the new increased or decreased weight.
+  db_update('system')
+    ->fields(array('weight' => $weight))
+    ->condition('name', 'gkplus', '=')
+    ->execute();
+}
+
+/**
+ * Adds an HTML block to gary's classes context.
+ *
+ * @todo get it working
+ */
+function _gkplus_classes_widget() {
+  if (!module_exists('spaces')) {
+    return;
+  }
+
+  $plugin_key = 'os_boxes_html';
+  $content = '<h3>Student Materials</h3>';
+
+  // For migration, copies the content as of 2012-10-15 from gking.harvard.edu.
+  $filepath = drupal_get_path('module', 'gkplus') . '/2012-10-15-student-materials.html';
+  if (file_exists($filepath)) {
+    $content .= file_get_contents($filepath);
+  }
+
+  $delta = os_boxes_create_delta();
+  $values = array(
+    'delta' => $delta,
+    'text' => array(
+      'value' => $content,
+      'format' => filter_default_format(),
+    ),
+  );
+
+  // @see boxes_box_form_submit()
+  $box = boxes_factory($plugin_key, $values);
+
+  // The gking vsite space id.
+  $sid = 3633;
+  $space = spaces_load($sid);
+  $space->controllers->boxes->set($box->delta, $box);
+
+  // @see os_layout_set()
+  $context_name = 'classes_classes';
+  $blocks = os_layout_get($context_name);
+  $blocks['boxes-' . $delta] = array(
+    'module' => 'boxes',
+    'delta' => $delta,
+    'region' => 'sidebar_second',
+    'weight' => '-10'
+  )';
+
+  vsite_layout_context_set($context_name, $blocks);
+}

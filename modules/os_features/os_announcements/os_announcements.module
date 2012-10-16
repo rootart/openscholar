@@ -17,10 +17,33 @@ function os_announcements_process_node(&$vars) {
   if ($vars['type'] !== 'announcement') {
     return;
   }
+
+  // Helps poor theme developers find these changes to $variables
+  $vars['classes'] .= ' modified-in-os_announcements_process_node';
+
   // Build the submitted variable used by default in node templates
   $pubdate = format_date($vars['created'], 'custom', 'F j, Y');
   // Publication date, formatted with time element
   $vars['submitted'] = '<time datetime="' . $vars['datetime'] . '" pubdate="pubdate">' . $pubdate . '</time>';
+
+  // Continues to modify teasers only
+  if (!$vars['teaser']) {
+    return;
+  }
+
+  // Moves the profile photo thumbnail before teaser title (full name)
+  if (isset($vars['content']['field_photo'])) {
+    $vars['title_prefix'] = $vars['content']['field_photo'];
+    unset($vars['content']['field_photo']);
+  }
+
+  // Includes custom CSS
+  $vars['title_prefix']['#attached'] = array(
+    'css' => array(
+      'type' => 'file',
+      'data' => drupal_get_path('module', 'os_announcements') . '/os_announcements.css',
+    ),
+  );
 }
 
 /**
