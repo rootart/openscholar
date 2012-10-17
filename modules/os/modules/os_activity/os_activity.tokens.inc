@@ -35,9 +35,16 @@ function os_activity_tokens($type, $tokens, array $data = array(), array $option
 
     $wrapper = entity_metadata_wrapper('node', $data['node']);
 
-    // The virtual site owner can decide of he want to present the username or the
-    // virtual site name as the message owner.
-    $replacements[$original] = $wrapper->field_message_display_name->value() == 'username' ? $wrapper->author->label() : $wrapper->label();
+    switch ($wrapper->getBundle()) {
+      case 'personal':
+        $replacements[$original] = $wrapper->author->label();
+        break;
+
+      case 'department':
+      case 'project':
+        $replacements[$original] = $wrapper->label();
+        break;
+    }
   }
 
   return $replacements;
