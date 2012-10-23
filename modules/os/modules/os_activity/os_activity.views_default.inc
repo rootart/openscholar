@@ -98,6 +98,9 @@ function os_activity_views_default_views() {
 
   /* Display: OS Activity - block */
   $handler = $view->new_display('block', 'OS Activity - block', 'block_1');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Recent Activity <a href=\'activity\'>(more)</a>';
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['pager'] = FALSE;
   $handler->display->display_options['pager']['type'] = 'some';
   $handler->display->display_options['pager']['options']['items_per_page'] = '25';
