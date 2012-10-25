@@ -8,7 +8,7 @@
 
 /**
  * Implements hook_menu_alter().
- * 
+ *
  * Overrides default taxonomy pages, accounts for features.
  *
  * @param array $items
@@ -36,8 +36,8 @@ function os_taxonomy_term_page($taxonomy_term) {
   $options = variable_get('os_taxonomy_term_page_options', array());
 
   $variables = array(
-  	'taxonomy_term' => $taxonomy_term,
-  	'options' => $options,
+    'taxonomy_term' => $taxonomy_term,
+    'options' => $options,
   );
 
   if(($feature = os_get_active_feature()) && isset($feature->info['features']['node'])){
@@ -171,58 +171,69 @@ function theme_os_taxonomy_vocabulary_item_list($variables) {
     'terms_description' => TRUE,
     'link_to_empty_terms' => TRUE,
   );
-
+  dpm($options);
   $vocabulary = taxonomy_vocabulary_load($variables['vid']);
 
   $query = new entityFieldQuery();
+  // Bring the list of terms ordered by name, and suporting range and offeset.
   $query
     ->entityCondition('entity_type', 'taxonomy_term')
     ->propertyCondition('vid', $variables['vid'])
     ->propertyOrderBy('name');
 
+  // Return a selective part of the list.
   if (!empty($options['range'])) {
     $query->range($options['offset'], $options['offset'] + $options['range']);
   }
 
   $result = $query->execute();
 
+  // No result - quit.
   if (empty($result['taxonomy_term'])) {
     return;
   }
 
+  // Load all terms.
   $terms = taxonomy_term_load_multiple(array_keys($result['taxonomy_term']));
+  // Arrange term in an array with more information.
   $items = os_taxonomy_build_term_items($terms, $options);
 
+  dpm($terms).
+  dpm($items).
+
   $path_prefix = '';
+
   if(count($options['bundles'])){
     $map = features_get_component_map('node');
-    foreach ($options['bundles'] as $bundle){
-      if(isset($feature) && isset($map[$bundle]) && count($map[$bundle]) && $feature != current($map[$bundle])){
+    foreach ($options['bundles'] as $bundle) {
+      if(isset($feature) && isset($map[$bundle]) && count($map[$bundle]) && $feature != current($map[$bundle])) {
         unset($feature);
         break;
-      }elseif (isset($map[$bundle]) && count($map[$bundle])){
+      }
+      elseif (isset($map[$bundle]) && count($map[$bundle])) {
         $feature = current($map[$bundle]);
       }
     }
-    $path_prefix = isset($feature)?strval(os_get_feature_path($feature)):'';
+    $path_prefix = isset($feature) ? strval(os_get_feature_path($feature)) : '';
     if(strlen($path_prefix)){
-      $path_prefix = $path_prefix."/";
+      $path_prefix = $path_prefix . "/";
     }
   }
 
   $data = $options['bundles'] = array();
 
   foreach($items as $tid => $item) {
-    // Skip on this if we don't dispaly empty childs term.
+    // Skip on this if we don't display empty children term.
     if (!$options['show_empty_terms'] && !$item['tagged_items'] && empty($item['child_number'])) {
       continue;
     }
 
-    // Don't show the a term which is a child of another term.
+    // Don't show the term which is a child of another term.
+    dpm($item['is_child']);
     if ($item['is_child']) {
       continue;
     }
-
+    dpm($item);
     // The attached number to the term name.
     $number = null;
     if($options['show_count']){
