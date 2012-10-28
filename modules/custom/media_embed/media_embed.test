@@ -5,7 +5,7 @@
  * Tests for Media Embed
  */
 
-class MediaEmbedTest extends OpenscholarWebTestCase {
+class MediaEmbedTest extends OSProfileTestCase {
 
   //protected $profile = 'openscholar';
 

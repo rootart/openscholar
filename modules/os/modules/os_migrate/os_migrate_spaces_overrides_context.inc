@@ -73,6 +73,23 @@ class SpacesOverridesContextMigration extends SpacesOverridesTableMigration {
       }
     }
 
+    //"All" context should always include login button and powered-by
+    if($object_id == 'os_public:reaction:block'){
+
+      $value['blocks']['os-powered-by'] = array(
+        'module' => 'os',
+        'delta' => 'powered-by',
+        'region' => 'footer',
+        'weight' => '10',
+      );
+      $value['blocks']['os-login'] = array(
+        'module' => 'os',
+        'delta' => 'login',
+        'region' => 'footer',
+        'weight' => '-10',
+      );
+    }
+
     //check the three special cases
     if (in_array($nid, array(
       1,

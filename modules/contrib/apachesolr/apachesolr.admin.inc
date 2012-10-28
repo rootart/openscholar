@@ -15,12 +15,18 @@ function apachesolr_environment_delete_form($form, &$form_state, $environment) {
     '#type' => 'value',
     '#value' => $environment['env_id'],
   );
+  if (isset($environment['export_type']) && $environment['export_type'] == 3) {
+    $verb = t('Revert');
+  }
+  else {
+    $verb = t('Delete');
+  }
   return confirm_form(
     $form,
-    t('Are you sure you want to delete search environment %name?', array('%name' => $environment['name'])),
+    t('Are you sure you want to !verb search environment %name?', array('%name' => $environment['name'], '!verb' => strtolower($verb))),
     'admin/config/search/apachesolr',
     t('This action cannot be undone.'),
-    t('Delete'),
+    $verb,
     t('Cancel')
   );
 }
@@ -149,6 +155,12 @@ function apachesolr_environment_edit_form($form, &$form_state, $environment = NU
     '#submit' => array('apachesolr_environment_edit_submit'),
     '#value' => t('Save'),
   );
+  $form['actions']['save_edit'] = array(
+    '#type' => 'submit',
+    '#validate' => array('apachesolr_environment_edit_validate'),
+    '#submit' => array('apachesolr_environment_edit_submit'),
+    '#value' => t('Save and edit'),
+  );
   $form['actions']['test'] = array(
     '#type' => 'submit',
     '#validate' => array('apachesolr_environment_edit_validate'),
@@ -215,11 +227,20 @@ function apachesolr_environment_edit_validate($form, &$form_state) {
 function apachesolr_environment_edit_submit($form, &$form_state) {
   apachesolr_environment_save($form_state['values']);
   if (!empty($form_state['values']['make_default'])) {
-    variable_set('apachesolr_default_environment', $form_state['values']['env_id']);
+    apachesolr_set_default_environment($form_state['values']['env_id']);
   }
   cache_clear_all('apachesolr:environments', 'cache_apachesolr');
   drupal_set_message(t('The %name search environment has been saved.', array('%name' => $form_state['values']['name'])));
-  $form_state['redirect'] = 'admin/config/search/apachesolr/settings';
+  if ($form_state['values']['op'] == t('Save')) {
+    $form_state['redirect'] = 'admin/config/search/apachesolr/settings';
+  }
+  else {
+    $form_state['redirect'] = current_path();
+  }
+  // Regardlessly of the destination parameter we want to go to another page
+  unset($_GET['destination']);
+  drupal_static_reset('drupal_get_destination');
+  drupal_get_destination();
 }
 
 /**
@@ -305,20 +326,34 @@ function apachesolr_settings($form, &$form_state) {
       ),
     );
     $env_name = l($data['name'], 'admin/config/search/apachesolr/settings/' . $data['env_id'] . '/edit', array('query' => array('destination' => $_GET['q'])));
+
     // Is this row our default environment?
     if ($environment_id == $default_environment) {
       $env_name = t('!environment <em>(Default)</em>', array('!environment' => $env_name));
       $env_class_row = 'default-environment';
-      $ops['delete'] = '';
     }
     else {
       $env_class_row = '';
-      // For every non-default we add a delete link
-      $ops['delete'] = array(
-        'class' => 'operation',
-        'data' => l(t('Delete'), 'admin/config/search/apachesolr/settings/' . $data['env_id'] . '/delete'),
-      );
     }
+    // For every non-default we add a delete link
+    // Allow to revert a search environment or to delete it
+    $delete_value = '';
+    if (!isset($data['in_code_only'])) {
+      if ((isset($data['type']) && $data['type'] == 'Overridden')) {
+        $delete_value = array(
+          'class' => 'operation',
+          'data' => l(t('Revert'), 'admin/config/search/apachesolr/settings/' . $data['env_id'] . '/delete'),
+        );
+      }
+      // don't allow the deletion of the default environment
+      elseif ($environment_id != $default_environment) {
+        $delete_value = array(
+          'class' => 'operation',
+          'data' => l(t('Delete'), 'admin/config/search/apachesolr/settings/' . $data['env_id'] . '/delete'),
+        );
+      }
+    }
+    $ops['delete'] = $delete_value;
 
     // When we are receiving a http POST (so the page does not show) we do not
     // want to check the statusses of any environment
@@ -457,8 +492,11 @@ function apachesolr_status_page($environment = NULL) {
       $status = apachesolr_index_status($environment["env_id"]);
       // We need a schema version greater than beta3. This is mostly to catch
       // people using the Drupal 6 schema.
-      if (version_compare($stats_summary['@schema_version'], 'drupal-3.0-beta3', '<=')) {
-        drupal_set_message(t('Your schema.xml version is too old. You must update it and re-index your content.'), 'error');
+      if (preg_match('/^drupal-[13]/', $stats_summary['@schema_version'])) {
+        $minimum = 'drupal-3.0-beta4';
+        if (version_compare($stats_summary['@schema_version'], $minimum, '<')) {
+          drupal_set_message(t('Your schema.xml version is too old. You must update it to at least %minimum and re-index your content.', array('%minimum' => $minimum)), 'error');
+        }
       }
       $pending_msg = $stats_summary['@pending_docs'] ? t('(@pending_docs sent but not yet processed)', $stats_summary) : '';
       $index_msg = $stats_summary['@index_size'] ? t('(@index_size on disk)', $stats_summary) : '';
@@ -467,25 +505,28 @@ function apachesolr_status_page($environment = NULL) {
         '!pending' => $pending_msg,
         '!index_msg' => $index_msg,
       ));
-      $messages[] = array('Indexed', $indexed_message);
+      $messages[] = array(t('Indexed'), $indexed_message);
 
       $remaining_message = t('@items (@percentage% has been sent to the server)', array(
           '@items' => format_plural($status['remaining'], t('1 item'), t('@count items')),
           '@percentage' => ((int)min(100, 100 * ($status['total'] - $status['remaining']) / max(1, $status['total']))),
         )
       );
-      $messages[] = array('Remaining', $remaining_message);
+      $messages[] = array(t('Remaining'), $remaining_message);
 
-      $messages[] = array('Schema', t('@schema_version', $stats_summary));
+      $messages[] = array(t('Schema'), t('@schema_version', $stats_summary));
       if (!empty($stats_summary['@core_name'])) {
-        $messages[] = array('Solr Core Name', t('@core_name', $stats_summary));
+        $messages[] = array(t('Solr Core Name'), t('@core_name', $stats_summary));
       }
-      $messages[] = array('Delay', t('@autocommit_time before updates are processed.', $stats_summary));
-      $messages[] = array('Pending Deletions', t('@deletes_total', $stats_summary));
+      $messages[] = array(t('Delay'), t('@autocommit_time before updates are processed.', $stats_summary));
+      $messages[] = array(t('Pending Deletions'), t('@deletes_total', $stats_summary));
     }
     catch (Exception $e) {
       watchdog('Apache Solr', nl2br(check_plain($e->getMessage())), NULL, WATCHDOG_ERROR);
     }
+  }
+  if (empty($messages)) {
+    $messages[] = array(t('Error'), t('No data was returned from the server. Check your log messages.'));
   }
   // Initializes output with information about which server's setting we are
   // editing, as it is otherwise not transparent to the end user.
@@ -1011,7 +1052,7 @@ function apachesolr_index_batch_index_finished($success, $results, $operations) 
   else {
     // An error occurred. $operations contains the unprocessed operations.
     $error_operation = reset($operations);
-    $message .= ' ' . t('An error occurred while processing @num with arguments :', array('@num' => $error_operation[0])) . print_r($error_operation[0], TRUE);
+    $message .= ' ' . t('An error occurred while processing @num with arguments: @args', array('@num' => $error_operation[0], '@args' => print_r($error_operation[0], TRUE)));
     $type = 'error';
   }
   drupal_set_message($message, $type);
@@ -1088,13 +1129,13 @@ function apachesolr_index_config_form_submit($form, &$form_state) {
       }
     }
     else {
-      drupal_set_message(t('The Apache Solr search engine is not available. Please contact your site administrator.'), 'error');
+      drupal_set_message(t('Search is temporarily unavailable. If the problem persists, please contact the site administrator.'), 'error');
     }
   }
 
   // Clear the entity cache, since we will be changing its data.
   entity_info_cache_clear();
-
+  cache_clear_all('apachesolr:environments', 'cache_apachesolr');
   drupal_set_message(t('Your settings have been saved.'));
 }
 

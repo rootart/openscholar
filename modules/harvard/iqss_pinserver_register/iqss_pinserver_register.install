@@ -38,10 +38,12 @@ function iqss_pinserver_register_schema(){
  * Implementation of hook_install().
  */
 function iqss_pinserver_register_install(){
- drupal_install_schema('iqss_pinserver_register');
- //set module weight
- db_query("UPDATE {system} SET weight = %d WHERE name = '%s'", 80, 'iqss_pinserver_register');
- cache_clear_all('strongarm', 'cache');
+  if(! db_table_exists('iqss_pinserver_register')) {
+    drupal_install_schema('iqss_pinserver_register');
+    //set module weight
+    db_query("UPDATE {system} SET weight = %d WHERE name = '%s'", 80, 'iqss_pinserver_register');
+    cache_clear_all('strongarm', 'cache');
+  }
 }  
 
 /**

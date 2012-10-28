@@ -386,8 +386,9 @@ ul.class_material_field_class a.class_material_field_class_anchor {
 	float: right;
 }
 
-.search-results /* Search results are an ordered list so we reset the margin */ {
-  margin: 0;
+#content-column ol.search-results /* Search results are an ordered list so we reset the margin */ {
+  list-style-type:none;
+  margin-left:0;
 }
 
 .views-row {margin-bottom:1.5em;}

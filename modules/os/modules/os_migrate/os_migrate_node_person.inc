@@ -36,7 +36,7 @@ class PersonNodeOSMigration extends AbstractNodeOSMigration {
 
     //website
     $this->addFieldMapping('field_website', 'field_person_website_url');
-    $this->addFieldMapping('field_website:title', 'field_person_website_title')->defaultValue('Website');
+    $this->addFieldMapping('field_website:title', 'field_person_website_title')->defaultValue(NULL);
     $this->addFieldMapping('field_website:attributes', 'field_person_website_attributes');
 
 
@@ -133,7 +133,7 @@ class PersonNodeOSMigration extends AbstractNodeOSMigration {
       $current_row->{'field_person_photo:source_dir'} = NULL;
     }
 
-    if (empty($current_row->field_person_website_title) || !$current_row->field_person_website_title) {
+    if ((empty($current_row->field_person_website_title) || !$current_row->field_person_website_title) && ($current_row->field_person_website_url)){
       $current_row->field_person_website_title = t('Website');
     }
     return parent::prepareRow($current_row); //false -> skip this row

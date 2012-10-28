@@ -29,8 +29,25 @@ abstract class OSMigration extends Migration {
     // class with ':id:' representing the position of the issue number, then add
     // ->issueNumber(1234) to a mapping.
     $this->issuePattern = 'https://redmine.hmdc.harvard.edu/issues/:id:';
+  }
 
-    //$this->restrict_vsites = array(3633);
+  /**
+   * @function restrict_vsites
+   *
+   * Returns array of nids of vsites to import.  FALSE when there's no restriction.
+   *
+   * Usage:
+   * if ($restrict = OSMigration::restrict_vsites()) {
+   *   $query->condition('id', $restrict, 'IN');
+   * }
+   * such that the condition's id matches vsite id for the migration class's query.
+   *
+   * @return boolean|Ambigous <boolean, multitype:>
+   */
+  static public function restrict_vsites() {
+    $restrict = explode(',', variable_get('os_migrate_restrict_vsites', ''));
+    $restrict = array_filter($restrict, 'is_numeric');
+    return (count($restrict)) ? $restrict : FALSE;
   }
 
   /**

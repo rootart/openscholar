@@ -9,6 +9,7 @@ class AnnouncementNodeOSMigration extends AbstractNodeOSMigration {
 
     //field_photo
     $this->addFieldMapping('field_photo', 'field_photo');
+    $this->addFieldMapping('field_photo:og_group_ref', 'group_nid');
     $this->addSimpleMappings(parent::subfields('field_photo', array('language', 'alt', 'title', 'destination_file', 'destination_dir')));
       //->defaultValue(FALSE);
     $this->addFieldMapping('field_photo:source_dir', 'field_photo:source_dir')

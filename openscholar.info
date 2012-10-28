@@ -60,6 +60,7 @@ dependencies[] = views_slideshow_cycle
 dependencies[] = os
 dependencies[] = os_help
 dependencies[] = os_files
+dependencies[] = os_files_private
 dependencies[] = os_boxes
 dependencies[] = os_wysiwyg
 dependencies[] = os_search_db

@@ -4,7 +4,7 @@
  * General tests for WYSIWYG functions in OpenScholar
  */
 
-class OsWysiwygTestCase extends OpenscholarWebTestCase {
+class OsWysiwygTestCase extends OSProfileTestCase {
 
   protected $urlList = array(
     'youtube' => 'http://youtu.be/hUkiJOBYmU4',

@@ -38,7 +38,7 @@ function os_ga_cp_settings() {
   	'group' => array(
     	'#id' => 'ga',
     	'#title' => t('Google Analytics'),
-    	'#weight' => 0,
+    	'#weight' => -100,
   	),
   );
 

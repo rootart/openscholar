@@ -169,15 +169,17 @@ border-radius:5px;
     bottom: -1px;
 }
 
+.feed_item {margin-bottom:8px;}
+.feed_item a {text-decoration:underline;}
+.feed_item span {font-style:italic;margin-right:4px;}
 
 /**** MAIN NAV BAR ****/
 
 #menu-bar #block-os-site_search,
-#menu-bar .block-os-search-db {
+#menu-bar .block-os-search-db,
+#menu-bar .block-os-search-solr {
 	   float: right;
        margin-top: 9px;
-       display:inline;
-       clear:right;
        width: 180px;
 }
 
@@ -212,6 +214,7 @@ top:3.1em;
   margin-right:5px;
   margin-top:2px;
   background: none;
+   float:left;
   }
 
 #menu-bar ul.nice-menu ul li {
@@ -357,7 +360,8 @@ float:right;
     font-weight: bold;
     height: 20px;
     padding: 2px 0 4px 8px;
-    position: relative;
+    position:static;
+    bottom:0;
     width: 98.75%;
 }
 
@@ -371,7 +375,7 @@ float:right;
 .views-slideshow-slide-counter {float:right;display:inline;clear:none;}
 .views-slideshow-controls-text {float:left;display:inline;clear:none;}
 
-.views-slideshow-controls-text a {text-indent: -9999px;white-space: nowrap;overflow:hidden;float:left;margin-right: 0;padding:15px 9px;}
+.views-slideshow-controls-text a {text-indent: -9999px;white-space: nowrap;overflow:hidden;float:left;margin-right: 0;padding:15px 9px 13px;}
 
 
 .views-slideshow-controls-text-previous {float:left;}

@@ -42,13 +42,9 @@
     $query->isNotNull('value');
     $query->distinct();
 
-    //$query->condition('id', '8921'); //jlepore
-    //$query->condition('id', '176'); //charlesmaier
-    if (isset($this->restrict_vsites)) {
-      $query->condition('id', $this->restrict_vsites, 'IN'); //dancabral, jlepore, jsagotsky, gary
+    if ($restrict = OSMigration::restrict_vsites()) {
+      $query->condition('id', $restrict, 'IN');
     }
-
-    //check that vsite exists?
 
     return $query;
   }

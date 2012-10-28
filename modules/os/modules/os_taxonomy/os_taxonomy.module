@@ -118,7 +118,7 @@ function theme_os_taxonomy_term_item($variables) {
     'items' => array(
       array(
         'data' => $item_content,
-        'class' => 'term-' . check_plain($variables['name'])
+        'class' => array('term-' . check_plain($variables['name']))
       )
     ),
   );

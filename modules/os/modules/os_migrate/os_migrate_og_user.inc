@@ -12,6 +12,11 @@ class OgUsersOSMigration extends OSMigration {
     $this->query = parent::d6_db_select('og_uid', 'ogu')
       ->fields('ogu');
 
+    if ($restrict = OSMigration::restrict_vsites()) {
+      $this->query->condition('nid', $restrict, 'IN');
+    }
+
+
     $source_key = array(
       'nid' => array(
         'type' => 'int',

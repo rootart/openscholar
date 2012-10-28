@@ -125,6 +125,13 @@ EOF
     '#description' => t('OpenScholar migration includes a few edge case scenarios where a certain vsite gets special treatment.  To prevent this from interfering with the general case, the special treatment only happens when the legacy database has a certain base domain.  This setting overrides that domain.  Useful when you\'re trying to test migration of http://prod.com, but are doing so from http://dev.local.'),
   );
 
+  $form['dev_fieldset']['os_migrate_restrict_vsites'] = array(
+    '#title' => t('Restrict vsites'),
+    '#default_value' => variable_get('os_migrate_restrict_vsites', ''),
+    '#type' => 'textfield',
+    '#description' => t('Limit migration to content from a specific vsite or comma separated list of vsites by id.  (ex: 1,3,10,100)'),
+  );
+
   return system_settings_form($form);
 }
 

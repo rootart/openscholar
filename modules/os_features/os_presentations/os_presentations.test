@@ -12,11 +12,11 @@
  *
  * @see DrupalWebTestCase
  */
-class OpenscholarPresentationsTestCase extends OpenscholarWebTestCase {
+class OpenscholarPresentationsTestCase extends OSProfileTestCase {
   protected $profile = 'openscholar';
   protected $user;
   protected $vsite_node;
-  
+
   public static function getInfo() {
     return array(
       'name' => 'OpenScholar Presentations',
@@ -24,7 +24,7 @@ class OpenscholarPresentationsTestCase extends OpenscholarWebTestCase {
       'group' => 'Features',
     );
   }
-  
+
   // Creates admin user, creates vsite node, and enables presentations feature module
   public function setUp() {
     parent::setUp('spaces', 'og', 'spaces_og', 'vsite', 'os_presentations');
@@ -47,7 +47,7 @@ class OpenscholarPresentationsTestCase extends OpenscholarWebTestCase {
     $this->clickLink('Site Building');
     debug($this->url);
     $this->verbose($this->url);
-    
+
     // Enables the OS Presentations feature module
 
     $cp_path      = $vsite_node['purl'] . '/cp/build';
@@ -57,7 +57,7 @@ class OpenscholarPresentationsTestCase extends OpenscholarWebTestCase {
     $edit['spaces_features[os_presentations]'] = $enable_value;
     $submit_value = t('Save for ') . $vsite_node['title'];
     $this->drupalPost($cp_path, $edit, $submit_value);
-    $this->assertText(t('The configuration options have been saved for @title.', array('@title' => $vsite_node['title']))); 
+    $this->assertText(t('The configuration options have been saved for @title.', array('@title' => $vsite_node['title'])));
     */
   }
 

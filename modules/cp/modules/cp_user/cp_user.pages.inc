@@ -111,7 +111,7 @@ function cp_user_user_management_page($vsite_id) {
 function cp_user_remove_membership_confirm($form_state, $user_load) {
   $space = spaces_get_space();
   // Form sets.
-  $form['gid'] = array('#type' => 'value', '#value' => $space->group->vid);
+  $form['gid'] = array('#type' => 'value', '#value' => $space->group->nid);
   $form['account'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->uid);
   $form['username'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->name);
   $form['site_name'] = array('#type' => 'value', '#value' => $space->group->title);
@@ -143,7 +143,7 @@ function cp_user_remove_membership_confirm_submit($form, &$form_state) {
 function cp_user_make_admin_confirm($form_state, $user_load) {
   $space = spaces_get_space();
   // Form sets.
-  $form['gid'] = array('#type' => 'value', '#value' => $space->group->vid);
+  $form['gid'] = array('#type' => 'value', '#value' => $space->group->nid);
   $form['group_type'] = array('#type' => 'value', '#value' => $space->group->type);
   $form['account'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->uid);
   $form['username'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->name);
@@ -181,7 +181,7 @@ function cp_user_make_admin_confirm_submit($form, &$form_state) {
 function cp_user_remove_admin_confirm($form_state, $user_load) {
   $space = spaces_get_space();
   // Form sets.
-  $form['gid'] = array('#type' => 'value', '#value' => $space->group->vid);
+  $form['gid'] = array('#type' => 'value', '#value' => $space->group->nid);
   $form['group_type'] = array('#type' => 'value', '#value' => $space->group->type);
   $form['account'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->uid);
   $form['username'] = array('#type' => 'value', '#value' => $user_load['build_info']['args'][0]->name);

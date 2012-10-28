@@ -65,7 +65,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
     $this->addFieldMapping('body', 'body');
     $this->addFieldMapping('body:format', 'format')->defaultValue('filtered_html');
     $this->addFieldMapping('body:language', 'language')->defaultValue('und');
-    $this->addFieldMapping('body:summary', 'teaser');
+  //  $this->addFieldMapping('body:summary', 'teaser');
 
     $this->addFieldMapping('log', 'log'); //from nr
     $this->addFieldMapping('revision')->defaultValue(TRUE); //create a new revision.  vid is automatically migrated
@@ -87,6 +87,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
       ), t('DNM'));
     }
 
+    $this->addUnmigratedDestinations(array('body:summary'), t('DNM'));
     /* Unmapped source fields.  Mark them as Do Not Map, so the UI knows they're intentionally ignored */
     $this->addUnmigratedSources(array(
       'moderate',
@@ -111,13 +112,12 @@ abstract class AbstractNodeOSMigration extends OSMigration {
     //$query->condition('n.nid', '6811', '='); //prod node with inline files
     //$query->condition('n.nid', '13701', '='); //prod node with multiple images
 
-
     $query->join('node_revisions', 'nr', 'n.vid = nr.vid');
     $query->fields('nr', array(
       'body',
       'uid',
       'log',
-      'teaser'
+      //'teaser'
     ));
 
     $query->leftjoin('filter_formats', 'ff', 'nr.format = ff.format');
@@ -136,8 +136,8 @@ abstract class AbstractNodeOSMigration extends OSMigration {
       $query->fields('ct');
     }
 
-    if (isset($this->restrict_vsites)) {
-      $query->condition('og.group_nid', $this->restrict_vsites, 'IN'); //dancabral, jlepore, jsagotsky, gary
+    if ($restrict = OSMigration::restrict_vsites()) {
+      $query->condition('og.group_nid', $restrict, 'IN'); //dancabral, jlepore, jsagotsky, gary
     }
 
     return $query;
@@ -346,7 +346,7 @@ abstract class AbstractNodeOSMigration extends OSMigration {
         'filepath' => 'filepath',
         //'file_destination' => 'file_destination',
         'filename' => 'filename',
-        'field_upload' => 'field_upload',
+        //'field_upload' => 'field_upload',
       );
 
       //need filepath, filename
@@ -371,14 +371,20 @@ abstract class AbstractNodeOSMigration extends OSMigration {
         $filepath = str_replace($file_directory_path, '', $filepath);
         $file = explode('/', trim($filepath, '/'));
 
-        $file_row->field_upload = $filepath;
         $file_row->filename = array_pop($file);
         $file_row->filepath = 'public://' . implode('/', $file);
+        $file_row->field_upload_replace = $filepath;// . '/' . $file_row->filename;
         //$file_row->file_destination = $file_destination;
         $files[] = $file_row;
       }
 
       parent::os_migrate_prepare_files($files, $row, 'field_upload', $fields);
+      //field upload is set up wrong, but it's too late to fix the general function.
+      if (isset($row->field_upload)) {
+        foreach (array_keys($row->field_upload) as $delta) {
+          $row->field_upload[$delta] = $files[$delta]->field_upload_replace;
+        }
+      }
     }
   }
 

@@ -1,18 +1,16 @@
 <?php
+// $Id$
 
 /**
  * Test case for the OpenScholar profile
  */
-class OpenscholarWebTestCase extends DrupalWebTestCase {
-	
-	protected $profile = 'openscholar';
-	
-	protected $profile_flavor = 'personal';
-	
-	protected $multi_tennant = true;
-	
-	protected $load_all_modules = false;
-	
+class OSProfileTestCase extends DrupalWebTestCase {
+
+  protected $profile = 'openscholar';
+  protected $profile_flavor = 'personal';
+  protected $multi_tenant = TRUE;
+  protected $load_all_modules = FALSE;
+
   /**
    * Clone of DrupalWebTestCase::setup() to work with profiles
    *
@@ -29,14 +27,11 @@ class OpenscholarWebTestCase extends DrupalWebTestCase {
   protected function setUp() {
     global $user, $language, $conf;
 
-    // Generate a temporary prefixed database to ensure that tests have a clean starting point.
+    // Generates a temporary prefixed database to ensure that tests have a clean starting point.
     $this->databasePrefix = 'simpletest' . mt_rand(1000, 1000000);
-    db_update('simpletest_test_id')
-      ->fields(array('last_prefix' => $this->databasePrefix))
-      ->condition('test_id', $this->testId)
-      ->execute();
+    db_update('simpletest_test_id')->fields(array('last_prefix' => $this->databasePrefix))->condition('test_id', $this->testId)->execute();
 
-    // Clone the current connection and replace the current prefix.
+    // Clones the current connection and replace the current prefix.
     $connection_info = Database::getConnectionInfo('default');
     Database::renameConnection('default', 'simpletest_original_default');
     foreach ($connection_info as $target => $value) {
@@ -46,19 +41,19 @@ class OpenscholarWebTestCase extends DrupalWebTestCase {
     }
     Database::addConnectionInfo('default', 'default', $connection_info['default']);
 
-    // Store necessary current values before switching to prefixed database.
+    // Stores necessary current values before switching to prefixed database.
     $this->originalLanguage = $language;
     $this->originalLanguageDefault = variable_get('language_default');
     $this->originalFileDirectory = variable_get('file_public_path', conf_path() . '/files');
     $this->originalProfile = drupal_get_profile();
     $clean_url_original = variable_get('clean_url', 0);
 
-    // Set to English to prevent exceptions from utf8_truncate() from t()
-    // during install if the current language is not 'en'.
+    // Sets language to English to prevent exceptions from utf8_truncate() from
+    // t() during install if the current language is not 'en'.
     // The following array/object conversion is copied from language_default().
-    $language = (object) array('language' => 'en', 'name' => 'English', 'native' => 'English', 'direction' => 0, 'enabled' => 1, 'plurals' => 0, 'formula' => '', 'domain' => '', 'prefix' => '', 'weight' => 0, 'javascript' => '');
+    $language = (object)array('language' => 'en', 'name' => 'English', 'native' => 'English', 'direction' => 0, 'enabled' => 1, 'plurals' => 0, 'formula' => '', 'domain' => '', 'prefix' => '', 'weight' => 0, 'javascript' => '');
 
-    // Save and clean shutdown callbacks array because it static cached and
+    // Saves and cleans shutdown callbacks array because it is static cached and
     // will be changed by the test run. If we don't, then it will contain
     // callbacks from both environments. So testing environment will try
     // to call handlers from original environment.
@@ -66,33 +61,33 @@ class OpenscholarWebTestCase extends DrupalWebTestCase {
     $this->originalShutdownCallbacks = $callbacks;
     $callbacks = array();
 
-    // Create test directory ahead of installation so fatal errors and debug
+    // Prepares test directory ahead of installation so fatal errors and debug
     // information can be logged during installation process.
-    // Use temporary files directory with the same prefix as the database.
-    $public_files_directory  = $this->originalFileDirectory . '/simpletest/' . substr($this->databasePrefix, 10);
+    // Uses temporary files directory with the same prefix as the database.
+    $public_files_directory = $this->originalFileDirectory . '/simpletest/' . substr($this->databasePrefix, 10);
     $private_files_directory = $public_files_directory . '/private';
-    $temp_files_directory    = $private_files_directory . '/temp';
+    $temp_files_directory = $private_files_directory . '/temp';
 
-    // Create the directories
+    // Creates the directories
     file_prepare_directory($public_files_directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
     file_prepare_directory($private_files_directory, FILE_CREATE_DIRECTORY);
     file_prepare_directory($temp_files_directory, FILE_CREATE_DIRECTORY);
     $this->generatedTestFiles = FALSE;
 
-    // Log fatal errors.
+    // Logs fatal errors.
     ini_set('log_errors', 1);
     ini_set('error_log', $public_files_directory . '/error.log');
 
-    // Reset all statics and variables to perform tests in a clean environment.
+    // Resets all statics and variables to perform tests in a clean environment.
     $conf = array();
     drupal_static_reset();
 
-    // Set the test information for use in other parts of Drupal.
+    // Sets the test information for use in other parts of Drupal.
     $test_info = &$GLOBALS['drupal_test_info'];
     $test_info['test_run_id'] = $this->databasePrefix;
     $test_info['in_child_site'] = FALSE;
 
-    // Preset the 'install_profile' system variable, so the first call into
+    // Presets the 'install_profile' system variable, so the first call into
     // system_rebuild_module_data() (in drupal_install_system()) will register
     // the test's profile as a module. Without this, the installation profile of
     // the parent site (executing the test) is registered, and the test
@@ -104,19 +99,19 @@ class OpenscholarWebTestCase extends DrupalWebTestCase {
 
     $this->preloadRegistry();
 
-    // Set path variables.
+    // Sets path variables.
     variable_set('file_public_path', $public_files_directory);
     variable_set('file_private_path', $private_files_directory);
     variable_set('file_temporary_path', $temp_files_directory);
 
-    // Include the testing profile.
+    // Includes the testing profile.
     variable_set('install_profile', $this->profile);
     $profile_details = install_profile_info($this->profile, 'en');
 
-    // Install the modules specified by the testing profile.
+    // Installs the modules specified by the testing profile.
     $this->install_profile_modules($profile_details['dependencies']);
 
-    // Install modules needed for this test. This could have been passed in as
+    // Installs modules needed for this test. This could have been passed in as
     // either a single array argument or a variable number of string arguments.
     // @todo Remove this compatibility layer in Drupal 8, and only accept
     // $modules as a single array argument.
@@ -131,8 +126,8 @@ class OpenscholarWebTestCase extends DrupalWebTestCase {
 
     // Run the profile tasks.
     $install_profile_module_exists = db_query("SELECT 1 FROM {system} WHERE type = 'module' AND name = :name", array(
-      ':name' => $this->profile,
-    ))->fetchField();
+        ':name' => $this->profile,
+      ))->fetchField();
     if ($install_profile_module_exists) {
       module_enable(array($this->profile), FALSE);
     }
@@ -164,73 +159,93 @@ class OpenscholarWebTestCase extends DrupalWebTestCase {
     drupal_set_time_limit($this->timeLimit);
     $this->setup = TRUE;
   }
-	
-	/**
-	 * Installation task; install required modules via a batch process.
-	 *
-	 * @param $modules
-	 *   An array of modules to install
-	 *
-	 * @return
-	 *   The batch definition.
-	 */
-	protected function install_profile_modules($modules) {
-	  
-	  $files = system_rebuild_module_data();
-	
-	  // Always install required modules first. Respect the dependencies between
-	  // the modules.
-	  $required = array();
-	  $non_required = array();
-	  // Although the profile module is marked as required, it needs to go after
-	  // every dependency, including non-required ones. So clear its required
-	  // flag for now to allow it to install late.
-	  $files[$this->profile]->info['required'] = FALSE;
-	  // Add modules that other modules depend on.
-	  foreach ($modules as $module) {
-	    if ($files[$module]->requires) {
-	      $modules = array_merge($modules, array_keys($files[$module]->requires));
-	    }
-	  }
-	  
-	  $modules = array_unique($modules);
-	  foreach ($modules as $module) {
-	    if (!empty($files[$module]->info['required'])) {
-	      $required[$module] = $files[$module]->sort;
-	    }
-	    else {
-	      $non_required[$module] = $files[$module]->sort;
-	    }
-	  }
-	  
-	  arsort($required);
-    arsort($non_required);
-  
-	  module_enable(array_keys($required));
-	  
-	  if($this->load_all_modules){
-	    module_enable(array_keys($non_required));
-	  }
-	
-	  $this->install_flavor();
-	  
-	  if($this->multi_tennant){
-	    $this->install_multi_tennant();
-	  }
-	}
-	
-	/**
-	 * Run install profile tasks associated with the flavor for this test
-	 */
-	protected function install_flavor(){
-		
-	}
-	
-	/**
-   * Run install profile tasks associated multi-tennant
+
+  /**
+   * Installation task; install required modules via a batch process.
+   *
+   * @param $modules
+   *   An array of modules to install
+   *
+   * @return
+   *   The batch definition.
    */
-  protected function install_multi_tennant(){
-    
+  protected function install_profile_modules($modules) {
+
+    $files = system_rebuild_module_data();
+
+    // Always install required modules first. Respect the dependencies between
+    // the modules.
+    $required = array();
+    $non_required = array();
+    // Although the profile module is marked as required, it needs to go after
+    // every dependency, including non-required ones. So clear its required
+    // flag for now to allow it to install late.
+    $files[$this->profile]->info['required'] = FALSE;
+    // Add modules that other modules depend on.
+    foreach ($modules as $module) {
+      if ($files[$module]->requires) {
+        $modules = array_merge($modules, array_keys($files[$module]->requires));
+      }
+    }
+
+    $modules = array_unique($modules);
+    foreach ($modules as $module) {
+      if (!empty($files[$module]->info['required'])) {
+        $required[$module] = $files[$module]->sort;
+      }
+      else {
+        $non_required[$module] = $files[$module]->sort;
+      }
+    }
+
+    arsort($required);
+    arsort($non_required);
+
+    module_enable(array_keys($required));
+
+    if ($this->load_all_modules) {
+      module_enable(array_keys($non_required));
+    }
+
+    $this->install_flavor();
+
+    if ($this->multi_tenant) {
+      $this->install_multi_tennant();
+    }
   }
-	
+
+  /**
+   * Runs install profile tasks associated with the flavor for this test
+   */
+  protected function install_flavor() {}
+
+  /**
+   * Runs install profile tasks associated multi-tennant
+   */
+  protected function install_multi_tennant() {}
+}
+
+/**
+ *
+ */
+class OSWebTestCase extends OSProfileTestCase {
+
+  protected $admin_user = NULL;
+
+  public function getInfo() {
+    return array(
+      'name' => 'OpenScholar Profile Test',
+      'description' => 'Ensure OpenScholar profile configuration.',
+      'group' => 'OpenScholar',
+    );
+  }
+
+  public function setUp() {
+    // $this->profile = 'openscholar';
+    parent::setUp();
+  }
+
+  public function testOpenscholarProfileInstall() {
+    $this->assertTrue(TRUE);
+  }
 }

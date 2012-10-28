@@ -35,6 +35,12 @@ class SpacesOverridesBoxesMigration extends SpacesOverridesTableMigration {
       return FALSE;
     }
 
+    //Update default box delta for fltr-cat
+    if( $row->id == 'vsite_taxonomy_fltr_cat'){
+      $row->id = 'os_taxonomy_fltr_cat';
+      $value->delta = 'os_taxonomy_fltr_cat';
+    }
+
     if ($box = $this->_update_box($value, $row->id)) {
       $value = $box;
     } else {
@@ -746,6 +752,11 @@ class BoxPorter {
       list(,$ct) = explode(':', $ct);
     }
 
+    //content type was updated
+    if ($ct == 'announcement') {
+      $ct = 'news';
+    }
+
     $defaults = array(
       'content_type' =>     'all',
       'display' =>          'display_title',
@@ -757,7 +768,7 @@ class BoxPorter {
       'sort_by' =>          'sort_newest',
     );
 
-    $options = $box->options + $defaults;
+    $options = array_merge($box->options, $defaults);
 
     $options['content_type'] = $ct;
     $options['display'] = $this->_sv_list_box_style($options['display']);
@@ -921,8 +932,24 @@ class BoxPorter {
       }
       $build = node_view($node, $teaser);
       unset($build['#contextual_links']); //don't hardcode the admin links into the html box...
+
+      //swap html back out for media tags
+      $matches = array();
+      $media_tag_pattern = '/\[\[.*?\]\]/';
+      if (preg_match_all($media_tag_pattern, $node->body[LANGUAGE_NONE][0]['value'], $matches)) {
+        $markup = $build['body'][0]['#markup'];
+        foreach ($matches[0] as $media_tag) {
+          $html = check_markup($media_tag, 'filtered_html');
+          $markup = str_replace($html, $media_tag, $markup);
+        }
+        $build['body'][0]['#markup'] = $markup;
+      }
+
       $body = drupal_render($build);
       //$format = 1; //make sure to use filtered html later
+
+
+
     } else {
       //if they haven't migrated, fetch the old node's body
       $query = $this->migration->d6_db_select('node', 'n')

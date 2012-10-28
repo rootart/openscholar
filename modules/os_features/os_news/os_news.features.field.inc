@@ -59,7 +59,7 @@ function os_news_field_default_fields() {
           'label' => 'hidden',
           'module' => 'text',
           'settings' => array(
-            'trim_length' => '100',
+            'trim_length' => '600',
           ),
           'type' => 'text_trimmed',
           'weight' => '1',

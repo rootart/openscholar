@@ -40,8 +40,10 @@ class GalleryNodeOSMigration extends AbstractNodeOSMigration {
     //field: media_gallery_media
 
     $this->addFieldMapping('media_gallery_media', 'media_gallery_media');
+    $this->addFieldMapping('media_gallery_media:destination_dir');
+    $this->addFieldMapping('media_gallery_media:destination_file');
     $this->addFieldMapping('media_gallery_media:source_dir')
-      ->defaultValue(variable_get('os_migrate_files', FALSE)); //adequate or does 2.4 need full path?
+      ->defaultValue(variable_get('os_migrate_files') . '/' . parent::d6_variable_get('file_directory_path', 'sites/default/files'));
 
     $this->addFieldMapping('media_gallery_media:description', 'media_gallery_media_description');
     $this->addFieldMapping('media_gallery_media:display', 'media_gallery_media_display')->defaultValue(1);
@@ -50,7 +52,7 @@ class GalleryNodeOSMigration extends AbstractNodeOSMigration {
     $this->addFieldMapping('media_gallery_media:og_group_ref', 'group_nid');
 
 
-    $this->addUnmigratedDestinations(parent::subfields('media_gallery_media', array('file_class', 'destination_dir', 'destination_file', 'file_replace', 'preserve_files')), t('DNM')); //happy with defaults
+    $this->addUnmigratedDestinations(parent::subfields('media_gallery_media', array('file_class', 'file_replace', 'preserve_files')), t('DNM')); //happy with defaults
     $this->addUnmigratedDestinations(array('media_gallery_image_info_where'), t('DNM'));
 
     $this->addFieldMapping('media_gallery_format')
@@ -131,10 +133,17 @@ class GalleryNodeOSMigration extends AbstractNodeOSMigration {
     $result = $query->execute();
     //$current_row->prepared_files = parent::os_migrate_prepare_files($result);
     //this gets subfields, but media_gallery_media still has nothing
-    $fields = array('language' => 'language', 'description' => 'description', 'display' => 'list');
+    $fields = array('language' => 'language', 'description' => 'description', 'display' => 'list', 'title' => 'title');
     //parent::os_migrate_prepare_files_v24($result, $current_row, 'media_gallery_media', $fields);
     parent::os_migrate_prepare_files($result, $current_row, 'media_gallery_media', $fields);
 
+    foreach($current_row->media_gallery_media as $delta => $filepath) {
+      if (list($path, $name) = $this->_migrate_filename($filepath)) {
+        $current_row->{'media_gallery_media:filename'}[$delta] = $name;
+        $current_row->{'media_gallery_media:destination_dir'}[$delta] = 'public://' . $path;
+        $current_row->{'media_gallery_media'}[$delta] = $path . '/' . $name;
+      }
+    }
     //description may be serialized array
     if (isset($current_row->media_gallery_media_description) && is_string($current_row->media_gallery_media_description)) {
       if ($desc = @unserialize($current_row->media_description)) {
@@ -150,6 +159,21 @@ class GalleryNodeOSMigration extends AbstractNodeOSMigration {
     */
     return parent::prepareRow($current_row); //false -> skip this row
 
+  }
+
+  /**
+   * Implements complete
+   *
+   * media_gallery doesn't provide a title field on the media files.  save it by hand after saving the node.
+   */
+  function complete(&$entity, $row) {
+    //attach titles to files.
+    foreach ($entity->media_gallery_media[LANGUAGE_NONE] as $delta => $file) {
+      $image = file_load($file['fid']);
+      if ($image->media_title[LANGUAGE_NONE][] = array('value' => $row->media_gallery_media_title[$delta])) {
+        file_save($image);
+      }
+    }
   }
 
 }
