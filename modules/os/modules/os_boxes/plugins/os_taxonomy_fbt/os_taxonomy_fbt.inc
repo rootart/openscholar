@@ -1,4 +1,6 @@
 <?php
+// $Id$
+
 
 /**
  * @author rbran100
@@ -9,20 +11,20 @@
 class os_taxonomy_fbt extends os_boxes_default {
 
   /**
-   * Implementation of boxes_content::options_defaults().
+   * Implements boxes_content::options_defaults().
    */
   public function options_defaults() {
     $options = parent::options_defaults();
 
-    $options['vocabulary'] = false;
+    $options['vocabulary'] = FALSE;
     $options['bundles'] = array('--all--');
     $options['range'] = 10;
     $options['offset'] = 0;
-    $options['show_empty_terms'] = false;
-    $options['terms_description'] = false;
-    $options['show_count'] = true;
-    $options['show_childs'] = true;
-    $options['add_childs'] = false;
+    $options['show_empty_terms'] = FALSE;
+    $options['show_term_descriptions'] = FALSE;
+    $options['show_count'] = TRUE;
+    $options['show_childs'] = TRUE;
+    $options['add_childs'] = FALSE;
     $options['depth'] = 0;
     $options['behavior'] = 'contextual';
 
@@ -30,7 +32,7 @@ class os_taxonomy_fbt extends os_boxes_default {
   }
 
   /**
-   * Implementation of boxes_content::options_form().
+   * Implements boxes_content::options_form().
    */
   public function options_form(&$form_state) {
     $form = parent::options_form($form_state);
@@ -79,10 +81,10 @@ class os_taxonomy_fbt extends os_boxes_default {
     $form['bundles'] = array(
       '#type' => 'select',
       '#title' => t('Select Post types'),
-      '#options' => self::get_all_bundles(),
+      '#options' => os_get_bundles(array(1,2)),
       '#description' => t('The post types that will be included in the count'),
       '#multiple' => TRUE,
-      '#size' => count(self::get_all_bundles()) / 2,
+      '#size' => count(os_get_bundles(array(1,2))) / 2,
       '#dependency' => array(
         'edit-behavior' => array('select'),
       ),
@@ -106,7 +108,7 @@ class os_taxonomy_fbt extends os_boxes_default {
       '#description' => t('Should terms be shown that do not have any posts tagged to them.'),
     );
 
-    $form['terms_description'] = array(
+    $form['show_term_description'] = array(
       '#type' => 'checkbox',
       '#title' => t('Show term descriptions'),
       '#description' => t('Show the description of the term if avalible under each term.'),
@@ -154,32 +156,33 @@ class os_taxonomy_fbt extends os_boxes_default {
   }
 
   /**
-   * Implementation of boxes_content::render().
+   * Implements boxes_content::render().
    */
   public function render() {
+    $block = parent::render();
     if (empty($this->options['vocabulary'])) {
       // There are no vocabularies defined in the VSite.
-      return;
-    }
 
-    $block = parent::render();
+      return $block;
+    }
     // For now - display the first vocabulary terms.
     if ($this->options['behavior'] == '--all--') {
       $this->options['bundles'] = array();
     }
 
     ctools_include('layout', 'os');
-    if($this->options['behavior'] == 'contextual' && ($feature = os_get_active_feature())){
+    if ($this->options['behavior'] == 'contextual' && ($feature = os_get_active_feature())) {
       if (isset($feature->info['features']['node'])) {
         $this->options['bundles'] = $feature->info['features']['node'];
       }
     }
 
+    $this->options['vocabulary'] = is_array($this->options['vocabulary'])?current($this->options['vocabulary']):$this->options['vocabulary'];
 
     $block['content'] = theme('os_taxonomy_vocabulary_item_list', array(
-      'vid' => $this->options['vocabulary'],
-      'options' => $this->options,
-    ));
+        'vid' => $this->options['vocabulary'],
+        'options' => $this->options,
+      ));
 
     return $block;
   }
@@ -187,8 +190,7 @@ class os_taxonomy_fbt extends os_boxes_default {
   /**
    * Return the cache parameters for this box.
    */
-  public function cache_info() {
-  }
+  public function cache_info() {}
 
   /**
    * Get all the volcabularies id using the taxonomy terms.
@@ -205,19 +207,5 @@ class os_taxonomy_fbt extends os_boxes_default {
 
     return $vocabularies;
   }
-
-  /**
-   * Return a list of node bundles.
-   */
-  private function get_all_bundles() {
-    $entity = entity_get_info('node');
-
-    $bundles = array();
-
-    foreach ($entity['bundles'] as $machine_name => $bundle) {
-      $bundles[$machine_name] = $bundle['label'];
-    }
-
-    return $bundles;
-  }
 }
+

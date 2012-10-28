@@ -1,5 +1,9 @@
 @media only screen and (min-width:320px) and (max-width:800px) {
 	
+#columns {
+    width: 95%;
+}	
+	
 #menu-bar {
     background: none;
     padding:0;
@@ -18,8 +22,8 @@
 #menu-bar ul.nice-menu li a {
     float: none;
      padding: 0.5em 1.6em;
-     background: #CCC;
-     border-bottom:1px solid #DDD;
+     background: #D6DEDE;
+     border-bottom:1px solid #999;
  
 }
 

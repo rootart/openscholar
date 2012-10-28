@@ -19,7 +19,7 @@ class CVNodeOSMigration extends AbstractNodeOSMigration {
 
 
     $this->addUnmigratedDestinations(
-      parent::subfields('field_biocv_pdf_upload', array('file_class', 'language', 'destination_dir', 'file_replace', 'preserve_files')),
+      parent::subfields('field_biocv_pdf_upload', array('file_class', 'language', 'file_replace', 'preserve_files')),
       t('DNM'));
 
     //cv pdf attachment
@@ -28,8 +28,9 @@ class CVNodeOSMigration extends AbstractNodeOSMigration {
     $this->addFieldMapping('field_biocv_pdf_upload', 'field_biocv_pdf_upload')
       ->defaultValue(NULL);
     $this->addFieldMapping('field_biocv_pdf_upload:destination_file');
+    $this->addFieldMapping('field_biocv_pdf_upload:destination_dir');
     $this->addFieldMapping('field_biocv_pdf_upload:source_dir')
-      ->defaultValue(variable_get('os_migrate_files', NULL));
+      ->defaultValue(variable_get('os_migrate_files') . '/' . parent::d6_variable_get('file_directory_path', 'sites/default/files'));
     $this->addFieldMapping('field_biocv_pdf_upload:description', 'field_cv_attach_data');
     $this->addFieldMapping('field_biocv_pdf_upload:display', 'field_cv_attach_list');
     $this->addFieldMapping('field_biocv_pdf_upload:og_group_ref', 'group_nid');
@@ -83,11 +84,17 @@ class CVNodeOSMigration extends AbstractNodeOSMigration {
     $alt_file = parent::get_file_by_fid($current_row->field_cv_attached_fid);
     $dir = variable_get('os_migrate_files', '') . '/';
     if ($file && parent::legacy_file_exists($dir . $file->filepath)) {
-      $current_row->field_biocv_pdf_upload = $file->filepath;
-      $current_row->{'field_biocv_pdf_upload:destination_file'} = $file->filepath;
+      if (list($path, $name) = $this->_migrate_filename($file->filepath)) {
+        $current_row->{'field_biocv_pdf_upload:destination_file'}  = $name;
+        $current_row->{'field_biocv_pdf_upload:destination_dir'} = 'public://' . $path;
+        $current_row->{'field_biocv_pdf_upload'} = $path . '/' . $name;
+      }
     } elseif ($alt_file && parent::legacy_file_exists($dir . $alt_file->filepath)) {
-      $current_row->field_biocv_pdf_upload = $alt_file->filepath;
-      $current_row->{'field_biocv_pdf_upload:destination_file'} = $alt_file->filepath;
+    if (list($path, $name) = $this->_migrate_filename($alt_file->filepath)) {
+        $current_row->{'field_biocv_pdf_upload:destination_file'}  = $name;
+        $current_row->{'field_biocv_pdf_upload:destination_dir'} = 'public://' . $path;
+        $current_row->{'field_biocv_pdf_upload'} = $path . '/' . $name;
+      }
     }
 
     return parent::prepareRow($current_row); //false -> skip this row

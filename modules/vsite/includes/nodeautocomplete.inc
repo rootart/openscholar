@@ -73,12 +73,12 @@ function vsite_node_autocomplete_validate($element, &$form_state) {
 }
 
 /**
- * Takes a "Title [nid:X]" string and returns the int value, or NULL if none.
+ * Takes a "Title [123]" string and returns the int value, or NULL if none.
  *
  * @see vsite_node_autocomplete_validate()
  */
 function _vsite_node_autocomplete_title_to_nid($title) {
-  preg_match('/^(?:\s*|(.*) )?\[\s*nid\s*:\s*(\d+)\s*\]$/', $title, $matches);
+  preg_match('/^(?:\s*|(.*) )?\[\s*(\d+)\s*\]$/', $title, $matches);
   if (!empty($matches) && isset($matches[2])) {
     return $matches[2];
   }
@@ -96,7 +96,7 @@ function _vsite_node_autocomplete_title_to_nid($title) {
  *   An un-indexed array of node ids.
  *
  * @return array $matches
- *   An indexed array containing elements like 'Title [nid:1]' => 'Title'.
+ *   An indexed array containing elements like 'Title [123]' => 'Title'.
  */
 function _vsite_node_autocomplete_matches($nids) {
   $matches = array();

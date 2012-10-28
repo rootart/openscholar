@@ -557,7 +557,7 @@ function os_form_alter(&$form, $form_state, $form_id) {
 
 /**
  * After build callback; added to every form.
- * 
+ *
  * @see os_form_alter()
  */
 function os_entity_form_after_build($form, $form_state) {
@@ -804,7 +804,7 @@ function os_context_registry_alter(&$registry) {
 
 /**
  * Helper function for adding conditional css.
- * 
+ *
  * Takes a browser css condition,
  * returns array to pass to drupal_add_css's $options['browser']
  * http://api.drupal.org/api/drupal/includes%21common.inc/function/drupal_pre_render_conditional_comments/7
@@ -853,6 +853,7 @@ function os_system_info_alter(&$info, $file, $type) {
       'content_bottom' => 'Content Bottom',
       'sidebar_first' => 'SideBar Left',
       'sidebar_second' => 'SideBar Right',
+      'footer' => 'Footer',
     );
   }
 }
@@ -972,7 +973,7 @@ function os_node_view_alter(&$build) {
 
 /**
  * Implements hook_permission().
- * 
+ *
  * Defines permissions for all the regions of the default theme
  */
 function os_permission() {
@@ -996,7 +997,7 @@ function os_permission() {
 
 /**
  * Given a box and a set of contexts, return the region the box is in.
- * 
+ *
  * This function will be called multiple times per page, so we get all the
  * regions at once and cache them in a static var.
  */

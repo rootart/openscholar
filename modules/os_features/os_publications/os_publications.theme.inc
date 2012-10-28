@@ -36,6 +36,7 @@ function theme_os_publications_tabular(&$vars) {
     'biblio_publisher',
     'biblio_volume',
     'biblio_issue',
+    'biblio_edition',
     'biblio_year',
     'biblio_place_published',
     'biblio_type_name',

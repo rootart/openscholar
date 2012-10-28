@@ -223,7 +223,8 @@ class vsite extends space_og {
         'contact',
         'node',
         'admin',
-        'admin/*'
+        'admin/*',
+        'files/*',
     );
 
     $excluded = array_merge($excluded, $more);

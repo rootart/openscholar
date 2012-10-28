@@ -362,7 +362,7 @@ $biblio_field_type = array(
   array('tid'=>105,'fid'=>40,'ftdid'=>40,'cust_tdid'=>40,'common'=>0,'vtab'=>8,'autocomplete'=>0,'required'=>0,'weight'=>170,'visible'=>0),
   array('tid'=>105,'fid'=>41,'ftdid'=>41,'cust_tdid'=>41,'common'=>0,'vtab'=>8,'autocomplete'=>0,'required'=>0,'weight'=>171,'visible'=>0),
   array('tid'=>105,'fid'=>42,'ftdid'=>42,'cust_tdid'=>42,'common'=>0,'vtab'=>2,'autocomplete'=>0,'required'=>0,'weight'=>172,'visible'=>0),
-  array('tid'=>105,'fid'=>43,'ftdid'=>43,'cust_tdid'=>43,'common'=>0,'vtab'=>2,'autocomplete'=>0,'required'=>0,'weight'=>15,'visible'=>1),
+  array('tid'=>105,'fid'=>43,'ftdid'=>43,'cust_tdid'=>43,'common'=>0,'vtab'=>2,'autocomplete'=>0,'required'=>0,'weight'=>15,'visible'=>0),
   array('tid'=>105,'fid'=>44,'ftdid'=>44,'cust_tdid'=>44,'common'=>0,'vtab'=>4,'autocomplete'=>0,'required'=>0,'weight'=>175,'visible'=>0),
   array('tid'=>105,'fid'=>45,'ftdid'=>45,'cust_tdid'=>45,'common'=>0,'vtab'=>9,'autocomplete'=>0,'required'=>0,'weight'=>176,'visible'=>0),
   array('tid'=>105,'fid'=>46,'ftdid'=>167,'cust_tdid'=>167,'common'=>0,'vtab'=>9,'autocomplete'=>0,'required'=>0,'weight'=>150,'visible'=>0),

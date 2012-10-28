@@ -528,6 +528,10 @@ function og_vocab_field_formatter_view($entity_type, $entity, $field, $instance,
     $data['term'][$term->vid][] = l($term->name, $url['path']);
   }
 
+  if (!$data) {
+    return;
+  }
+
   $element = array();
   foreach ($data['term'] as $vid => $values) {
     $element[0][$vid] = array('#theme' => 'item_list', '#items' => $values, '#title' => $data['vocabylary'][$vid]);
@@ -995,6 +999,30 @@ function og_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
     }
   }
   $form['#submit'][] = 'og_vocab_form_taxonomy_form_vocabulary_submit';
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Using the hook_form_alter and not hook_form_FORM_ID_alter due to the
+ * invokes order of the hooks.
+ */
+function og_vocab_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id != 'taxonomy_form_vocabulary' || !$context = og_vocab_is_group_admin_context()) {
+    return;
+  }
+  $form['#submit'][] = 'og_vocab_redirect_to_group_vocabularies';
+}
+
+/**
+ * After deleting the group vocabulary, redirect to the taxonomy group admin
+ * page.
+ */
+function og_vocab_redirect_to_group_vocabularies($form, &$form_state) {
+  if (!$context = og_vocab_is_group_admin_context()) {
+    return;
+  }
+  $form_state['redirect'] = 'group/' . $context['group_type'] .'/' . $context['gid'] . '/admin/taxonomy';
 }
 
 /**

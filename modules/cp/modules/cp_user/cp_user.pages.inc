@@ -7,14 +7,14 @@ function cp_user_check_role($user_id, $group_id) {
   // First check to see if the user is the admin of this group.
   $space = spaces_get_space();
 
-  if($space->group->vid == $group_id && $space->group->uid == $user_id){
+  if($space->group->nid == $group_id && $space->group->uid == $user_id){
 	// User is the manager of the site, don't allow any actions on them.
 	$group_member = t('Manager');
 	$admin_link = '';
 	$remove_link = '';
   }else{
   	// Check their OG roles here, they could be a vsite admin and not the manager
-	$user_roles = og_get_user_roles('node',$space->group->vid, $user_id);
+	$user_roles = og_get_user_roles('node',$space->group->nid, $user_id);
 	// Check for the vsite admin role now
 	if(in_array('vsite admin', $user_roles)) {
 	  $group_member = t('Administrator');

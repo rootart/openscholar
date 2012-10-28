@@ -258,8 +258,11 @@ function cp_layout_layout_select($form, $form_state){
   $form['layout'] = array(
     '#type' => 'radios',
     '#options' => array_combine($options, $options),
-    '#default_value' => at_get_setting('bigscreen_layout', $theme_name)
+    '#default_value' => at_get_setting('bigscreen_layout', $theme_name),
+    '#description' => t('Click a layout to select which you would like your site to use. This selection will not affect the header of your site,
+    only the area below it.'),
   );
+  $form['#attached']['css'] = array(drupal_get_path('module', 'cp_layout').'/theme/cp_layout_select.css');
 
   $form['actions'] = array(
     '#type' => 'actions',
@@ -388,6 +391,19 @@ function cp_layout_select_submit($form, $form_state){
 }
 
 function _cp_layout_get_layout_options($theme_name){
+  require_once drupal_get_path('theme', 'adaptivetheme').'/inc/get.inc';
+  require_once drupal_get_path('theme', 'adaptivetheme').'/inc/plugins.inc';
+
+  // hack so at gets options for our theme
+  global $theme_key;
+  $theme_key_orig = $theme_key;
+  $theme_key = $theme_name;
+
+  // hack to make sure it doesn't get options for cp theme
+  cache_clear_all('at_page_layouts_data_structure', 'cache');
+
   $layouts = responsive_page_layouts_device_group_options($theme_name);
+  $theme_key = $theme_key_orig;
+
   return $layouts['bigscreen'];
 }

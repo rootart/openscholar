@@ -55,7 +55,7 @@ function vsite_form_node_form_alter(&$form, &$form_state, $form_id) {
 
 /**
  * Returns the default value for the homepage path.
- * 
+ *
  * @return array
  */
 function vsite_group_default_homepage_value($entity_type, $entity, $field, $instance, $langcode) {
@@ -752,7 +752,7 @@ function vsite_user_view_alter(&$build) {
 
 /**
  * Implements hook_mail_alter().
- * 
+ *
  * Alters system emails to users based on certain actions.
  */
 function vsite_mail_alter(&$message) {
@@ -788,7 +788,7 @@ function vsite_mail_alter(&$message) {
       // Alter the body message.
       $message['body'][0] = t("Dear !firstname,\n\nYour account at the !site website has been created for you. You may now log in by either clicking through on the following link or pasting it into your browser:\n\n !login_url\n\n(Note: This login can be used only once.)\n\nYour username is: !username \n\nAfter setting your password with the included link, you will be able to log in at !futurelogin in the future.\n\nSincerely,\nThe !site Team", $replacements);
       break;
-      
+
     // Account created by admin in the admin/people panel.
     case 'user_register_admin_created':
       // Get the user id we just created.
@@ -1109,6 +1109,7 @@ function vsite_contact_mail_owner($form, &$form_state, $recipient) {
   );
   $form['submit'] = array('#type' => 'submit',
     '#value' => t('Send e-mail'),
+    '#weight' => 100,
   );
 
   return $form;
@@ -1224,3 +1225,32 @@ function vsite_form_node_admin_content_alter(&$form, &$form_state) {
   }
 }
 
+/**
+ * Implements hook_mollom_form_list().
+ */
+function vsite_mollom_form_list() {
+  if(module_exists('mollom')) {
+    $forms['vsite_contact_mail_owner'] = array(
+      'title' => t('Contact Site Owner'),
+    );
+    return $forms;
+  }
+}
+
+/**
+ * Implements hook_mollom_form_info().
+ */
+function vsite_mollom_form_info($form_id) {
+  if(module_exists('mollom')) {
+    switch ($form_id) {
+      case 'vsite_contact_mail_owner':
+        $form_info = array(
+      	  'mode' => MOLLOM_MODE_CAPTCHA,
+          'elements' => array(),
+          'mapping' => array(),
+        );
+      return $form_info;
+      break;
+    }
+  }
+}

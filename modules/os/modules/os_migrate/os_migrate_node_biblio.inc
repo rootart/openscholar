@@ -18,11 +18,15 @@ class BiblioNodeOSMigration extends AbstractNodeOSMigration {
 
 
     //$this->addUnmigratedDestinations($fields)
-    $this->addUnmigratedDestinations(parent::subfields('field_biblio_image', array('file_class', 'language', 'destination_dir', 'destination_file', 'file_replace', 'preserve_files', 'source_dir')), t('DNM'));
+    $this->addUnmigratedDestinations(parent::subfields('field_biblio_image', array('file_class', 'language', 'file_replace', 'preserve_files',)), t('DNM'));
+
+    $this->addFieldMapping('field_biblio_image:source_dir')->defaultValue(
+      variable_get('os_migrate_files') . '/' . parent::d6_variable_get('file_directory_path', 'sites/default/files'));
+    $this->addFieldMapping('field_biblio_image:destination_dir');
 
     $this->addUnmigratedSources(array('field_biblio_image_fid', 'field_biblio_image_list', 'field_biblio_image_data'), t('DNM'));
 
-    $this->addSimpleMappings(array('field_biblio_image', 'field_biblio_image:alt', 'field_biblio_image:title', 'field_biblio_extra', 'field_biblio_extra:label', 'field_biblio_extra:value'));
+    $this->addSimpleMappings(array('field_biblio_image', 'field_biblio_image:alt', 'field_biblio_image:title', 'field_biblio_image:destination_file', 'field_biblio_extra', 'field_biblio_extra:label', 'field_biblio_extra:value'));
     $this->addFieldMapping('field_biblio_image:og_group_ref', 'group_nid');
 
   }
@@ -71,13 +75,21 @@ class BiblioNodeOSMigration extends AbstractNodeOSMigration {
      */
 
 		if ($current_row->field_biblio_image_fid) {
-		  parent::d6_db_select('files', 'f')
+		  $query = parent::d6_db_select('files', 'f')
 		  	->condition('f.fid', $current_row->field_biblio_image_fid, '=')
-		  	->fields('f');
+		  	->fields('f')
+		  	->execute();
+		  $cover = $query->fetchObject();
 
 		  if ($current_row->field_biblio_image_data && $data = unserialize($current_row->field_biblio_image_data)) {
 		    $current_row->{'field_biblio_image:alt'} = isset($data['alt']) ? $data['alt'] : '';
 		    $current_row->{'field_biblio_image:title'} = isset($data['title']) ? $data['title'] : '';
+		  }
+
+		  if (list($path, $name) = $this->_migrate_filename($cover->filepath)) {
+		    $current_row->{'field_biblio_image:destination_file'}  = $name;
+		    $current_row->{'field_biblio_image:destination_dir'} = 'public://' . $path;
+		    $current_row->{'field_biblio_image'} = $path . '/' . $name;
 		  }
 		}
 

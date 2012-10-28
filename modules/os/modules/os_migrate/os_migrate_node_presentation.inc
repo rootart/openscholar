@@ -29,7 +29,8 @@ class PresentationNodeOSMigration extends AbstractNodeOSMigration {
     $this->addFieldMapping('field_presentation_file:og_group_ref', 'group_nid');
     $this->addSimpleMappings(parent::subfields('field_presentation_file', array('destination_file', 'description', 'display')));
     $this->addFieldMapping('field_presentation_file:source_dir')
-      ->defaultValue(variable_get('os_migrate_files', FALSE));
+      ->defaultValue(variable_get('os_migrate_files') . '/' . parent::d6_variable_get('file_directory_path', 'sites/default/files'));
+    $this->addFieldMapping('field_presentation_file:destination_dir');
     $this->addUnmigratedDestinations(parent::subfields('field_presentation_file', array('file_class', 'language', 'destination_dir', 'file_replace', 'preserve_files')));
 
     //$this->dependencies[] = 'StubNodeOS'; // append dependencies.  these classes must be migrated before this class.
@@ -77,6 +78,12 @@ class PresentationNodeOSMigration extends AbstractNodeOSMigration {
     $query = $this->_presentation_files_query($current_row->nid);
     $fields = array('filepath' => 'destination_file', 'data'=>'description', 'list' => 'display');
     parent::os_migrate_prepare_files($query->execute(), $current_row, 'field_presentation_file', $fields);
+
+    if (list($path, $name) = $this->_migrate_filename($current_row->{'field_presentation_file:filepath'})) {
+      $current_row->{'field_presentation_file:filename'} = $name;
+      $current_row->{'field_presentation_file:destination_dir'} = 'public://' . $path;
+      $current_row->{'field_presentation_file'} = $path . '/' . $name;
+    }
 
     return parent::prepareRow($current_row); //false -> skip this row
 

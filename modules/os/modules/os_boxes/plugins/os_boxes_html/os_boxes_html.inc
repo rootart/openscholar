@@ -23,7 +23,6 @@ class os_boxes_html extends os_boxes_default {
       '#title' => t('Content'),
       '#description' => t('You can put almost anything into here to place it in a widget. Text, HTML, Images, Video, whatever works in the editor.')
     );
-
     return $form;
   }
 
@@ -38,7 +37,9 @@ class os_boxes_html extends os_boxes_default {
 
   public function render() {
     $block = parent::render();
+
     $block['content'] = check_markup($this->options['text']['value'], $this->options['text']['format']);
+
     return $block;
   }
 }

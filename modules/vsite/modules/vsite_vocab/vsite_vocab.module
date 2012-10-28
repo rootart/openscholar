@@ -64,7 +64,7 @@ function vsite_vocab_field_create_instance($instance) {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter() for taxonomy_form_vocabulary.
  *
  * 1) Limit avalible bundles to just Publc/Private bundles in OS.
  *
@@ -73,17 +73,6 @@ function vsite_vocab_field_create_instance($instance) {
 function vsite_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
   if (!isset($form['og_vocab'])) {
     return;
-  }
-
-  // Get enabled bundles.
-  $bundles = array_keys(os_get_bundles(array(1,2)));
-
-  // Remove bundle configuration for bundles not enabled in this site.
-  foreach (element_children($form['og_vocab']) as $child) {
-    list($bundle_type, $bundle) = explode(":", $child, 2);
-    if (!in_array($bundle, $bundles)) {
-      unset($form['og_vocab'][$child]);
-    }
   }
 
   // Hiding elements in the form.
@@ -102,13 +91,15 @@ function vsite_vocab_form_taxonomy_form_vocabulary_alter(&$form, $form_state) {
   $cardinality = FIELD_CARDINALITY_UNLIMITED;
 
   // Add description for the name.
-  $form['name']['#description'] = t('The vocabulary name. E.g. "Area of intrest"');
+  $form['name']['#description'] = t('The vocabulary name. E.g. "Research interests"');
+
+  // Get enabled bundles.
+  $bundles = os_get_bundles(array(1,2));
 
   // Loop through all of the content types and build their checkboxe's.
   $form['bundles'] = array();
   $default_bundles = array();
-  $group_content = og_get_all_group_content_bundle();
-  foreach ($group_content['node'] as $bundle => $bundle_label) {
+  foreach ($bundles as $bundle => $bundle_label) {
     $vid = !empty($form['vid']['#value']) ? $form['vid']['#value'] : 0;
     $og_vocab = og_vocab_load_og_vocab($vid, 'node', $bundle, TRUE);
     $options[$bundle] = check_plain($bundle_label);
@@ -181,15 +172,15 @@ function vsite_vocab_form_alter(&$form, $form_state, $form_id) {
   if ($form_id != 'taxonomy_form_vocabulary' || !$context = og_vocab_is_group_admin_context()) {
     return;
   }
-  $form['#submit'][] = 'og_vocab_redirect_to_group_vocabularies';
+  $form['#submit'][] = 'vsite_vocab_redirect_to_group_vocabularies';
 }
 
 /**
  * After deleting the group vocabulary, redirect to the taxonomy group admin
  * page.
  */
-function og_vocab_redirect_to_group_vocabularies($form, &$form_state) {
-  $form_state['redirect'] = 'cp/build/taxonomy/';
+function vsite_vocab_redirect_to_group_vocabularies($form, &$form_state) {
+  $form_state['redirect'] = 'cp/build/taxonomy';
 }
 
 /**
@@ -218,7 +209,16 @@ function vsite_vocab_field_attach_view_alter(&$output, $context) {
     return;
   }
   $original = $output[OG_VOCAB_FIELD][0]['#markup'];
-  $output[OG_VOCAB_FIELD][0]['#markup'] = t('In !terms', array('!terms' => $original));
+
+  if (count($output[OG_VOCAB_FIELD]['#items']) > 3) {
+    // Show links collapsed.
+    $output[OG_VOCAB_FIELD][0]['#markup'] = '<a href="#" class="toggle" >' . t('in terms') . '</a><div class="slider">'. $original .'</div>';
+
+    $output['#attached']['js'][] = drupal_get_path('module', 'os').'/theme/os_toggle.js';
+  }
+  else {
+    $output[OG_VOCAB_FIELD][0]['#markup'] = t('In !terms', array('!terms' => $original));
+  }
 }
 
 /**
@@ -243,10 +243,10 @@ function vsite_vocab_og_vocab_is_admin_context() {
  */
 function vsite_vocab_form_taxonomy_form_vocabulary_submit(&$form, &$form_state) {
   $vid = empty($form_state['vocabulary']->vid) ? 0 : $form_state['vocabulary']->vid;
-  $group_content = og_get_all_group_content_bundle();
+  $bundles = os_get_bundles(array(1,2));
   $values = $form_state['values'];
 
-  foreach ($group_content['node'] as $bundle => $bundle_label) {
+  foreach ($bundles as $bundle => $bundle_label) {
     $og_vocab = og_vocab_load_og_vocab($vid, 'node', $bundle);
 
     if (empty($og_vocab)) {

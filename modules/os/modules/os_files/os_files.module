@@ -137,14 +137,16 @@ function os_files_views_api() {
  */
 function os_files_download() {
   $args = func_get_args();
+  $scheme = 'public';
 
-  if (module_exists('vsite')) {
+  if (module_exists('vsite') && !file_exists($scheme . '://' . implode('/', $args))) {
 
     // Add the menu entry as an arg.
     array_unshift($args, 'files');
 
     $prefix = vsite_get_purl();
-    if ($prefix) {
+    //If we are in a vsite and the file is in a vsite prefixed directory
+    if ($prefix  && !file_exists($scheme . '://' . implode('/', $args))) {
       // Add the prefix as an arg.
       array_unshift($args, $prefix);
     }
@@ -284,6 +286,7 @@ function os_files_file_formatter_file_link($file, $display, $langcode) {
       'link' => array(
         '#theme' => 'link',
         '#href' => $path,
+        '#path' => $path,
         '#text' => $title,
         '#options' => array(
           'html' => false,

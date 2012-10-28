@@ -256,6 +256,7 @@ function citation_distribute_flag($event, $flag, $nid, $account) {
             $removed = $service->remove($nid);
           }
         }
+        $batch_cmd = NULL;
       } else {
         $batch_cmd = 'remove'; //schedule a removal at next cron run
       }

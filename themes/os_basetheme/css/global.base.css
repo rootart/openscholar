@@ -439,6 +439,7 @@ dd {
 }
 
 
+
 /**
  * Flexible Media and Cross browser improvements
  * - This can cause issues in table cells where no width is set on the column,
@@ -548,3 +549,20 @@ header[role=banner],
 .element-hidden {
   display: none;
 }
+
+/** TABLES **/
+	
+tbody {
+border-top: none;
+}	
+	
+th, td {
+    color: #4A4A4A;
+    padding: 0.6em;
+    vertical-align: top;
+}
+
+td img {
+     max-width: none !important;
+}
+

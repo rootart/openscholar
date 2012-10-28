@@ -16,7 +16,6 @@ class FileInlineOSMigration extends OSMigration {
 
     //////$this->destination = new MigrateDestinationFile(array('copy_file'=>TRUE));
 
-
     $this->destination = new MigrateDestinationFile('file', 'MigrateFileURI');
     $this->addFieldMapping('value', 'uri');
     $this->addFieldMapping('destination_file', 'filename');
@@ -24,10 +23,13 @@ class FileInlineOSMigration extends OSMigration {
 
     $this->addFieldMapping('timestamp', 'timestamp');
     //$this->addFieldMapping('path');
-    //$this->addFieldMapping('destination_dir');
-    //$this->addFieldMapping('source_dir')->defaultValue(variable_get('os_migrate_files'));
 
-    $this->addUnmigratedDestinations(array('file_replace', 'preserve_files', 'path', 'destination_dir', 'source_dir'), t('DNM'));
+    $this->addFieldMapping('destination_dir', 'destination_dir');
+    $this->addFieldMapping('source_dir')->defaultValue(
+      variable_get('os_migrate_files') . '/' . parent::d6_variable_get('file_directory_path', 'sites/default/files'));
+
+
+    $this->addUnmigratedDestinations(array('file_replace', 'preserve_files', 'path'), t('DNM'));
     $this->addUnmigratedSources(array('nid', 'field_os_inline_files_fid', 'filepath'), t('DNM'));
 
   }
@@ -49,10 +51,19 @@ class FileInlineOSMigration extends OSMigration {
     //this appraoch does not take into account vsite_domain_names from spaces_overrides
     //$purl = parent::d6_variable_get('purl_base_domain');
     $dir = variable_get('os_migrate_files');
-    $row->uri = $dir . '/' . $row->filepath;
+    $legacy_uri = $dir . '/' . $row->filepath;
+
+    $file_directory_path = parent::d6_variable_get('file_directory_path', 'sites/default/files');
+    $filepath = $row->filepath;
+    $filepath = str_replace($file_directory_path, '', $filepath);
+    $file = explode('/', trim($filepath, '/'));
+    $row->filename = array_pop($file);
+    $row->destination_dir = 'public://' . implode('/', $file);
+    $row->uri = $filepath;
 
 
-    if (!parent::legacy_file_exists($row->uri)) {
+
+    if (!parent::legacy_file_exists($legacy_uri)) {
       return FALSE;
     }
 
@@ -92,11 +103,17 @@ class ImageInlineOSMigration extends OSMigration {
     $this->addFieldMapping('value', 'uri');
     $this->addFieldMapping('destination_file', 'filename');
 
+    $this->addFieldMapping('destination_dir', 'destination_dir');
+    $this->addFieldMapping('source_dir')->defaultValue(
+     variable_get('os_migrate_files') . '/' . parent::d6_variable_get('file_directory_path', 'sites/default/files'));
+
+
+
     // Field mappings //
     $this->addSimpleMappings(array('uid', 'timestamp'));
 
     //ignored
-    $this->addUnmigratedDestinations(array('file_replace', 'preserve_files', 'path', 'destination_dir', 'source_dir'), t('DNM'));
+    $this->addUnmigratedDestinations(array('file_replace', 'preserve_files', 'path'), t('DNM'));
     $this->addUnmigratedSources(array('filepath', 'fid', 'nid', 'field_os_inline_image_fid'), t('DNM'));
   }
 
@@ -117,9 +134,17 @@ class ImageInlineOSMigration extends OSMigration {
     //going with that for now.  may patch migrate if it's obnoxious.
     //this appraoch does not take into account vsite_domain_names from spaces_overrides
     $dir = variable_get('os_migrate_files');
-    $row->uri = $dir . '/' . $row->filepath;
+    $legacy_uri = $dir . '/' . $row->filepath;
 
-    if (!parent::legacy_file_exists($row->uri)) {
+    $file_directory_path = parent::d6_variable_get('file_directory_path', 'sites/default/files');
+    $filepath = $row->filepath;
+    $filepath = str_replace($file_directory_path, '', $filepath);
+    $file = explode('/', trim($filepath, '/'));
+    $row->filename = array_pop($file);
+    $row->destination_dir = 'public://' . implode('/', $file);
+    $row->uri = $filepath;
+
+    if (!parent::legacy_file_exists($legacy_uri)) {
       parent::saveMessage(t('Image Migration Error.  File not found: %uri', array('%uri'=>$row->uri)), MigrationBase::MESSAGE_WARNING);
       return FALSE;
     }

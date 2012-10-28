@@ -51,6 +51,13 @@ function os_activity_views_default_views() {
   $handler->display->display_options['relationships']['field_group_target_id']['table'] = 'field_data_field_group';
   $handler->display->display_options['relationships']['field_group_target_id']['field'] = 'field_group_target_id';
   $handler->display->display_options['relationships']['field_group_target_id']['label'] = 'Group';
+  /* Field: Message: Timestamp */
+  $handler->display->display_options['fields']['timestamp']['id'] = 'timestamp';
+  $handler->display->display_options['fields']['timestamp']['table'] = 'message';
+  $handler->display->display_options['fields']['timestamp']['field'] = 'timestamp';
+  $handler->display->display_options['fields']['timestamp']['label'] = '';
+  $handler->display->display_options['fields']['timestamp']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['timestamp']['date_format'] = 'time ago';
   /* Field: Message: Render message (Get text) */
   $handler->display->display_options['fields']['message_render']['id'] = 'message_render';
   $handler->display->display_options['fields']['message_render']['table'] = 'message';
@@ -59,13 +66,6 @@ function os_activity_views_default_views() {
   $handler->display->display_options['fields']['message_render']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['message_render']['partials'] = 0;
   $handler->display->display_options['fields']['message_render']['partials_delta'] = '0';
-  /* Field: Message: Timestamp */
-  $handler->display->display_options['fields']['timestamp']['id'] = 'timestamp';
-  $handler->display->display_options['fields']['timestamp']['table'] = 'message';
-  $handler->display->display_options['fields']['timestamp']['field'] = 'timestamp';
-  $handler->display->display_options['fields']['timestamp']['label'] = '';
-  $handler->display->display_options['fields']['timestamp']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['timestamp']['date_format'] = 'time ago';
   /* Sort criterion: Message: Timestamp */
   $handler->display->display_options['sorts']['timestamp']['id'] = 'timestamp';
   $handler->display->display_options['sorts']['timestamp']['table'] = 'message';
@@ -98,7 +98,13 @@ function os_activity_views_default_views() {
 
   /* Display: OS Activity - block */
   $handler = $view->new_display('block', 'OS Activity - block', 'block_1');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Recent Activity <a href=\'activity\'>(more)</a>';
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'some';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '25';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
   $handler->display->display_options['style_plugin'] = 'slideshow';
   $handler->display->display_options['style_options']['slideshow_type'] = 'views_slideshow_cycle';
@@ -113,8 +119,8 @@ function os_activity_views_default_views() {
   $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_pager']['weight'] = '1';
   $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_pager']['type'] = 'views_slideshow_pager_fields';
   $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_pager']['views_slideshow_pager_fields_fields'] = array(
-    'message_render' => 0,
     'timestamp' => 0,
+    'message_render' => 0,
   );
   $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_controls']['weight'] = '1';
   $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_controls']['type'] = 'views_slideshow_controls_text';
@@ -122,8 +128,8 @@ function os_activity_views_default_views() {
   $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_pager']['weight'] = '1';
   $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_pager']['type'] = 'views_slideshow_pager_fields';
   $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_pager']['views_slideshow_pager_fields_fields'] = array(
-    'message_render' => 0,
     'timestamp' => 0,
+    'message_render' => 0,
   );
   $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_controls']['weight'] = '1';
   $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_controls']['type'] = 'views_slideshow_controls_text';

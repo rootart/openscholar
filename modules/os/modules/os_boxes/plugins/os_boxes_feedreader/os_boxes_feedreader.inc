@@ -87,7 +87,7 @@ class os_boxes_feedreader extends os_boxes_default {
   public function render(){
     $block = parent::render();
     if (! $this->options['feed'] || ! ($node = node_load($this->options['feed']))) {
-      return "";
+      return $block;
     }
 
     field_attach_prepare_view('node', array(

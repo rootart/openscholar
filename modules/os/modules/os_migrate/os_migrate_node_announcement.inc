@@ -9,11 +9,13 @@ class AnnouncementNodeOSMigration extends AbstractNodeOSMigration {
 
     //field_photo
     $this->addFieldMapping('field_photo', 'field_photo');
-    $this->addSimpleMappings(parent::subfields('field_photo', array('language', 'alt', 'title', 'destination_file')));
+    $this->addSimpleMappings(parent::subfields('field_photo', array('language', 'alt', 'title', 'destination_file', 'destination_dir')));
       //->defaultValue(FALSE);
     $this->addFieldMapping('field_photo:source_dir', 'field_photo:source_dir')
-      ->defaultValue(variable_get('os_migrate_files', FALSE));
-    $this->addUnmigratedDestinations(array('field_photo:file_class', 'field_photo:destination_dir', 'field_photo:file_replace',
+      ->defaultValue(variable_get('os_migrate_files') . '/' . parent::d6_variable_get('file_directory_path', 'sites/default/files'));
+
+
+    $this->addUnmigratedDestinations(array('field_photo:file_class', 'field_photo:file_replace',
         'field_photo:preserve_files', ), t('DNM'));
 
 //     //field_upload
@@ -56,7 +58,13 @@ class AnnouncementNodeOSMigration extends AbstractNodeOSMigration {
     $photo = $result->fetchAssoc();
     if (is_array($photo) && count($photo)) {
       $row->field_photo = $photo['filepath'];
-      $row->{'field_photo:destination_file'} = $photo['filepath'];
+      //$row->{'field_photo:destination_file'} = $photo['filepath'];
+
+      if (list($path, $name) = $this->_migrate_filename($photo['filepath'])) {
+        $row->{'field_photo:filename'} = $name;
+        $row->{'field_photo:destination_dir'} = 'public://' . $path;
+        $row->field_photo = $path . '/' . $name;
+      }
     }
 
 //     //file attachments

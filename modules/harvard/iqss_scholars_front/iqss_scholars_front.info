@@ -8,6 +8,7 @@ dependencies[] = ctools
 dependencies[] = features
 dependencies[] = strongarm
 dependencies[] = os_stats
+dependencies[] = mollom
 features[box][] = iqss_scholars_fp_headertext
 features[box][] = iqss_scholars_fp_infoblock
 features[box][] = iqss_scholars_fp_logoblock

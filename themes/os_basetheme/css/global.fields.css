@@ -27,14 +27,14 @@
 }
 
 
-.field-items {
-     display: inline-block;
-}
-
 
 .node-type-book .field-name-body .field-items {
      display: inline;
 }
+
+.node-type-class .field-items {
+     display: inline-block;
+	  	}
 
 
 /*

@@ -21,6 +21,7 @@ dependencies[] = strongarm
 dependencies[] = token
 dependencies[] = views
 features[context][] = os_sitewide_front
+features[context][] = os_sitewide
 features[context][] = os_users
 features[ctools][] = context:context:3
 features[ctools][] = strongarm:strongarm:1

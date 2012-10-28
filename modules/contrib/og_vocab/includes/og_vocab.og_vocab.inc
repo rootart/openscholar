@@ -88,6 +88,9 @@ class OgVocab extends Entity {
       $element['#element_validate'] = array('_og_vocab_autocomplete_tags_validate');
     }
 
+    $element['#element_validate'][] = 'og_vocab_sub_widget_cardinality_validate';
+    $element['#og_vocab'] = $this;
+
     form_load_include($form_state, 'inc', 'og_vocab', '/includes/og_vocab.og_vocab');
     $form['#after_build']['og_vocab'] = 'og_vocab_element_after_build';
     $form['#validate']['og_vocab'] = 'og_vocab_element_validate';
@@ -177,6 +180,41 @@ function og_vocab_element_after_build($form, &$form_state) {
   $form[OG_VOCAB_FIELD][LANGUAGE_NONE]['#theme_wrappers'] = array('fieldset');
   $form[OG_VOCAB_FIELD][LANGUAGE_NONE]['#title'] = '';
   return $form;
+}
+
+/**
+ * Element validate; Check cardinality of sub-widget.
+ */
+function og_vocab_sub_widget_cardinality_validate($element, &$form_state) {
+  $og_vocab = $element['#og_vocab'];
+  $cardinality = $og_vocab->settings['cardinality'];
+
+  if ($cardinality == FIELD_CARDINALITY_UNLIMITED) {
+    return;
+  }
+
+  if (empty($form_state['values'][OG_VOCAB_FIELD][LANGUAGE_NONE][0])) {
+    return;
+  }
+
+  $vid = $og_vocab->vid;
+
+  $count = 0;
+
+  foreach ($form_state['values'][OG_VOCAB_FIELD][LANGUAGE_NONE][0][$vid] as $value) {
+    if (!empty($value['target_id'])) {
+      ++$count;
+      if ($count > $cardinality) {
+        $vocabulary = taxonomy_vocabulary_load($vid);
+        $params = array(
+          '@name' => $vocabulary->name,
+          '@cardinality' => $cardinality,
+        );
+        form_error($element, t('@name: this field cannot hold more than @cardinality values', $params));
+        return;
+      }
+    }
+  }
 }
 
 

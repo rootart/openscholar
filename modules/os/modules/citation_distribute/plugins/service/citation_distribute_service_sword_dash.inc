@@ -59,7 +59,7 @@ class citation_distribute_service_sword_dash extends citation_distribute_service
 		if ($files[LANGUAGE_NONE][0]['fid']) { //has a file been added?
 			return TRUE;
 		} else {
-			form_set_error('files', $this->title . ' requires the full text document be uploaded as an attachment.');
+			form_set_error('files', $this->title . ' requires the full text document be uploaded as an attachment.  Please upload your document in the Attach Files section of this form.');
 			return FALSE;
 
 			//TODO: check if a user has set his affiliation.  if not, send them to where that setting can be adjusted.

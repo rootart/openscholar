@@ -51,9 +51,8 @@ abstract class os_boxes_default extends boxes_box {
    * Implementation of boxes_content::render().
    */
   public function render() {
-    $title = isset($this->title) ? check_plain($this->title) : NULL;
+    $title = isset($this->title) ? $this->title : NULL;
     $block['title'] = $title;
-    $block['subject'] = $title;
     $block['delta'] = $this->delta;
     $block['content'] = '';
     return $block;

@@ -1,6 +1,20 @@
 <?php
 
 function media_embed_install() {
+  // legacy:
+  $type = new stdClass();
+  $type->name = 'html';
+  $type->label = "Embedded HTML";
+  $type->base = TRUE;
+  $type->type_callback_args = array(
+    'match_type' => 'all',
+    'mimetypes' => array('/^html/'),
+    'extensions' => array(),
+    'streams' => array('embed'),
+  );
+
+  media_type_save($type);
+
   // add the fields for it
   try {
     field_create_field(array(

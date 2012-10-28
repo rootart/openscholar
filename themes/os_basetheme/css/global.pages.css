@@ -626,6 +626,16 @@ div.ctools-modal-content .modal-content .modal-throbber-wrapper img {
 }	
 	
 /** OS LOGIN CONTAINER STYLES **/	
+/** SLIDER **/
+.slider {
+  display: none;
+  color: black;
+  position: static;
+  width: auto;
+  background: #F1F1F1;
+  border: 1px solid #C0C5CC;
+  padding: 1em;
+}
 .not-logged-in.page-user #columns {
 	width:540px;
 	border-radius:5px;

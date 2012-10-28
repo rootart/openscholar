@@ -23,7 +23,6 @@ features[field][] = message-os_edit_node-field_private_message
 features[field][] = message-os_node-field_group
 features[field][] = message-os_node-field_node_reference
 features[field][] = message-os_node-field_private_message
-features[field][] = node-vsite-field_message_display_name
 features[field][] = node-vsite-field_private_messages
 features[field][] = og_membership-og_membership_type_default-field_message
 features[message_type][] = os_create_node

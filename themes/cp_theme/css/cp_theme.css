@@ -329,7 +329,9 @@ width:30%;
 	margin-top: -1045px;
 }
  
-
+.tabledrag-toggle-weight-wrapper {
+  display: none;
+}
 	
 	
 	

@@ -67,7 +67,7 @@ function os_taxonomy_theme() {
         'childs' => NULL,
         'menu-class' => NULL,
         'description' => NULL,
-        'terms_description' => NULL,
+        'show_term_descriptions' => NULL,
       ),
     ),
     'os_taxonomy_tagged_nodes' => array(
@@ -90,7 +90,7 @@ function os_taxonomy_theme() {
  *      with zero tagged nodes.
  *    - url_path: The url of the taxonomy term.
  *    - link_options: A setting variable for the l() function.
- *    - terms_description: Whether to display the taxonomy term description.
+ *    - show_term_descriptions: Whether to display the taxonomy term description.
  *    - description: The taxonomy term description.
  *    - childs: The html menu item list for the term child's
  *    - menu-class: Class for ul element.
@@ -103,7 +103,7 @@ function theme_os_taxonomy_term_item($variables) {
   $name = !$number && !$variables['link_to_empty_terms'] ? $name : l($name, $variables['url_path'], $variables['link_options']);
   $item_content = $item_wrapper . $name . $number;
 
-  if ($variables['terms_description'] && !empty($variables['description'])) {
+  if ($variables['show_term_descriptions'] && !empty($variables['description'])) {
     $item_content .= '<div class="description"> - ' . check_plain($variables['description']) . '</div>';
   }
 
@@ -151,7 +151,7 @@ function theme_os_taxonomy_term_item($variables) {
  *        count.
  *      - show_empty_terms: Show empty terms in the terms list.
  *      - link_to_empty_terms: Show en empty term name as a link to the term.
- *      - terms_description: Show to term descprition under the title.
+ *      - show_term_descriptions: Show to term descprition under the title.
  *      - tid_active_class: The term id that will get the active class.
  *      - show_childs: Control if to show the childrens with their parent term.
  *        Also, the number of the tagged nodes to the childs term will not be
@@ -168,7 +168,7 @@ function theme_os_taxonomy_vocabulary_item_list($variables) {
     'show_childs' => TRUE,
     'tid_active_class' => 0,
     'show_empty_terms' => TRUE,
-    'terms_description' => TRUE,
+    'show_term_descriptions' => TRUE,
     'link_to_empty_terms' => TRUE,
   );
   dpm($options);
@@ -236,14 +236,13 @@ function theme_os_taxonomy_vocabulary_item_list($variables) {
     dpm($item);
     // The attached number to the term name.
     $number = null;
-    if($options['show_count']){
+    if ($options['show_count']) {
       $number = $item['tagged_items'];
       $number += $options['add_childs'] && isset($item['child_number']) ? $item['child_number'] : 0;
     }
 
     // Check if we need to disable the link to the term base on the child number.
     $link_options = empty($item['class']) ? array() : array('attributes' => array('class' => $item['class']));
-
     $child_content = !empty($item['childs']) ? os_taxonomy_build_child_item($item['childs'], $item, $options) : '';
 
     $data[$tid] = array(
@@ -254,7 +253,7 @@ function theme_os_taxonomy_vocabulary_item_list($variables) {
         'url_path' => $path_prefix.$item['url']['path'],
         'description' => $item['description'],
         'link_to_empty_terms' => $options['link_to_empty_terms'],
-        'terms_description' => $options['terms_description'],
+        'show_term_descriptions' => $options['show_term_descriptions'],
         'childs' => $child_content,
       )),
     );
@@ -287,15 +286,52 @@ function os_taxonomy_build_term_items($terms, $options) {
     // Add the number of tagged nodes to the childrens when needed.
     if ($options['show_childs']) {
       $depth = !isset($options['depth']) == 0 ? NULL : $options['depth'];
-      $tree = taxonomy_get_tree($term->vid, $term->tid, $depth, TRUE);
+      $childrens = os_taxonomy_get_term_childrens($term->tid, $term->vid, $options);
       if ($options['add_childs']) {
-        $items[$tid]['child_number'] = os_taxonomy_count_term_tagged_items($tree, $options['bundles']);
+        $items[$tid]['child_number'] = os_taxonomy_count_term_tagged_items($childrens, $options['bundles']);
       }
-      $items[$tid]['childs'] = os_taxonomy_build_term_items($tree, $options);
+      $items[$tid]['childs'] = os_taxonomy_build_term_items($childrens, $options);
     }
   }
 
   return $items;
+}
+
+/**
+ * Loading the taxonomy term childrens and remove all the childrens that their
+ * depth in the vocabulary is bigger than the require nested level defined in
+ * the box settings.
+ * Because we are using recursive function for rendering the terms children with
+ * the theme function, we can remove deeper terms and then they won't be
+ * rendered with the theme function.
+ *
+ *  @param $tid
+ *    The term ID.
+ *  @param $vid
+ *    Vocabulary ID of the term.
+ *  @param $options
+ *    Settings variable of the theme function.
+ *
+ *  @return
+ *    Taxonomy terms childrens ready to be rendered by the theme function.
+ */
+function os_taxonomy_get_term_childrens($tid, $vid, $options) {
+  $tree = &drupal_static(__FUNCTION__, array());
+  if (!$tree) {
+    $vocabulary = taxonomy_get_tree($options['vocabulary']);
+    foreach ($vocabulary as $term) {
+      $tree[$term->tid] = $term->depth;
+    }  }
+
+  $childrens = taxonomy_get_children($tid, $vid);
+
+  foreach ($childrens as $children) {
+    if ($options['depth'] < $tree[$children->tid]) {
+      unset($childrens[$children->tid]);
+    }
+  }
+
+  return $childrens;
 }
 
 /**
@@ -318,7 +354,7 @@ function os_taxonomy_build_child_item($items, $parent, $options) {
     }
 
     $number = null;
-    if($options['show_count']){
+    if ($options['show_count']) {
       $number = $item['tagged_items'];
       $number += $options['add_childs'] && isset($item['child_number']) ? $item['child_number'] : 0;
     }
@@ -329,7 +365,7 @@ function os_taxonomy_build_child_item($items, $parent, $options) {
       'url_path' => $item['url']['path'],
       'description' => $item['description'],
       'link_to_empty_terms' => $options['link_to_empty_terms'],
-      'terms_description' => $options['terms_description'],
+      'show_term_descriptions' => $options['show_term_descriptions'],
       'menu-class' => 'termchild-' . check_plain($parent['term_name']),
       'childs' => $child_content,
     ));
@@ -419,6 +455,10 @@ function theme_os_taxonomy_tagged_nodes($variables) {
     'term' => taxonomy_term_view($taxonomy_term, 'full'),
   );
 
+  // Checks whether there are child terms to display below this one.
+  $children = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, 1, TRUE);
+  $has_children_to_display = (!empty($children) && (is_null($options['max_depth']) || (is_numeric($options['max_depth']) && $options['max_depth'] > $options['cur_depth'])));
+
   // Attaches list of nodes in this term, or empty message if term is root term.
   $node_count = os_taxonomy_count_attached_nodes($taxonomy_term->tid, $options['bundles']);
   if ($node_count) {
@@ -426,7 +466,7 @@ function theme_os_taxonomy_tagged_nodes($variables) {
     $nodes = node_load_multiple($nids);
     $build += node_view_multiple($nodes);
   }
-  else if ((int) $options['cur_depth'] === 0) {
+  else if ((int) $options['cur_depth'] === 0 && !$has_children_to_display) {
     $build['no_content'] = array(
       '#prefix' => '<p>',
       '#markup' => t('There is currently no content classified with this term.'),
@@ -442,7 +482,6 @@ function theme_os_taxonomy_tagged_nodes($variables) {
     }
     $options['cur_depth'] = $options['cur_depth'] + 1;
 
-    $children = taxonomy_get_tree($taxonomy_term->vid, $taxonomy_term->tid, 1, TRUE);
     foreach ($children as $child) {
       $output .= theme('os_taxonomy_tagged_nodes', array('taxonomy_term' => $child, 'options' => $options));
     }

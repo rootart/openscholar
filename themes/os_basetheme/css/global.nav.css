@@ -479,6 +479,13 @@ color: #FFF !important;
     text-decoration:none !important;
 	}
 
+/**
+ * Fixes case where the contextual link gear will cover the 'next month' button on a calendar.
+ */
+#block-views-os-events-block-1 .contextual-links-wrapper {
+  right: 35px;
+}
+
 html.js div.ctools-dropdown a.ctools-dropdown-text-link {
     background: none;
     padding:0 0 0 13px;

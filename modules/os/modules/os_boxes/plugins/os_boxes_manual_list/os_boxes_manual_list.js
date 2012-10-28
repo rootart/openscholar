@@ -15,7 +15,7 @@ Drupal.behaviors.os_manual_list = {
 		// add a new row to the table, set all its form elements to the right values and make it draggable
 		$('.add_new', $form).click(function (e) {
 			var val = $('#edit-node-to-add', $form).val(),
-				patt = /(.+) \[id: ([\d]+)\]/,
+				patt = /(.+) \[([\d]+)\]/,
 				matches = patt.exec(val),
 				id, weight = -Infinity,
 				new_row;

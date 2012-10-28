@@ -181,6 +181,32 @@ class UrlAliasTableMigration extends TableCopyMigration {
   }
 }
 
+class ContextualAnnotationsTableMigration extends TableCopyMigration {
+
+  public function __construct() {
+    $this->required_modules = array('contextual_annotation');
+    $key_schema = array(
+      'annotation_key' => array(
+        'type' => 'varchar',
+        'length' => 127,
+        'not null' => TRUE,
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+    );
+
+    $table = 'contextual_annotation';
+    parent::__construct($table, $key_schema);
+  }
+
+  public function prepareRow(&$row) {
+    unset($row->annotation_type);
+  }
+}
+
 class UsageLogTableMigration extends TableCopyMigration {
   public function __construct() {
     $this->required_modules = array('openscholar_log_usage');

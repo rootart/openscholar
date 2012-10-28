@@ -47,6 +47,24 @@ function os_activity_node_update($node) {
   if (!og_get_entity_groups('node', $node)) {
     return;
   }
+
+  // Check if such message was created in the past 24, to prevent
+  // multiple messages from multiple edits.
+  $time_ago = strtotime(date('r', time()) . '-1 day');
+
+  $query = new entityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'message')
+    ->propertyCondition('type', 'os_edit_node')
+    ->propertyCondition('timestamp', $time_ago, '>=')
+    ->count()
+    ->execute();
+
+  if ($result) {
+    // A message already exists.
+    return;
+  }
+
   os_activity_message_node_create($node, 'update');
 }
 

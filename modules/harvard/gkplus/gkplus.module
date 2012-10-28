@@ -98,7 +98,7 @@ function gkplus_init() {
 function gkplus_cron() {
   $options = array(
     'tree' => TRUE,
-    'max_depth' => 2,
+    'max_depth' => 3,
     'description' => TRUE,
   );
 

@@ -10,7 +10,7 @@
 function os_activity_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'message-os_create_node-field_group'
+  // Exported field: 'message-os_create_node-field_group'.
   $fields['message-os_create_node-field_group'] = array(
     'field_config' => array(
       'active' => '1',
@@ -31,6 +31,7 @@ function os_activity_field_default_fields() {
           0 => 'target_id',
         ),
       ),
+      'locked' => '0',
       'module' => 'entityreference',
       'settings' => array(
         'handler' => 'base',
@@ -102,7 +103,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_create_node-field_node_reference'
+  // Exported field: 'message-os_create_node-field_node_reference'.
   $fields['message-os_create_node-field_node_reference'] = array(
     'field_config' => array(
       'active' => '1',
@@ -123,6 +124,7 @@ function os_activity_field_default_fields() {
           0 => 'target_id',
         ),
       ),
+      'locked' => '0',
       'module' => 'entityreference',
       'settings' => array(
         'handler' => 'base',
@@ -192,7 +194,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_create_node-field_private_message'
+  // Exported field: 'message-os_create_node-field_private_message'.
   $fields['message-os_create_node-field_private_message'] = array(
     'field_config' => array(
       'active' => '1',
@@ -206,6 +208,7 @@ function os_activity_field_default_fields() {
           0 => 'value',
         ),
       ),
+      'locked' => '0',
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(
@@ -254,7 +257,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_edit_node-field_group'
+  // Exported field: 'message-os_edit_node-field_group'.
   $fields['message-os_edit_node-field_group'] = array(
     'field_config' => array(
       'active' => '1',
@@ -275,6 +278,7 @@ function os_activity_field_default_fields() {
           0 => 'target_id',
         ),
       ),
+      'locked' => '0',
       'module' => 'entityreference',
       'settings' => array(
         'handler' => 'base',
@@ -346,7 +350,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_edit_node-field_node_reference'
+  // Exported field: 'message-os_edit_node-field_node_reference'.
   $fields['message-os_edit_node-field_node_reference'] = array(
     'field_config' => array(
       'active' => '1',
@@ -367,6 +371,7 @@ function os_activity_field_default_fields() {
           0 => 'target_id',
         ),
       ),
+      'locked' => '0',
       'module' => 'entityreference',
       'settings' => array(
         'handler' => 'base',
@@ -436,7 +441,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_edit_node-field_private_message'
+  // Exported field: 'message-os_edit_node-field_private_message'.
   $fields['message-os_edit_node-field_private_message'] = array(
     'field_config' => array(
       'active' => '1',
@@ -450,6 +455,7 @@ function os_activity_field_default_fields() {
           0 => 'value',
         ),
       ),
+      'locked' => '0',
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(
@@ -498,7 +504,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_node-field_group'
+  // Exported field: 'message-os_node-field_group'.
   $fields['message-os_node-field_group'] = array(
     'field_config' => array(
       'active' => '1',
@@ -519,6 +525,7 @@ function os_activity_field_default_fields() {
           0 => 'target_id',
         ),
       ),
+      'locked' => '0',
       'module' => 'entityreference',
       'settings' => array(
         'handler' => 'base',
@@ -596,7 +603,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_node-field_node_reference'
+  // Exported field: 'message-os_node-field_node_reference'.
   $fields['message-os_node-field_node_reference'] = array(
     'field_config' => array(
       'active' => '1',
@@ -617,6 +624,7 @@ function os_activity_field_default_fields() {
           0 => 'target_id',
         ),
       ),
+      'locked' => '0',
       'module' => 'entityreference',
       'settings' => array(
         'handler' => 'base',
@@ -692,7 +700,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-os_node-field_private_message'
+  // Exported field: 'message-os_node-field_private_message'.
   $fields['message-os_node-field_private_message'] = array(
     'field_config' => array(
       'active' => '1',
@@ -706,6 +714,7 @@ function os_activity_field_default_fields() {
           0 => 'value',
         ),
       ),
+      'locked' => '0',
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(
@@ -760,73 +769,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-vsite-field_message_display_name'
-  $fields['node-vsite-field_message_display_name'] = array(
-    'field_config' => array(
-      'active' => '1',
-      'cardinality' => '1',
-      'deleted' => '0',
-      'entity_types' => array(),
-      'field_name' => 'field_message_display_name',
-      'foreign keys' => array(),
-      'indexes' => array(
-        'value' => array(
-          0 => 'value',
-        ),
-      ),
-      'module' => 'list',
-      'settings' => array(
-        'allowed_values' => array(
-          'username' => 'Username',
-          'group-name' => 'Virtual site name',
-        ),
-        'allowed_values_function' => '',
-      ),
-      'translatable' => '0',
-      'type' => 'list_text',
-    ),
-    'field_instance' => array(
-      'bundle' => 'vsite',
-      'default_value' => array(
-        0 => array(
-          'value' => 'username',
-        ),
-      ),
-      'deleted' => '0',
-      'description' => '',
-      'display' => array(
-        'default' => array(
-          'label' => 'above',
-          'module' => 'list',
-          'settings' => array(),
-          'type' => 'list_default',
-          'weight' => 7,
-        ),
-        'teaser' => array(
-          'label' => 'above',
-          'settings' => array(),
-          'type' => 'hidden',
-          'weight' => 0,
-        ),
-      ),
-      'entity_type' => 'node',
-      'field_name' => 'field_message_display_name',
-      'label' => 'Message owner diplay',
-      'required' => 0,
-      'settings' => array(
-        'user_register_form' => FALSE,
-      ),
-      'widget' => array(
-        'active' => 1,
-        'module' => 'options',
-        'settings' => array(),
-        'type' => 'options_select',
-        'weight' => '35',
-      ),
-    ),
-  );
-
-  // Exported field: 'node-vsite-field_private_messages'
+  // Exported field: 'node-vsite-field_private_messages'.
   $fields['node-vsite-field_private_messages'] = array(
     'field_config' => array(
       'active' => '1',
@@ -840,6 +783,7 @@ function os_activity_field_default_fields() {
           0 => 'value',
         ),
       ),
+      'locked' => '0',
       'module' => 'list',
       'settings' => array(
         'allowed_values' => array(
@@ -894,7 +838,7 @@ function os_activity_field_default_fields() {
     ),
   );
 
-  // Exported field: 'og_membership-og_membership_type_default-field_message'
+  // Exported field: 'og_membership-og_membership_type_default-field_message'.
   $fields['og_membership-og_membership_type_default-field_message'] = array(
     'field_config' => array(
       'active' => '1',
@@ -915,6 +859,7 @@ function os_activity_field_default_fields() {
           0 => 'target_id',
         ),
       ),
+      'locked' => '0',
       'module' => 'entityreference',
       'settings' => array(
         'handler' => 'base',
@@ -989,7 +934,6 @@ function os_activity_field_default_fields() {
   t('Control if the messages generated by OS Activity are private to this group.');
   t('Group reference');
   t('Last message');
-  t('Message owner diplay');
   t('Node reference');
   t('Private message');
   t('Private messages');

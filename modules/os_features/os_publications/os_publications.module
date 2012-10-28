@@ -195,6 +195,7 @@ function os_publications_form_biblio_node_form_alter(&$form, $form_state) {
   }
   unset($form['biblio_tabs']['biblio_authors']);
 
+  $form['body'][LANGUAGE_NONE][0]['summary']['#access'] = false;
   $form['biblio_tabs']['biblio_full_text']['body'] = $form['body'];
   unset($form['body']);
 
