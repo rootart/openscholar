@@ -10,3 +10,64 @@ function os_migrate_demo_migrate_api() {
   );
   return $api;
 }
+
+/**
+ * Attach and remove blocks from regions on OS.
+ */
+function os_migrate_demo_set_box_in_region($box, $page, $region = 'sidebar_second') {
+  ctools_include('layout', 'os');
+  // Mapping for all the pages.
+  $page_mapping = array(
+    'News' => 'news_news',
+    'Blog' => 'blog_blog',
+    'Bio' => 'biocv_biocv',
+    'Link' => 'links_links',
+    'Reader' => 'reader_reader',
+    'Calendar' => 'events_events',
+    'Classes' => 'classes_classes',
+    'People' => 'profiles_profiles',
+    'Data' => 'dataverse_dataverse',
+    'Galleries' => 'gallery_gallery',
+    'Software' => 'software_software',
+    'Documents' => 'booklets_booklets',
+    'Publications' => 'publications_publications',
+    'Presentations' => 'presentations_presentations',
+  );
+
+  // Mapping widgets we want to tests.
+  $boxes_mapping = array(
+    'Filter by term' => 'os_taxonomy_fbt',
+  );
+
+  // Define the box.
+  $vocabulary = taxonomy_vocabulary_machine_name_load('authors_personal1');
+  $options = array(
+    'delta' => 'box-' . strtolower(str_replace(" ", "-", $box)),
+    'title' => $box,
+    'description' => $box,
+    'options' => array(
+      'vocabulary' => $vocabulary->vid,
+      'show_empty_terms' => TRUE,
+    ) + $boxes_mapping[$box]::options_defaults(),
+  );
+
+  // Create the box.
+  $box = boxes_box::factory($boxes_mapping[$box], $options);
+  $box->save();
+
+  $region = $region ? $region : FALSE;
+
+  $contexts = array(
+    $page_mapping[$page],
+    'os_public',
+  );
+
+  // Save the widget in the region.
+  $blocks = os_layout_get_multiple($contexts, FALSE, TRUE);
+  $blocks['boxes-' . $box->delta]['region'] = $region;
+
+  $vsite = spaces_load('og', 1);
+  $vsite->controllers->context->set($contexts[0] . ":reaction:block", array(
+    'blocks' => $blocks,
+  ));
+}

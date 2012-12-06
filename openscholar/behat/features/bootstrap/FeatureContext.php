@@ -216,4 +216,11 @@ class FeatureContext extends DrupalContext {
     );
   }
 
+  /**
+   * @Given /^the widget "([^"]*)" is set in the "([^"]*)" page$/
+   */
+  public function theWidgetIsSetInThePage($page, $widget) {
+    $code = "os_migrate_demo('$page', '$widget'); ";
+    $results = $this->getDriver()->drush("php-eval \"os_migrate_demo_set_box_in_region('$page', '$widget');\"");
+  }
 }
