@@ -70,4 +70,24 @@ function os_migrate_demo_set_box_in_region($box, $page, $region = 'sidebar_secon
   $vsite->controllers->context->set($contexts[0] . ":reaction:block", array(
     'blocks' => $blocks,
   ));
+
+  print_r($options['delta'] . ',' . $page_mapping[$page]);
+}
+
+/**
+ * Hiding a box.
+ */
+function os_migrate_demo_hide_box($delta, $page) {
+  ctools_include('layout', 'os');
+  $contexts = array(
+    $page,
+    'os_public',
+  );
+  $blocks = os_layout_get_multiple($contexts, FALSE, TRUE);
+  $blocks['boxes-' . $delta]['region'] = FALSE;
+
+  $vsite = spaces_load('og', 1);
+  $vsite->controllers->context->set($page . ":reaction:block", array(
+    'blocks' => $blocks,
+  ));
 }

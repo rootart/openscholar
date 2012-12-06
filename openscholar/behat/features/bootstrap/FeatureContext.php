@@ -13,6 +13,9 @@ class FeatureContext extends DrupalContext {
   // Variable to pass into the last xPath expression.
   private $xpath = '';
 
+  // The box delta we need to hide.
+  private $box = '';
+
   /**
    * Initializes context.
    *
@@ -221,6 +224,18 @@ class FeatureContext extends DrupalContext {
    */
   public function theWidgetIsSetInThePage($page, $widget) {
     $code = "os_migrate_demo('$page', '$widget'); ";
-    $results = $this->getDriver()->drush("php-eval \"os_migrate_demo_set_box_in_region('$page', '$widget');\"");
+    $this->box = $this->getDriver()->drush("php-eval \"os_migrate_demo_set_box_in_region('$page', '$widget');\"");
+  }
+
+  /**
+   * Run after every scenario.
+   *
+   * @AfterScenario
+   */
+  public function afterScenario($event) {
+    if (!empty($this->box)) {
+      $contexts = explode(',', $this->box);
+      $this->getDriver()->drush("php-eval \"os_migrate_demo_hide_box('{$contexts[0]}', '{$contexts[1]}');\"");
+    }
   }
 }
