@@ -21,6 +21,16 @@ class FeatureContext extends DrupalContext {
   private $box = '';
 
   /**
+   * Hold the user name and password for the selenium tests for log in.
+   */
+  private $drupal_users;
+
+  /**
+   * Hold the NID of the vsite.
+   */
+  private $nid;
+
+  /**
    * Initializes context.
    *
    * Every scenario gets its own context object.
@@ -31,6 +41,10 @@ class FeatureContext extends DrupalContext {
   public function __construct(array $parameters) {
     if (isset($parameters['drupal_users'])) {
       $this->drupal_users = $parameters['drupal_users'];
+    }
+
+    if (isset($parameters['vsite'])) {
+      $this->nid = $parameters['vsite'];
     }
   }
 
@@ -227,7 +241,7 @@ class FeatureContext extends DrupalContext {
    * @Given /^the widget "([^"]*)" is set in the "([^"]*)" page$/
    */
   public function theWidgetIsSetInThePage($page, $widget) {
-    $code = "os_migrate_demo_set_box_in_region('$page', '$widget'); ";
+    $code = "os_migrate_demo_set_box_in_region({$this->nid}, '$page', '$widget');";
     $this->box[] = $this->getDriver()->drush("php-eval \"{$code}\"");
   }
 
@@ -241,9 +255,31 @@ class FeatureContext extends DrupalContext {
       return;
     }
 
-    foreach ($this->box as $box) {
-      $contexts = explode(',', $box);
-      $this->getDriver()->drush("php-eval \"os_migrate_demo_hide_box('{$contexts[0]}', '{$contexts[1]}');\"");
+    // Loop over the box we collected in the scenario, hide them and delete
+    // them.
+    foreach ($this->box as $box_handler) {
+      $data = explode(',', $box_handler);
+      $code = "os_migrate_demo_hide_box({$this->nid}, '{$data[0]}', '{$data[1]}', '{$data[2]}');";
+      $this->getDriver()->drush("php-eval \"{$code}\"");
+    }
+  }
+
+  /**
+   * @Given /^I should see the following <links>$/
+   */
+  public function iShouldNotSeeTheFollowingLinks(TableNode $table) {
+    $page = $this->getSession()->getPage();
+    $hash = $table->getRows();
+
+    foreach ($hash as $i => $table_row) {
+      if (empty($table_row)) {
+        continue;
+      }
+      $element = $page->find('xpath', "//a[.='{$table_row[0]}']");
+
+      if (empty($element)) {
+        throw new Exception(printf("The link %s wasn't found on the page", $table_row[0]));
+      }
     }
   }
 }

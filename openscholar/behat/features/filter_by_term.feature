@@ -7,4 +7,7 @@ Feature:
      When I clear the cache
       And I visit "john/publications"
      Then I should see "Filter by term"
-      And I should see "Antoine de Saint-Exupéry"
+      And I should see the following <links>
+          | Antoine de Saint-Exupéry |
+          | Douglas Noël Adams       |
+          | Antoine de Saint-Exupéry |

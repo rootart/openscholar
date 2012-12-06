@@ -4,6 +4,8 @@ default:
       drupal_users:
         admin:
           'admin'
+      vsite:
+        1
 
   extensions:
     Behat\MinkExtension\Extension:
