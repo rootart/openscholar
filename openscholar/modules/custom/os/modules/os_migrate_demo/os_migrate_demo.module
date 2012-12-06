@@ -12,7 +12,24 @@ function os_migrate_demo_migrate_api() {
 }
 
 /**
- * Attach and remove blocks from regions on OS.
+ * Return the NID for john vsite.
+ */
+function os_migrate_demo_get_vsite_nid() {
+  $query = new EntityFieldQuery();
+
+  $result = $query
+    ->entityCondition('entity_type', 'node')
+    ->propertyCondition('title', 'John')
+    ->propertyCondition('type', 'personal')
+    ->execute();
+
+  if (!empty($result['node'])) {
+    return reset(array_keys($result['node']));
+  }
+}
+
+/**
+ * Attach a block to region on OS.
  */
 function os_migrate_demo_set_box_in_region($box, $page, $region = 'sidebar_second') {
   ctools_include('layout', 'os');
@@ -66,7 +83,7 @@ function os_migrate_demo_set_box_in_region($box, $page, $region = 'sidebar_secon
   $blocks = os_layout_get_multiple($contexts, FALSE, TRUE);
   $blocks['boxes-' . $box->delta]['region'] = $region;
 
-  $vsite = spaces_load('og', 1);
+  $vsite = spaces_load('og', os_migrate_demo_get_vsite_nid());
   $vsite->controllers->context->set($contexts[0] . ":reaction:block", array(
     'blocks' => $blocks,
   ));
@@ -86,7 +103,7 @@ function os_migrate_demo_hide_box($delta, $page) {
   $blocks = os_layout_get_multiple($contexts, FALSE, TRUE);
   $blocks['boxes-' . $delta]['region'] = FALSE;
 
-  $vsite = spaces_load('og', 1);
+  $vsite = spaces_load('og', os_migrate_demo_get_vsite_nid());
   $vsite->controllers->context->set($page . ":reaction:block", array(
     'blocks' => $blocks,
   ));
